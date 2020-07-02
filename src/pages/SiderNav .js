@@ -7,64 +7,74 @@ import SubMenu from 'antd/lib/menu/SubMenu';
 
 
 
-const SiderNav = ({ departments }) => {
+const SiderNav = ({ departments, getItemKey }) => {
 
-    const onClikMenuItem = menuItem => {
-        console.log(menuItem)
+    function onClikMenuItem  (itemKey){
+        console.log(itemKey)
+        getItemKey(itemKey)
     }
 
+    
+    console.log(departments[0].members)
+    
+    
 
     return (
         <div>
             <div className="logo" >掌声OKR</div>
-            <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} onClick={onClikMenuItem}>
+            <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']} onClick={onClikMenuItem } >
 
                 <Menu.Item key="sub1" icon={<HomeOutlined />}> 公司OKR</Menu.Item>
 
                 <SubMenu key="sub2" title={<span><GoldOutlined /><span>部门OKR</span></span>}>
                     {departments.map(item => {
-                        return <Menu.Item key={item.key} key={item.title}>{item.title}</Menu.Item>
+                        return <Menu.Item key={item.key} title={item.title}>{item.title}</Menu.Item>
                     })}
 
                 </SubMenu>
 
                 <SubMenu key="sub3" title={<span><UserOutlined /><span>个人OKR</span></span>}>
                     <Menu.ItemGroup key="g1" title={<span><GoldOutlined /><span>总经办</span></span>}>
-                        <Menu.Item key="9" >陈家慧</Menu.Item>
-                        <Menu.Item key="10">Jack</Menu.Item>
+                    {departments[0].members.map(item => {
+                        return <Menu.Item key={item.key} >{item.name}</Menu.Item>
+                    })}
+                        
                     </Menu.ItemGroup>
 
                     <Menu.ItemGroup key="g1" title={<span><GoldOutlined /><span>人力行政部</span></span>}>
-                        <Menu.Item key="11" >范晓静</Menu.Item>
-                        <Menu.Item key="12">林家静</Menu.Item>
+                    {departments[1].members.map(item => {
+                        return <Menu.Item key={item.key} >{item.name}</Menu.Item>
+                    })}
                     </Menu.ItemGroup>
 
                     <Menu.ItemGroup key="g1" title={<span><GoldOutlined /><span>企业部</span></span>}>
-                        <Menu.Item key="13" >李婷婷</Menu.Item>
+                    {departments[2].members.map(item => {
+                        return <Menu.Item key={item.key} >{item.name}</Menu.Item>
+                    })}
                     </Menu.ItemGroup>
 
-                    <Menu.ItemGroup key="g2" title={<span><GoldOutlined /><span>品部</span></span>}>
-                        <Menu.Item key="14" >蒋丽婵</Menu.Item>
-                        <Menu.Item key="15" >Zhoujie</Menu.Item>
+                    <Menu.ItemGroup key="g2" title={<span><GoldOutlined /><span>产品部</span></span>}>
+                    {departments[3].members.map(item => {
+                        return <Menu.Item key={item.key} >{item.name}</Menu.Item>
+                    })}
                     </Menu.ItemGroup>
 
                     <Menu.ItemGroup key="g3" title={<span><GoldOutlined /><span>研发部</span></span>}>
-                        <Menu.Item key="16" >金嵘</Menu.Item>
-                        <Menu.Item key="17" >李小龙</Menu.Item>
-                        <Menu.Item key="18" >袁闯</Menu.Item>
-                        <Menu.Item key="19" >苏夏萍</Menu.Item>
-                        <Menu.Item key="20" >Diana Chen</Menu.Item>
+                    {departments[4].members.map(item => {
+                        return <Menu.Item key={item.key} >{item.name}</Menu.Item>
+                    })}
                     </Menu.ItemGroup>
 
                     <Menu.ItemGroup key="g3" title={<span><GoldOutlined /><span>财务部</span></span>}>
-                        <Menu.Item key="21" >曹学锋</Menu.Item>
-                        <Menu.Item key="22" >凌晓丽</Menu.Item>
-                        <Menu.Item key="23" >乐yao yao</Menu.Item>
+                    {departments[5].members.map(item => {
+                        return <Menu.Item key={item.key} >{item.name}</Menu.Item>
+                    })}
                     </Menu.ItemGroup>
 
                     <Menu.ItemGroup key="g4" title={<span><GoldOutlined /><span>市场部</span></span>}>
-                        <Menu.Item key="24" >Jack</Menu.Item>
-                        <Menu.Item key="25" >Ida</Menu.Item>
+                    {departments[6].members.map(item => {
+                        return <Menu.Item key={item.key} >{item.name}</Menu.Item>
+                    })}
                     </Menu.ItemGroup>
                 </SubMenu>
             </Menu>

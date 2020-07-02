@@ -17,7 +17,7 @@ const menu = (
 
 const ContentContainer = ({ expandAllRow, tableData }) => {
 
-    console.log(tableData)
+    
 
     const columns = [
         { title: '目标', dataIndex: 'objectives', key: 'objectives' },
