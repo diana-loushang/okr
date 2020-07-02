@@ -35,3 +35,10 @@ code {
 .site-layout .site-layout-background {
   background: #fff;
 }
+
+
+/* //tags  */
+
+span .ant-tag {
+  margin-right: 0px
+}

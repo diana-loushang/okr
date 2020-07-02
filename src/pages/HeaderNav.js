@@ -10,6 +10,7 @@ const { Header } = Layout;
 const HeaderNav = ({ collapsed, toggle }) => {
 
     return (
+   
         <Header className="site-layout-background" style={{ padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
             <div style={{ padding: 0, display: 'flex',alignItems: 'center'}}>
                 {React.createElement(collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
@@ -27,6 +28,7 @@ const HeaderNav = ({ collapsed, toggle }) => {
                 <MoreOutlined />
             </div>
         </Header>
+      
     )
 
 }
