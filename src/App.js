@@ -11,7 +11,7 @@ const { Sider, Content } = Layout;
 const { TabPane } = Tabs
 
 const initialPanes = [
-  { title: '首页', content: '', key: '首页', closable: false },
+  { title: '全部目标', content: '', key: '全部目标', closable: false },
 
 ];
 
@@ -102,10 +102,14 @@ export default class App extends Component {
     })
   };
 
+
+  //create tab 
   getItemKey = (targetKey) => {
     let newPane = targetKey.key;
     console.log(newPane)
+ 
     const { panes } = this.state;
+    console.log(panes)
     const newPanes = [...panes]
     newPanes.push({ title: `${newPane} `, key: `${newPane} `, content: '' })
     this.setState({
@@ -136,18 +140,7 @@ export default class App extends Component {
       panes:newPanes
     })
     console.log("pannes",this.state.panes)  
-    // if (newPanes.length && newActiveKey === targetKey){
-    //   if (lastIndex >= 0){
-    //     newActiveKey = newPanes[lastIndex].key;
-    //   }else
-    //   {
-    //     newActiveKey = newPanes[0].key;
-    //   }
-    // }
-    // this.setState({
-    //   panes:newPanes,
-    //   activeKey:newActiveKey,
-    // })
+
     if (newPanes.length && newActiveKey === targetKey) {
       if (lastIndex >= 0) {
         newActiveKey = newPanes[lastIndex].key;
