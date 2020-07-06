@@ -25,11 +25,52 @@ const tailLayout = {
 export default class ContentContainer extends Component {
     formRef = React.createRef();
     state = {
-        columns: [
-            { title: '目标', dataIndex: 'objectives', key: 'objectives' },
-            { title: '执行人', dataIndex: 'excutor', key: 'excutor' },
-            { title: '类型', dataIndex: 'category', key: 'category' },
+        // columns: [
+        //     { title: '目标', dataIndex: 'objectives', key: 'objectives' },
+        //     { title: '执行人', dataIndex: 'excutor', key: 'excutor' },
+        //     { title: '类型', dataIndex: 'category', key: 'category' },
+        //     { title: '操作', key: 'operation', render: () => <span><Button>修改</Button><Button>查看</Button></span> },
+        // ],
+        columns:[
+            { title: '目标', dataIndex: 'content', key: 'content' },
+            { title: '执行人', dataIndex: 'ascriptionName', key: 'ascriptionName' },
+            { title: '类型', dataIndex: 'level', key: 'level' },
             { title: '操作', key: 'operation', render: () => <span><Button>修改</Button><Button>查看</Button></span> },
+        ],
+        hData:[
+            {
+                id: 9,
+                content: "公司目标1",
+                okrId: 7,
+                level: "company",
+                parentId: 0,
+                ascription: "",
+                ascriptionName: "",
+                children: [
+                    {
+                        id: 10,
+                        content: "研发部目标1",
+                        okrId: 7,
+                        level: "department",
+                        parentId: 9,
+                        ascription: "121731713",
+                        ascriptionName: "研发部",
+                        children: [
+                            {
+                                id: 11,
+                                content: "个人目标1",
+                                okrId: 7,
+                                level: "person",
+                                parentId: 10,
+                                ascription: "041648044126186040",
+                                ascriptionName: "李小龙",
+                                childs: null
+                            }
+                        ]
+                    }
+                ]
+            }
+           
         ],
         data: [
             {
@@ -124,13 +165,20 @@ export default class ContentContainer extends Component {
             },
 
         ],
+       
         visible: false,
         value: 1,
 
         modalVisible: false,
         confirmLoading: false,
 
-        expand:false,
+        expand: false,
+        getNewPeriod: this.props.getNewPeriod,
+    }
+
+    componentDidMount(){
+    //  this.setState({hData:this.props.homeData})
+     console.log(this.state.hData)
     }
 
     handleChange(value) {
@@ -203,7 +251,7 @@ export default class ContentContainer extends Component {
             });
         }, 600);
         message.success('添加周期成功', 1);
-  
+
     };
 
     handleCancel = () => {
@@ -211,26 +259,31 @@ export default class ContentContainer extends Component {
         this.setState({
             modalVisible: false,
         });
-     
+
     };
+    // handldeAddPeriod = (time) => {
+    //     const newPeriod = time.target.value;
+    //     getNewPeriod= this.getNewPeriod
+    // }
 
 
     //展开折叠按钮
-    handleExpand=()=>{
+    handleExpand = () => {
         this.setState({
-            expand:true
+            expand: true
         })
     }
-    closeExpand=()=>{
+    closeExpand = () => {
         this.setState({
-            expand:false
+            expand: false
         })
     }
 
     render() {
-        const { tableData } = this.props;
-        const { columns, data, expand } = this.state;
-
+        const { tableData, listSelect, getNewPeriod, homeData } = this.props;
+        const { columns, data, expand, hData} = this.state;
+      
+        
 
         return (
             <div>
@@ -238,12 +291,12 @@ export default class ContentContainer extends Component {
                     <div className="time-range" style={{ display: 'flex', alignItems: 'center', marginBottom: "1rem" }}>
                         <span style={{ width: '5rem' }}>OKR周期</span>
                         <Select placeholder="2020年第二季度（456月）" onChange={this.handleChange} style={{ width: '100%' }}>
-                            <Option value="年度">年度</Option>
-                            <Option value="月度">月度</Option>
-                            <Option value="2020年第一季度">2020年第一季度</Option>
-                            <Option value="2020年第二季度（456月）">2020年第二季度（456月）</Option>
+                            {listSelect.map(item => {
+                                return <Option value={item.title}>{item.title}</Option>
+                            })}
+
                         </Select>
-                        
+
                     </div>
 
                     <div style={{ display: 'flex' }}>
@@ -264,6 +317,7 @@ export default class ContentContainer extends Component {
                             onClose={this.onClose}
                             visible={this.state.visible}
                             bodyStyle={{ paddingBottom: 80 }}
+                            onChange={this.handldeAddPeriod}
 
                         >
 
@@ -378,7 +432,7 @@ export default class ContentContainer extends Component {
                                     rules={[{ required: true, message: 'OKR周期' }]}
                                 >
 
-                                    <Input style={{ width: '100%' }} onChange={this.handleFormChange} />
+                                    <Input style={{ width: '100%' }} onChange={(e) => { getNewPeriod(e.target.value) }} />
 
                                 </Form.Item>
 
@@ -394,14 +448,16 @@ export default class ContentContainer extends Component {
                         tableData && tableData.length ?
                             <Table className="components-table-demo-nested"
                                 columns={columns}
-                                dataSource={data}
+                                dataSource={hData}
                                 expandable
-                          
+
                                 defaultExpandAllRows={this.state.expand}
 
                             /> : '暂无数据'
                     }
                 </Content >
+                
+
 
             </div >
         )
