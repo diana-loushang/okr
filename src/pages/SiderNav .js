@@ -9,6 +9,7 @@ import { getInputClassName } from 'antd/lib/input/Input';
 
 
 const SiderNav = ({ menu, getItemKey}) => {
+    console.log(menu)
 
     function onClikMenuItem  (itemKey){
         const id =itemKey.item.props.dataId;
