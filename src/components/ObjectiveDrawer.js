@@ -1,65 +1,9 @@
-import React, { Component, useState, useEffect, useRef } from 'react';
-import { Form, Input, Select, Button, Radio, Drawer } from 'antd';
-import { FormInstance } from 'antd/lib/form';
-import Axios from 'axios';
+import React, {  useEffect, useRef } from 'react';
+import { Form, Input, Select, Radio } from 'antd';
 import Modal from 'antd/lib/modal/Modal';
 const { Option, OptGroup } = Select;
 
-const Person = [
-    {
-        groupName: "总经办",
-        list: [
-            {
-                ascriptionId: "115068393337724345",
-                name: "陈家慧"
-            },
-            {
-                ascriptionId: "061635460424260674",
-                name: "Jack 徐子昂"
-            }
-        ]
-    },
-    {
-        groupName: "人力行政部",
-        list: [
-            {
-                ascriptionId: "193701406033081769",
-                name: "范晓静"
-            },
-            {
-                ascriptionId: "255725582326206279",
-                name: "林嘉静"
-            }
-        ]
-    },
-];
-const Department = [
-    {
-        groupName: "部门",
-        list: [
-            {
-                ascriptionId: 87606831,
-                name: "总经办"
-            },
-            {
-                ascriptionId: 121542597,
-                name: "人力行政部"
-            },
-            {
-                ascriptionId: 121633617,
-                name: "企划部"
-            },]
 
-    }];
-
-const makeGroup = ({ groupName, list }, i) => (
-    <OptGroup key={i} label={groupName}>
-        {list.map(makePerson)}
-    </OptGroup>
-);
-const makePerson = ({ ascriptionId, name }) => (
-    <Option key={ascriptionId}>{name}</Option>
-);
 
 // reset form fields when modal is form, closed
 const useResetFormOnCloseModal = ({ form, visible }) => {
@@ -79,9 +23,6 @@ const useResetFormOnCloseModal = ({ form, visible }) => {
 const ObjectiveDrawer = ({ closeDrawer, visible, listSelect }) => {
     const [form] = Form.useForm();
 
-    useEffect(() => {
-        console.log('useEffe tetting')
-    })
 
     useResetFormOnCloseModal({
         form,
@@ -158,9 +99,9 @@ const ObjectiveDrawer = ({ closeDrawer, visible, listSelect }) => {
                     rules={[{ required: true }, { message: "选择上级Objective" }]}
                 >
                     <Select label="选择上级Objective">
-                    
-                            <Option key="qfdfdfd">重要一</Option>
-                      
+
+                        <Option key="qfdfdfd">重要一</Option>
+
                     </Select>
                 </Form.Item>
 
@@ -200,6 +141,65 @@ const ObjectiveDrawer = ({ closeDrawer, visible, listSelect }) => {
 
 
 export default ObjectiveDrawer;
+// const Person = [
+//     {
+//         groupName: "总经办",
+//         list: [
+//             {
+//                 ascriptionId: "115068393337724345",
+//                 name: "陈家慧"
+//             },
+//             {
+//                 ascriptionId: "061635460424260674",
+//                 name: "Jack 徐子昂"
+//             }
+//         ]
+//     },
+//     {
+//         groupName: "人力行政部",
+//         list: [
+//             {
+//                 ascriptionId: "193701406033081769",
+//                 name: "范晓静"
+//             },
+//             {
+//                 ascriptionId: "255725582326206279",
+//                 name: "林嘉静"
+//             }
+//         ]
+//     },
+// ];
+// const Department = [
+//     {
+//         groupName: "部门",
+//         list: [
+//             {
+//                 ascriptionId: 87606831,
+//                 name: "总经办"
+//             },
+//             {
+//                 ascriptionId: 121542597,
+//                 name: "人力行政部"
+//             },
+//             {
+//                 ascriptionId: 121633617,
+//                 name: "企划部"
+//             },]
+
+//     }];
+
+// const makeGroup = ({ groupName, list }, i) => (
+//     <OptGroup key={i} label={groupName}>
+//         {list.map(makePerson)}
+//     </OptGroup>
+// );
+
+// const makePerson = ({ ascriptionId, name }) => (
+//     <Option key={ascriptionId}>{name}</Option>
+// );
+
+
+
 
 
 // export default class ObjectiveDrawer extends Component {
@@ -465,20 +465,6 @@ export default ObjectiveDrawer;
 
 
 
-{/* {level.map(group => {
-                            return (
-
-                                <OptGroup label={group.groupName}>
-
-                                    {group.list.map(d => {
-                                        return (
-                                            <Option value={d.name}>{d.name}</Option>
-                                        )
-                                    })}
-
-                                </OptGroup>)
-                        })
-                        } */}
 {/* </Select> */ }
 
 {/* </Form.Item>

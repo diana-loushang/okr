@@ -1,39 +1,21 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { BrowserRouter as Router } from "react-router-dom";
 import SiderNav from './pages/SiderNav ';
 import HeaderNav from './pages/HeaderNav';
 import ContentContainer from './pages/ContentContainer';
-import { Layout, Menu, Button, Tag, Tabs, Spin, Alert } from 'antd';
+import { Layout, Tabs, Spin } from 'antd';
 import 'antd/dist/antd.css';
-import CollapsePanel from 'antd/lib/collapse/CollapsePanel';
 import Axios from 'axios';
 
-const { Sider, Content } = Layout;
+const { Sider } = Layout;
 const { TabPane } = Tabs;
 
 const initialPanes = [
-  { title: '全部目标', content: '', key: '全部目标', closable: false }];
-// const getMenuList = () => {
-//   return axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
-// }
-// const getListSelect = () => {
-//   return axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
-// }
-// const getOkrList = () => {
-//   axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
-//     .then(response => {
-//       this.setState({
-//         listSelect: response.data.data,
-//         currentOkrId: response.data.data[0].id
-//       });
-//       console.log('currenOkr', this.state.currentOkrId)
-//     })
-//     .catch(error => {
-//       console.log(error)
-//     })
-// }
+  { title: '全部目标', content: '', key: '2111551', closable: false },
+  { title: 'test', content: '', key: 'dadf235353', },
+  { title: 'Pter', content: '', key: 'Peter', }
 
+];
 
 export default class App extends Component {
   state = {
@@ -48,8 +30,6 @@ export default class App extends Component {
     currentOkrId: null,
     currentLevel: null,
     currentPersonId:' ',
-
-
     collapsed: false,
     expandAllRow: true,
     tableData: [1, 2, 5.3], //testing
@@ -60,71 +40,10 @@ export default class App extends Component {
       { range: '2020年第二季度（456月）' },
       { range: '2020年第二季度（456月）' },
     ],
-    activeKey: initialPanes[0].key, //默认focus的Tabpane[]
+    activeKey: null, //默认focus的Tabpane[]
     panes: initialPanes,
-    // departments: [
-    //   {
-    //     title: '总经办',
-    //     key: '总经办',
-    //     members: [
-    //       { name: '陈家慧', key: '陈家慧' },
-    //       { name: 'Jack', key: 'Jack' },
-    //     ]
-    //   },
-    //   {
-    //     title: '人力行政部',
-    //     key: '人力行政部',
-    //     members: [
-    //       { name: '范晓静', key: '范晓静' },
-    //       { name: '林家静', key: '林家静' },
-    //     ]
-    //   },
-
-    //   {
-    //     title: '企业部',
-    //     key: '企业部',
-    //     members: [
-    //       { name: '李婷婷', key: '李婷婷' },
-    //     ]
-    //   },
-    //   {
-    //     title: '产品部',
-    //     key: '产品部',
-    //     members: [
-    //       { name: '蒋丽婵', key: '蒋丽婵' },
-    //       { name: 'Zhoujie', key: 'Zhoujie' },
-    //     ]
-    //   },
-    //   {
-    //     title: '研发部', key: '研发部',
-    //     members: [
-    //       { name: '金嵘', key: '金嵘' },
-    //       { name: '李小龙', key: '李小龙' },
-    //       { name: '苏夏萍', key: '苏夏萍' },
-    //       { name: 'Diana Chen', key: 'Diana Chen' },
-    //     ]
-    //   },
-    //   {
-    //     title: '财务部', key: '财务部',
-    //     members: [
-    //       { name: '曹学锋', key: '曹学锋' },
-    //       { name: '凌晓丽', key: '凌晓丽' },
-    //       { name: '苏夏萍', key: '苏夏萍' },
-    //       { name: '乐yao yao', key: '乐yao yao' },
-    //     ]
-    //   },
-    //   {
-    //     title: '市场部', key: '市场部',
-    //     members: [
-    //       { name: 'Jack', key: 'Jack' },
-    //       { name: 'Ida', key: 'Ida' },
-
-    //     ]
-    //   },
-
-    // ]
-
   }
+
   // 获取表格数据
   httpTableData = () => {
     axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/homeData?okrId=` + `${this.state.currenOkrId}`)
@@ -148,8 +67,12 @@ export default class App extends Component {
   }
 
   componentDidMount() {
+    console.log(this.state.activeKey, "cMD activeKey")
     this.retrieveInfo()
-
+    const k = initialPanes[0].key
+    this.setState({
+      activeKey:"Peter"
+    })
     console.log(this.state.currentOkrId)
   }
 
@@ -176,7 +99,7 @@ export default class App extends Component {
       [
         axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
           .then(response => {
-            console.log("first time get OKR Period data", response.data.data)
+          
             this.setState({
               listSelect: response.data.data,
               currentOkrId: response.data.data[0].id
@@ -323,48 +246,69 @@ export default class App extends Component {
 
   // Tab 
   onChange = (activeKey) => {
-    console.log("activeKey", activeKey)
     //onChange Tab focus change 
     this.setState({
       activeKey
     })
+
   };
 
+  onEdit = (targetKey, action) => {
+    this[action](targetKey);
+    console.log(targetKey, action )
+  };
   //create tab 
   getItemKey = (targetKey) => {
 
     //取得当天页的level 和 id 
-    console.log("currentTabInfo", targetKey)
-    const currentLevel = targetKey.item.props.dataLevel;
+    const activeKey = targetKey.item.props.eventKey;
+    const currentLevel = targetKey.item.props.eventKey;
     const currentPersonId = targetKey.item.props.dataId;
-    console.log(currentLevel, currentPersonId, this.state.currenOkrId)
     this.setState({
       currentLevel: currentLevel,
-      currentPersonId: currentPersonId
-
+      currentPersonId: currentPersonId,
+     
     })
+
     //Creating newTab, updating tab panes 
     let newPane = targetKey.key;
+    let key= targetKey.item.props.dataId;
+    console.log('newPane', newPane, targetKey.key)
     const { panes } = this.state;
     const newPanes = [...panes]
-    newPanes.push({ title: `${newPane} `, key: `${newPane} `, content: '' })
+    newPanes.push({ title: `${newPane} `, key: `${key} `, content: '' })
+    console.log('newPane', key, newPanes)
     const id = this.state.currentOkrId;
     console.log('testing', id)
     //绑定当前页的相关值去 state
     this.setState({
       panes: newPanes,
       currentLevel: currentLevel,
-      currentPersonId: currentPersonId
+      currentPersonId: currentPersonId,
+      activeKey:key,
     }, () => {
+      console.log('state activekey', this.state.activeKey)
+
       console.log(this.state.currentLevel, this.state.currentOkrId, this.state.currentPersonId)
-      this.updateTable()
     })
+     console.log('state activekey', this.state.activeKey)
   };
+
+
+  setActiveKey=(tab)=>{
+    console.log(tab)
+    this.setState({
+      activeKey:tab
+    })
+    
+    return tab
+  }
 
   //获取表格数据
   updateTable = (id) => {
     axios.get("")
     const okrId = id
+    console.log(id)
     const level = this.state.currentLevel
     const ascriptionId = this.state.currentPersonId;
     const http = `${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/listData?okrId=${okrId}&level=${level}&ascriptionId=${ascriptionId}`
@@ -373,7 +317,7 @@ export default class App extends Component {
       this.setState({
         isLoading:true
       })
-      if(res.data.msg="成功"){
+      if(res.data.msg === "成功"){
         this.setState({
           homeData:res.data.data,
         })
@@ -427,9 +371,7 @@ export default class App extends Component {
   };
 
 
-  onEdit = (targetKey, action) => {
-    this[action](targetKey);
-  };
+
 
 
   toggle = () => {
@@ -442,8 +384,8 @@ export default class App extends Component {
 
   render() {
 
-    const { collapsed, tabs, activeKey, menu, listSelect, homeData, isLoading, currentOkrValue } = this.state;
-
+    const { collapsed,  activeKey, menu, listSelect, currentOkrValue } = this.state;
+    console.log(this.state.activeKey)
     return (
       <div>
         <Layout>
@@ -471,7 +413,7 @@ export default class App extends Component {
             <HeaderNav collapsed={collapsed} toggle={this.toggle} />
 
 
-            <Tabs size='small' type="editable-card" hideAdd onChange={this.onChange} onEdit={this.onEdit} activeKey={activeKey} tabBarGutter={0}>
+            <Tabs size='small' type="editable-card" hideAdd onChange={this.onChange} onEdit={this.onEdit}  activeKey={activeKey} tabBarGutter={0}>
               {this.state.panes.map(pane => (
                 <TabPane tab={pane.title} key={pane.key} closable={pane.closable} style={{ width: '12rem' }} >
                   {pane.content}
