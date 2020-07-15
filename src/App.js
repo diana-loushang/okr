@@ -10,31 +10,29 @@ import CollapsePanel from 'antd/lib/collapse/CollapsePanel';
 import Axios from 'axios';
 
 const { Sider, Content } = Layout;
-const { TabPane } = Tabs
+const { TabPane } = Tabs;
 
 const initialPanes = [
-  { title: '全部目标', content: '', key: '全部目标', closable: false },
-
-];
+  { title: '全部目标', content: '', key: '全部目标', closable: false }];
 // const getMenuList = () => {
 //   return axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
 // }
 // const getListSelect = () => {
 //   return axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
 // }
-const getOkrList = () => {
-  axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
-    .then(response => {
-      this.setState({
-        listSelect: response.data.data,
-        currentOkrId: response.data.data[0].id
-      });
-      console.log('currenOkr', this.state.currentOkrId)
-    })
-    .catch(error => {
-      console.log(error)
-    })
-}
+// const getOkrList = () => {
+//   axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
+//     .then(response => {
+//       this.setState({
+//         listSelect: response.data.data,
+//         currentOkrId: response.data.data[0].id
+//       });
+//       console.log('currenOkr', this.state.currentOkrId)
+//     })
+//     .catch(error => {
+//       console.log(error)
+//     })
+// }
 
 
 export default class App extends Component {
@@ -49,7 +47,7 @@ export default class App extends Component {
     //send info to backend to  dtm table content
     currentOkrId: null,
     currentLevel: null,
-    currentPersonId: null,
+    currentPersonId:' ',
 
 
     collapsed: false,
@@ -127,14 +125,36 @@ export default class App extends Component {
     // ]
 
   }
+  // 获取表格数据
+  httpTableData = () => {
+    axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/homeData?okrId=` + `${this.state.currenOkrId}`)
+      .then(response => {
+        console.log("httptable data ", this.state.currentOkrId, response.data.data)
+        this.setState({
+          homeData: response.data.data
+
+        })
+          ;
+        this.setState({
+          isLoading: false
+        })
+      }
+      )
+      .catch(error => {
+        console.log('home', error)
+
+      })
+
+  }
 
   componentDidMount() {
     this.retrieveInfo()
+
+    console.log(this.state.currentOkrId)
   }
 
   //连接后台读取GET数据
   retrieveInfo = () => {
-
     axios.all(
 
       // 对接左侧导航栏端口
@@ -152,26 +172,32 @@ export default class App extends Component {
           })
       ],
 
-
       // 对接OKR周期端口
       [
         axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
           .then(response => {
+            console.log("first time get OKR Period data", response.data.data)
             this.setState({
               listSelect: response.data.data,
               currentOkrId: response.data.data[0].id
             });
             console.log('currenOkr', this.state.currentOkrId)
+
           })
+          // .then(res=>{
+          //   this.httpTableData()
+          //   console.log('first rendder get OKR Id then call me ')
+          // })
           .catch(error => {
             console.log(error)
           })
       ]
       ,
       // 对接首页表格端口
-      [axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/homeData?okrId=7`)
+      [axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/homeData?okrId=` + `${this.state.currentOkrId}`)
         .then(response => {
           this.setState({
+            currentLevel:"company",
             homeData: response.data.data
 
           })
@@ -212,9 +238,6 @@ export default class App extends Component {
 
   };
 
-
-
-
   getNewPeriod = (period) => {
     console.log("getNewPeriod", period)
     axios.post((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/add`), {
@@ -243,13 +266,18 @@ export default class App extends Component {
       })
 
   }
+
+  //on Change on okr 周期 selected, setstate the current OKR Period value
   getOkrValue = (okrId) => {
     console.log('getOKR', okrId)
-    this.setState({
-      currenOkrId: okrId
-    })
-  }
 
+      this.setState({
+        currenOkrId: okrId
+      })
+
+      console.log("setstae Okr period change", this.state.currentOkrId)
+    this.updateTable(okrId)
+  }
 
   //Delete Period
   deletePeriod = (id) => {
@@ -285,17 +313,13 @@ export default class App extends Component {
     )
 
 
-  }
-
-
+  };
 
   //update 上级Object
-
   updateExcutorList = (level) => {
     console.log(level, "updataEcutor List")
 
-  }
-
+  };
 
   // Tab 
   onChange = (activeKey) => {
@@ -306,7 +330,6 @@ export default class App extends Component {
     })
   };
 
-
   //create tab 
   getItemKey = (targetKey) => {
 
@@ -316,8 +339,8 @@ export default class App extends Component {
     const currentPersonId = targetKey.item.props.dataId;
     console.log(currentLevel, currentPersonId, this.state.currenOkrId)
     this.setState({
-      currentLevel :currentLevel,
-      currentPersonId : currentPersonId
+      currentLevel: currentLevel,
+      currentPersonId: currentPersonId
 
     })
     //Creating newTab, updating tab panes 
@@ -333,32 +356,39 @@ export default class App extends Component {
       currentLevel: currentLevel,
       currentPersonId: currentPersonId
     }, () => {
-      console.log(this.state.currentLevel,this.state.currentOkrId,this.state.currentPersonId)
-
+      console.log(this.state.currentLevel, this.state.currentOkrId, this.state.currentPersonId)
       this.updateTable()
-
-
     })
-
-
   };
 
-  updateTable = () => {
-    console.log('update table')
+  //获取表格数据
+  updateTable = (id) => {
     axios.get("")
-    console.log(this.state.currentLevel,this.state.currentOkrId,this.state.currentPersonId)
-
-    const okrId = this.state.currentOkrId;
-    const level = this.state.level;
-    const ascriptionId = this.state.currentOkrId;
-
-    const http = `${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/getParentObjective?okrId=${okrId}&level=${level}&ascriptionId=${ascriptionId}`
-    axios.get(http).then(response => {
-      console.log(response)
-    })
-
-
-  }
+    const okrId = id
+    const level = this.state.currentLevel
+    const ascriptionId = this.state.currentPersonId;
+    const http = `${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/listData?okrId=${okrId}&level=${level}&ascriptionId=${ascriptionId}`
+    console.log(http)
+    axios.get(http).then(res => {
+      this.setState({
+        isLoading:true
+      })
+      if(res.data.msg="成功"){
+        this.setState({
+          homeData:res.data.data,
+        })
+      }
+      else(
+        console.log(res.data.msg)
+      )
+      this.setState({
+        isLoading:false
+      })
+      console.log('updateTable homeData', this.state.homeData)
+    }
+    
+    )
+  };
 
 
   remove = targetKey => {
@@ -402,7 +432,6 @@ export default class App extends Component {
   };
 
 
-
   toggle = () => {
     this.setState({
       collapsed: !this.state.collapsed,
@@ -417,7 +446,6 @@ export default class App extends Component {
 
     return (
       <div>
-
         <Layout>
           <div></div>
           <Sider trigger={null} collapsible collapsed={this.state.collapsed} >
@@ -470,12 +498,10 @@ export default class App extends Component {
                 padding: '30px 50px',
                 margin: '20px 0'
               }}>
-
                 <Spin size="large" tip="Loading..." />
               </div>}
           </Layout>
         </Layout >
-
       </div>
     );
   }

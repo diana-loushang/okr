@@ -4,11 +4,13 @@ import { Layout, Table, Button, Input, Radio, Drawer, Select, Form, Modal, messa
 import 'antd/dist/antd.css';
 import { PlusOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import ObjectiveDrawer from '../components/ObjectiveDrawer'
+import ObjectiveDrawer from '../components/ObjectiveDrawer';
+import HomeTable from '../components/HomeTable'
 const { Content, } = Layout;
-
-
 const { Option, OptGroup } = Select;
+
+
+
 const layout = {
     labelCol: {
         span: 8,
@@ -17,15 +19,6 @@ const layout = {
         span: 16,
     },
 };
-// const tailLayout = {
-//     wrapperCol: {
-//         offset: 8,
-//         span: 16,
-//     },
-// };
-
-
-
 
 export default class ContentContainer extends Component {
     formRef = React.createRef();
@@ -85,7 +78,7 @@ export default class ContentContainer extends Component {
 
 
         //codeSnad
-        
+
     }
 
 
@@ -127,7 +120,7 @@ export default class ContentContainer extends Component {
     onFinish = fieldsValue => {
 
         console.log(fieldsValue)
-    
+
         message.success('添加目标成功', 1);
     };
 
@@ -286,9 +279,9 @@ export default class ContentContainer extends Component {
         console.log(this.props)
         this.props.deletePeriod(periodId)
         this.setState({
-            showDeletePeriodModal:false
+            showDeletePeriodModal: false
         })
-    
+
     }
 
 
@@ -296,7 +289,7 @@ export default class ContentContainer extends Component {
     render() {
         const { tableData, homeData, listSelect } = this.props;
         const { columns, data, excutorValue, fetching, onObjectiveChange, onFinish } = this.state;
-
+        console.log(this.props.homeData)
         return (
             <div>
 
@@ -325,9 +318,9 @@ export default class ContentContainer extends Component {
                                         users: [...users, values]
                                     });
                                     this.setState({
-                                        visible:false
+                                        visible: false
                                     })
-                                    {/* setVisible(false); */}
+                                    {/* setVisible(false); */ }
                                 }
                             }}
                         >
@@ -571,13 +564,20 @@ export default class ContentContainer extends Component {
 
                     {
                         tableData && tableData.length ?
-
-                            <Table
+                            <React.Fragment>
+                                     <Table
+                                    columns={columns}
+                                    dataSource={this.props.homeData}
+                                    expandable={this.onExpand}
+                                    rowKey={record => record.id}
+                                />
+                                <HomeTable  
                                 columns={columns}
-                                dataSource={homeData}
-                                expandable={this.onExpand}
-                                rowKey={record => record.id}
-                            />
+                                dataSource={this.props.homeData}
+                                    expandable={this.onExpand}
+                                    rowKey={record => record.id} />
+                           
+                            </React.Fragment>
                             :
 
                             '暂无数据'
