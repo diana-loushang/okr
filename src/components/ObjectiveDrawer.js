@@ -35,10 +35,13 @@ const ObjectiveDrawer = ({ closeDrawer, visible, listSelect }) => {
 
     const onformValueChange = (changedValues, allValues) => {
         console.log("formValueChange", changedValues, allValues);
+        
     };
 
 
-
+    const handelLevelChange=(value)=>{
+        console.log(value.target.value)
+    }
 
 
     return (
@@ -74,7 +77,7 @@ const ObjectiveDrawer = ({ closeDrawer, visible, listSelect }) => {
                     label="层级"
                     rules={[{ required: true }, { message: "选择OKR周期" }]}
                 >
-                    <Radio.Group>
+                    <Radio.Group onChange={handelLevelChange}>
                         <Radio value={"company"}>公司</Radio>
                         <Radio value={"department"}>部门</Radio>
                         <Radio value={"person"}>个人</Radio>

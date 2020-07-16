@@ -11,9 +11,10 @@ const { Sider } = Layout;
 const { TabPane } = Tabs;
 
 const initialPanes = [
+  // {title:"displayName", content:'', key:'id'}
   { title: '全部目标', content: '', key: '2111551', closable: false },
   { title: 'test', content: '', key: 'dadf235353', },
-  { title: 'Pter', content: '', key: 'Peter', }
+  { title: 'Peter', content: '', key: 'Peter23123', }
 
 ];
 
@@ -26,54 +27,37 @@ export default class App extends Component {
     objectivesData: null, //列表数据
     listData: null,  //上级可选Objective列表数据
 
-    //send info to backend to  dtm table content
+    //当前页读取的值
     currentOkrId: null,
+    currentOkrValue:null,
     currentLevel: null,
-    currentPersonId:' ',
+    currentPersonId: ' ',
+    activeKey: null, //默认focus的Tabpane[]
+    activeMenu:null,
+
     collapsed: false,
     expandAllRow: true,
     tableData: [1, 2, 5.3], //testing
-    okrRange: [
-      { range: '年度' },
-      { range: '月度' },
-      { range: '2020年第一季度' },
-      { range: '2020年第二季度（456月）' },
-      { range: '2020年第二季度（456月）' },
-    ],
-    activeKey: null, //默认focus的Tabpane[]
+    // okrRange: [
+    //   { range: '年度' },
+    //   { range: '月度' },
+    //   { range: '2020年第一季度' },
+    //   { range: '2020年第二季度（456月）' },
+    //   { range: '2020年第二季度（456月）' },
+    // ],
+
     panes: initialPanes,
   }
 
-  // 获取表格数据
-  httpTableData = () => {
-    axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/homeData?okrId=` + `${this.state.currenOkrId}`)
-      .then(response => {
-        console.log("httptable data ", this.state.currentOkrId, response.data.data)
-        this.setState({
-          homeData: response.data.data
-
-        })
-          ;
-        this.setState({
-          isLoading: false
-        })
-      }
-      )
-      .catch(error => {
-        console.log('home', error)
-
-      })
-
-  }
 
   componentDidMount() {
-    console.log(this.state.activeKey, "cMD activeKey")
     this.retrieveInfo()
-    const k = initialPanes[0].key
     this.setState({
-      activeKey:"Peter"
+      activeKey: '2111551',
+      
     })
-    console.log(this.state.currentOkrId)
+    console.log('compdidmount', this.state.currentOkrId)
+    console.log(this.state.currentLevel)
   }
 
   //连接后台读取GET数据
@@ -86,8 +70,12 @@ export default class App extends Component {
           .then(response => {
             this.setState({
               menu: response.data.data,
-
-            });
+              currentLevel:response.data.data[0].title,
+             
+            },(()=>{
+              console.log(this.activeMenu)
+            }));
+            
 
           })
           .catch(error => {
@@ -99,18 +87,18 @@ export default class App extends Component {
       [
         axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
           .then(response => {
-          
+              console.log('comdidM before setstea', response.data.data[0].title)
             this.setState({
               listSelect: response.data.data,
-              currentOkrId: response.data.data[0].id
+              currentOkrId: response.data.data[0].id,
+              activeMenu: null,
+              currentOkrValue:response.data.data[0].title
+        
             });
-            console.log('currenOkr', this.state.currentOkrId)
+            console.log('comdid uptate after set', this.state.currentOkrId, this.state.currentOkrValue)
 
           })
-          // .then(res=>{
-          //   this.httpTableData()
-          //   console.log('first rendder get OKR Id then call me ')
-          // })
+
           .catch(error => {
             console.log(error)
           })
@@ -120,7 +108,7 @@ export default class App extends Component {
       [axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/homeData?okrId=` + `${this.state.currentOkrId}`)
         .then(response => {
           this.setState({
-            currentLevel:"company",
+            currentLevel: "company",
             homeData: response.data.data
 
           })
@@ -162,7 +150,6 @@ export default class App extends Component {
   };
 
   getNewPeriod = (period) => {
-    console.log("getNewPeriod", period)
     axios.post((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/add`), {
       title: period
     }).then(response => {
@@ -171,14 +158,12 @@ export default class App extends Component {
         // getOkrList()
         axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
           .then(res => {
-            console.log(res.data.data)
             this.setState
               ({
                 listSelect: res.data.data,
                 isLoading: false,
 
               })
-            console.log('res', res, "this.state.list", this.state.listSelect)
 
           })
 
@@ -192,14 +177,16 @@ export default class App extends Component {
 
   //on Change on okr 周期 selected, setstate the current OKR Period value
   getOkrValue = (okrId) => {
-    console.log('getOKR', okrId)
+    let currentOkrId = okrId
 
-      this.setState({
-        currenOkrId: okrId
-      })
 
-      console.log("setstae Okr period change", this.state.currentOkrId)
-    this.updateTable(okrId)
+    console.log('getokr before set', okrId)
+    this.setState({
+      currentOkrId: currentOkrId
+    },(()=>{
+      this.updateTable()
+    }))
+  
   }
 
   //Delete Period
@@ -240,7 +227,6 @@ export default class App extends Component {
 
   //update 上级Object
   updateExcutorList = (level) => {
-    console.log(level, "updataEcutor List")
 
   };
 
@@ -255,95 +241,109 @@ export default class App extends Component {
 
   onEdit = (targetKey, action) => {
     this[action](targetKey);
-    console.log(targetKey, action )
   };
+
+
   //create tab 
-  getItemKey = (targetKey) => {
-
-    //取得当天页的level 和 id 
-    const activeKey = targetKey.item.props.eventKey;
-    const currentLevel = targetKey.item.props.eventKey;
-    const currentPersonId = targetKey.item.props.dataId;
+  getItemKey = (itemId, itemLevel, itemName) => {
+    // 定义传来的值及绑定当前state
+    const ascriptionId = itemId;
+    const level = itemLevel;
     this.setState({
-      currentLevel: currentLevel,
-      currentPersonId: currentPersonId,
-     
-    })
+      currentPersonId: ascriptionId,
+      currentLevel: level,
+      activeKey: ascriptionId,
+    },(()=>{
+      const { panes } = this.state;
+      this.checkPane(panes, itemId, itemLevel, itemName)
+  
 
-    //Creating newTab, updating tab panes 
-    let newPane = targetKey.key;
-    let key= targetKey.item.props.dataId;
-    console.log('newPane', newPane, targetKey.key)
-    const { panes } = this.state;
-    const newPanes = [...panes]
-    newPanes.push({ title: `${newPane} `, key: `${key} `, content: '' })
-    console.log('newPane', key, newPanes)
-    const id = this.state.currentOkrId;
-    console.log('testing', id)
-    //绑定当前页的相关值去 state
-    this.setState({
-      panes: newPanes,
-      currentLevel: currentLevel,
-      currentPersonId: currentPersonId,
-      activeKey:key,
-    }, () => {
-      console.log('state activekey', this.state.activeKey)
-
-      console.log(this.state.currentLevel, this.state.currentOkrId, this.state.currentPersonId)
-    })
-     console.log('state activekey', this.state.activeKey)
+    }))
+   
+    //check if tab exist in panes list then dtm create newPane or not; 
   };
 
 
-  setActiveKey=(tab)=>{
-    console.log(tab)
-    this.setState({
-      activeKey:tab
+
+  checkPane = (panes, itemId, itemLevel, itemName) => {
+
+    let isExist = true
+    panes.find(pane => {
+
+      if (pane.title === itemName) {
+
+        isExist = false;
+      }
+
     })
-    
-    return tab
+
+    if (isExist) {
+      this.createNewPanes(panes, itemId, itemLevel, itemName)
+    }
   }
 
+  createNewPanes = (proppanes, itemId, itemLevel, itemName) => {
+    console.log("createPane 查看state值", this.state.currentOkrId, this.state.currentLevel)
+    const { panes } = this.state;
+    const ascriptionId = itemId;
+    const level = itemLevel;
+    const name = itemName;
+
+    let newpaneKey = ascriptionId;
+    const newPanes = [...panes];
+    newPanes.push({ title: `${name}`, key: `${newpaneKey}`, content: "" });
+    this.setState({
+      panes: newPanes,
+     
+      activeKey: newpaneKey,
+    }, function () {
+
+    })
+    console.log(this.state.currentOkrId)
+    //update the table according to the newTan 
+    this.updateTable(level, ascriptionId)
+  }
+
+
+
+
   //获取表格数据
-  updateTable = (id) => {
-    axios.get("")
-    const okrId = id
-    console.log(id)
+  updateTable = (updateLevel, updateId) => {
+    console.log( 'update table para', updateLevel, updateId,)
+    console.log("updateTab 查看state值", this.state.currentOkrId, this.state.currentLevel)
+
+    const okrId = this.state.currentOkrId
     const level = this.state.currentLevel
     const ascriptionId = this.state.currentPersonId;
-    const http = `${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/listData?okrId=${okrId}&level=${level}&ascriptionId=${ascriptionId}`
+    
+    const http = `${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/listData?okrId=` + `${okrId}` + '&ascriptionId=' + `${ascriptionId}` + `&level=` + `${level}`
     console.log(http)
     axios.get(http).then(res => {
       this.setState({
-        isLoading:true
+        isLoading: true
       })
-      if(res.data.msg === "成功"){
+      if (res.data.msg === "成功") {
+        console.log("跟新表格获取数据", res.data)
         this.setState({
-          homeData:res.data.data,
+          homeData: res.data.data,
         })
       }
-      else(
+      else (
         console.log(res.data.msg)
       )
       this.setState({
-        isLoading:false
+        isLoading: false
       })
-      console.log('updateTable homeData', this.state.homeData)
     }
-    
+
     )
   };
 
 
   remove = targetKey => {
     const { panes, activeKey } = this.state;
-
     let key = targetKey;
-    console.log("key", key)
-    console.log('panesB4 remove', this.state.panes)
-
     let newActiveKey = activeKey;
-    console.log(newActiveKey)
     //adjust focus tag after remove 
     let lastIndex;
     panes.forEach((pane, i) => {
@@ -355,7 +355,6 @@ export default class App extends Component {
     this.setState({
       panes: newPanes
     })
-    console.log("pannes", this.state.panes)
 
     if (newPanes.length && newActiveKey === targetKey) {
       if (lastIndex >= 0) {
@@ -367,6 +366,7 @@ export default class App extends Component {
     this.setState({
       panes: newPanes,
       activeKey: newActiveKey,
+   
     });
   };
 
@@ -383,14 +383,12 @@ export default class App extends Component {
 
 
   render() {
-
-    const { collapsed,  activeKey, menu, listSelect, currentOkrValue } = this.state;
-    console.log(this.state.activeKey)
+    const { collapsed, activeKey, menu, listSelect, currentOkrId, currentOkrValue, activeMenu} = this.state;
     return (
       <div>
         <Layout>
           <div></div>
-          <Sider trigger={null} collapsible collapsed={this.state.collapsed} >
+          <Sider trigger={null} collapsible collapsed={this.state.collapsed} activeMenu="公司OKR">
             {menu ?
               <SiderNav menu={menu} getItemKey={this.getItemKey} />
               :
@@ -408,12 +406,13 @@ export default class App extends Component {
 
 
           </Sider>
+
           <Layout className="site-layout">
 
             <HeaderNav collapsed={collapsed} toggle={this.toggle} />
 
 
-            <Tabs size='small' type="editable-card" hideAdd onChange={this.onChange} onEdit={this.onEdit}  activeKey={activeKey} tabBarGutter={0}>
+            <Tabs size='small' type="editable-card" hideAdd onChange={this.onChange} onEdit={this.onEdit} activeKey={activeKey} tabBarGutter={0}>
               {this.state.panes.map(pane => (
                 <TabPane tab={pane.title} key={pane.key} closable={pane.closable} style={{ width: '12rem' }} >
                   {pane.content}
@@ -426,7 +425,7 @@ export default class App extends Component {
                 homeData={this.state.homeData} listSelect={this.state.listSelect}
                 getNewPeriod={this.getNewPeriod}
                 currentOkrValue={currentOkrValue} getOkrValue={this.getOkrValue}
-                deletePeriod={this.deletePeriod}
+                deletePeriod={this.deletePeriod} currentOkrId={currentOkrId} currentOkrValue={currentOkrValue}
               >
                 updateExcutorList={this.updateExcutorList}
 

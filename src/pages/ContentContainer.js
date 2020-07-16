@@ -136,7 +136,7 @@ export default class ContentContainer extends Component {
     };
 
     fetchUser = value => {
-       
+
         this.setState({
             fetching: true,
         })
@@ -246,6 +246,7 @@ export default class ContentContainer extends Component {
     }
 
     handleOkrChange = (value, option) => {
+        console.log('handle Okr period change', value, option.key)
         const id = option.key
         this.props.getOkrValue(id)
 
@@ -280,17 +281,19 @@ export default class ContentContainer extends Component {
 
 
     render() {
-        const { tableData,  listSelect } = this.props;
+        const { tableData, listSelect, currentOkrId, currentOkrValue} = this.props;
+        console.log(this.props.currentOkrValue)
         const { columns, onFinish } = this.state;
-       
+
         return (
             <div>
 
 
                 <Content className="site-layout-background" style={{ margin: '24px 16px', padding: 24, minHeight: 280 }}>
+
                     <div className="time-range" style={{ display: 'flex', alignItems: 'center', marginBottom: "1rem" }}>
                         <span style={{ width: '5rem' }}>OKR周期</span>
-                        <Select initialvalues={this.props.listSelect[0].title} placeholder={this.props.listSelect[0].title} onChange={this.handleOkrChange} style={{ width: '100%' }}>
+                        <Select  defaultValue={currentOkrValue} onSelect={this.handleOkrChange} style={{ width: '100%' }}>
                             {this.props.listSelect.map(item => {
                                 return <Option key={item.id} value={item.title}>{item.title}</Option>
                             })}
@@ -298,6 +301,7 @@ export default class ContentContainer extends Component {
                         </Select>
 
                     </div>
+
 
                     <div style={{ display: 'flex' }}>
                         {/* <Button  onClick={this.handleExpand}>全部折叠</Button> <Button onClick={this.closeExpand}>全部展开</Button> */}
@@ -313,7 +317,7 @@ export default class ContentContainer extends Component {
                                     this.setState({
                                         visible: false
                                     })
-                                    {/* setVisible(false); */ }
+                               
                                 }
                             }}
                         >
@@ -331,14 +335,10 @@ export default class ContentContainer extends Component {
 
 
                         </Form.Provider>
+
                         <Button onClick={this.showModal}>
                             <PlusOutlined />添加周期
                             </Button>
-
-
-
-
-
 
                         <Button onClick={this.onShowDeletePeriodModal}>
                             <PlusOutlined />删除周期
@@ -358,15 +358,10 @@ export default class ContentContainer extends Component {
                                         label="选择OKR周期">
                                         <Select>
 
-
                                             {this.props.listSelect.map(item => {
                                                 return <Option key={item.title} value={item.id}>{item.title}</Option>
                                             })}
-
-
                                         </Select>
-
-
                                     </Form.Item>
                                     < div style={{ textAlign: 'right' }} >
                                         <Button onClick={this.onCloseDeletePeriodModal} style={{ marginRight: 8 }}>
