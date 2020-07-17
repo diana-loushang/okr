@@ -33,7 +33,6 @@ export default class App extends Component {
     currentLevel: null,
     currentPersonId: ' ',
     activeKey: null, //默认focus的Tabpane[]
-    activeMenu:null,
 
     collapsed: false,
     expandAllRow: true,
@@ -56,8 +55,7 @@ export default class App extends Component {
       activeKey: '2111551',
       
     })
-    console.log('compdidmount', this.state.currentOkrId)
-    console.log(this.state.currentLevel)
+
   }
 
   //连接后台读取GET数据
@@ -71,9 +69,8 @@ export default class App extends Component {
             this.setState({
               menu: response.data.data,
               currentLevel:response.data.data[0].title,
-             
+
             },(()=>{
-              console.log(this.activeMenu)
             }));
             
 
@@ -87,15 +84,14 @@ export default class App extends Component {
       [
         axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
           .then(response => {
-              console.log('comdidM before setstea', response.data.data[0].title)
             this.setState({
               listSelect: response.data.data,
               currentOkrId: response.data.data[0].id,
-              activeMenu: null,
+
               currentOkrValue:response.data.data[0].title
         
             });
-            console.log('comdid uptate after set', this.state.currentOkrId, this.state.currentOkrValue)
+
 
           })
 
@@ -110,7 +106,6 @@ export default class App extends Component {
           this.setState({
             currentLevel: "company",
             homeData: response.data.data
-
           })
             ;
           this.setState({
@@ -191,8 +186,6 @@ export default class App extends Component {
 
   //Delete Period
   deletePeriod = (id) => {
-    console.log('delete http', id)
-    console.log(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/` + `${id}`)
     axios.delete(
       (`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/` + `${id}`),
       {
@@ -204,12 +197,11 @@ export default class App extends Component {
         }
       }
     ).then(res => {
-      console.log(res)
       if (res.data.msg === "成功") {
-        console.log('get update OKR period')
+
         Axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
           .then(res => {
-            console.log(res.data)
+
             this.setState({
               listSelect: res.data.data
             })
@@ -283,7 +275,7 @@ export default class App extends Component {
   }
 
   createNewPanes = (proppanes, itemId, itemLevel, itemName) => {
-    console.log("createPane 查看state值", this.state.currentOkrId, this.state.currentLevel)
+
     const { panes } = this.state;
     const ascriptionId = itemId;
     const level = itemLevel;
@@ -309,8 +301,6 @@ export default class App extends Component {
 
   //获取表格数据
   updateTable = (updateLevel, updateId) => {
-    console.log( 'update table para', updateLevel, updateId,)
-    console.log("updateTab 查看state值", this.state.currentOkrId, this.state.currentLevel)
 
     const okrId = this.state.currentOkrId
     const level = this.state.currentLevel
@@ -366,8 +356,7 @@ export default class App extends Component {
     this.setState({
       panes: newPanes,
       activeKey: newActiveKey,
-   
-    });
+    },(()=>{}));
   };
 
 
@@ -383,12 +372,12 @@ export default class App extends Component {
 
 
   render() {
-    const { collapsed, activeKey, menu, listSelect, currentOkrId, currentOkrValue, activeMenu} = this.state;
+    const { collapsed, activeKey, menu, listSelect, currentOkrId, currentOkrValue} = this.state;
     return (
       <div>
         <Layout>
           <div></div>
-          <Sider trigger={null} collapsible collapsed={this.state.collapsed} activeMenu="公司OKR">
+          <Sider trigger={null} collapsible collapsed={this.state.collapsed} >
             {menu ?
               <SiderNav menu={menu} getItemKey={this.getItemKey} />
               :

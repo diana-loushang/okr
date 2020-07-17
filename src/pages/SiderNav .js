@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState} from 'react';
 import 'antd/dist/antd.css';
 import { Menu } from 'antd';
 import SubMenu from 'antd/lib/menu/SubMenu';
@@ -6,15 +6,11 @@ import SubMenu from 'antd/lib/menu/SubMenu';
 
 
 const SiderNav = ({ menu, getItemKey, activeMenu }) => {
-    console.log(activeMenu)
-
-    function onClikMenuItem({ item, key},) {
-  
+    
+    function onClikMenuItem({ item, key}, ) {
         const id= key //ascription id 
         const level = item.props.datalevel
         const name = item.props.dataname
-        
-        console.log("click sideNav of ", level, id, name)
         getItemKey(id, level, name)
     }
 
@@ -22,7 +18,7 @@ const SiderNav = ({ menu, getItemKey, activeMenu }) => {
         <div>
             <div></div>
             <div className="logo" >掌声OKR</div>
-            <Menu mode="inline" theme='dark' onSelect={onClikMenuItem}  defaultSelectedKeys="121542597">
+            <Menu mode="inline" theme='dark' onSelect={onClikMenuItem}  >
             
                <Menu.Item key=' ' datalevel={menu[0].level} dataname={menu[0].name}>{menu[0].name}</Menu.Item>
                 

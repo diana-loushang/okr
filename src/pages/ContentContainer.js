@@ -281,11 +281,10 @@ export default class ContentContainer extends Component {
 
 
     render() {
-        const { tableData, listSelect, currentOkrId, currentOkrValue} = this.props;
-        console.log(this.props.currentOkrValue)
+        const { tableData, listSelect, currentOkrValue} = this.props;
         const { columns, onFinish } = this.state;
 
-        return (
+        return ( 
             <div>
 
 
@@ -423,7 +422,8 @@ export default class ContentContainer extends Component {
                                 <Table
                                     columns={columns}
                                     dataSource={this.props.homeData}
-                                    expandable={this.onExpand}
+                                    expandable={true}
+                                    defaultExpandAllRows={true}
                                     rowKey={record => record.id}
                                     childrenColumnName="keyResults"
                                 />
@@ -432,7 +432,7 @@ export default class ContentContainer extends Component {
                                     columns={columns}
                                     dataSource={this.props.homeData}
                                     expandable={this.onExpand}
-                                    rowKey={record => record.id}
+                                    rowKey={record => record.id} 
                                 /> */}
                             </div>
                             :
