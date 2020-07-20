@@ -1,9 +1,12 @@
 import React, { Component } from 'react'
+import axios from 'axios';
 
-import { Layout, Table, Button, Input, Select, Form, Modal, message } from 'antd';
+import { Layout, Table, Button, Input, Select, Form, Modal, message, Popconfirm } from 'antd';
 import 'antd/dist/antd.css';
 import { PlusOutlined } from '@ant-design/icons';
 import ObjectiveDrawer from '../components/ObjectiveDrawer';
+import DetailModal from '../components/Modal/DetailModal'
+// import HomeTable from '../components/HomeTable'
 const { Content, } = Layout;
 const { Option } = Select;
 
@@ -41,7 +44,13 @@ export default class ContentContainer extends Component {
             {
                 title: '操作',
                 dataIndex: 'operation',
-                render: () => <span><Button>修改</Button><Button>查看</Button></span>
+                // render: () => <span><Button>修改</Button><Button>查看</Button></span>
+                render: (text, record) =>
+        
+                    <Button  onClick={()=>{ console.log('click check id of',record.id); this.onShowDetail(record.id)}}>
+                        <a>查看</a>
+                    </Button>
+
             },
         ],
         currentOkrId: null,
@@ -51,7 +60,10 @@ export default class ContentContainer extends Component {
         currentExcutorList: [],
         visible: false,
         value: 1,
-
+        
+        showDetailModal:false,
+        detailId:null,
+        detailData:null,
 
         modalVisible: false,
         confirmLoading: false,
@@ -78,6 +90,34 @@ export default class ContentContainer extends Component {
         //codeSnad
 
     }
+
+
+    //点击查看
+    onShowDetail=(id)=>{
+        console.log('hello onHSoeDetail', id)
+        this.setState({
+            detailId:id
+        }, (()=>{
+            axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/info/` + `${id}`)
+                .then(res => {
+                    if (res.data.msg === '成功') {
+                        console.log(res.data.data)
+                        this.setState({
+                            detailData:res.data.data
+                        },(()=>{
+                            this.setState({
+                                showDetailModal:true
+                            })
+                        }))
+                    }
+                    else {
+                        console.log('Failed', res.data.msg)
+                    }
+                })
+
+        }))
+    }
+
 
 
 
@@ -111,6 +151,8 @@ export default class ContentContainer extends Component {
     };
 
     closeDrawer = () => {
+        console.log('befroe reset')
+        console.log('after reset')
         this.setState({
             visible: false,
         });
@@ -126,8 +168,6 @@ export default class ContentContainer extends Component {
         console.log('Failed:', errorInfo);
     };
 
-
-
     //选择执行对象
     onChange = e => {
         console.log('radio checked', e);
@@ -140,17 +180,8 @@ export default class ContentContainer extends Component {
         this.setState({
             fetching: true,
         })
-        // axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/getAscription?level=` + `${level}`)
-        //     .then(res => {
-        //         console.log(res.data.data)
 
-        //         this.setState({
-        //             data: res.data.data
-        //         })
-        //         console.log(this.state.data)
-        //     })
     }
-
 
     onRadioChange = e => {
         const temp = this.state.tempData
@@ -178,12 +209,10 @@ export default class ContentContainer extends Component {
         this.fetchUser(level)
 
     }
+
     onSelectExcutor = (string, number, labeledValue, Option) => {
         console.log(string, number, labeledValue, Option)
     }
-
-
-
 
     //Model function
 
@@ -201,7 +230,6 @@ export default class ContentContainer extends Component {
 
         });
         message.success('添加目标成功', 1);
-        this.formRef.current.resetFields();
         this.props.getNewPeriod(newOkr)
     };
 
@@ -212,20 +240,23 @@ export default class ContentContainer extends Component {
         });
 
     };
+
     onObejectiveChange = (e) => {
 
         console.log("obejchange", e)
     }
+
     onResultChange = e => {
         console.log('draw result', e)
     }
+
     ondrawerOkrPeriodChange = e => {
     }
+
     testOnChange = (e) => {
         console.log(this.state.testValue)
         console.log('test', e)
     }
-
 
     //展开折叠按钮
     handleExpand = () => {
@@ -233,12 +264,13 @@ export default class ContentContainer extends Component {
             expand: true
         })
     }
+
+
     closeExpand = () => {
         this.setState({
             expand: false
         })
     }
-
 
     onExpand = (expanded, record) => {
         console.log(expanded)
@@ -263,6 +295,7 @@ export default class ContentContainer extends Component {
         });
 
     }
+
     onCloseDeletePeriodModal = e => {
         this.setState({
             showDeletePeriodModal: false,
@@ -280,11 +313,11 @@ export default class ContentContainer extends Component {
 
 
 
-    render() {
-        const { tableData, listSelect, currentOkrValue} = this.props;
-        const { columns, onFinish } = this.state;
 
-        return ( 
+    render() {
+        const { tableData, listSelect, currentOkrValue, getCreateNewObjective } = this.props;
+        const { columns, onFinish } = this.state;
+        return (
             <div>
 
 
@@ -292,7 +325,7 @@ export default class ContentContainer extends Component {
 
                     <div className="time-range" style={{ display: 'flex', alignItems: 'center', marginBottom: "1rem" }}>
                         <span style={{ width: '5rem' }}>OKR周期</span>
-                        <Select  defaultValue={currentOkrValue} onSelect={this.handleOkrChange} style={{ width: '100%' }}>
+                        <Select defaultValue={currentOkrValue} onSelect={this.handleOkrChange} style={{ width: '100%' }}>
                             {this.props.listSelect.map(item => {
                                 return <Option key={item.id} value={item.title}>{item.title}</Option>
                             })}
@@ -316,7 +349,7 @@ export default class ContentContainer extends Component {
                                     this.setState({
                                         visible: false
                                     })
-                               
+
                                 }
                             }}
                         >
@@ -330,7 +363,7 @@ export default class ContentContainer extends Component {
                                 </Form.Item>
                             </Form>
 
-                            <ObjectiveDrawer closeDrawer={this.closeDrawer} visible={this.state.visible} listSelect={listSelect} />
+                            <ObjectiveDrawer closeDrawer={this.closeDrawer} visible={this.state.visible} listSelect={listSelect} getCreateNewObjective={getCreateNewObjective} />
 
 
                         </Form.Provider>
@@ -411,9 +444,7 @@ export default class ContentContainer extends Component {
 
                     </div >
 
-
-
-
+                     {this.state.showDetailModal ? <DetailModal  visible={this.state.showDetailModal}  detailData={this.state.detailData} /> : null }                           
 
                     {
                         tableData && tableData.length > 0 ?
@@ -430,10 +461,11 @@ export default class ContentContainer extends Component {
 
                                 {/* <HomeTable
                                     columns={columns}
-                                    dataSource={this.props.homeData}
+                                    homeData={this.props.homeData}
                                     expandable={this.onExpand}
                                     rowKey={record => record.id} 
                                 /> */}
+
                             </div>
                             :
                             <div>  暂无数据</div>

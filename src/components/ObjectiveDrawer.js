@@ -1,64 +1,13 @@
 import React, { useEffect, useRef, Component } from 'react';
-import { Form, Input, Select, Radio } from 'antd';
+import { Form, Input, Select, Radio, message } from 'antd';
 import Modal from 'antd/lib/modal/Modal';
 import Axios from 'axios';
-import { LoadingOutlined } from '@ant-design/icons';
 const { Option, OptGroup } = Select;
 
 
+const makePerson = ({ ascriptionId, name, key }, i) => (
 
-// // reset form fields when modal is form, closed
-// const useResetFormOnCloseModal = ({ form, visible }) => {
-//     const prevVisibleRef = useRef();
-//     useEffect(() => {
-//         prevVisibleRef.current = visible;
-//     }, [visible]);
-//     const prevVisible = prevVisibleRef.current;
-//     useEffect(() => {
-//         if (!visible && prevVisible) {
-//             form.resetFields();
-//         }
-//     }, [visible]);
-// };
-
-// const makeGroup = () => (
-//     <React.Fragment>
-//         <OptGroup  label='总经办'>
-//             <Option value="Mary" >Mary</Option>
-//             <Option  value="Jack" >Jack</Option>
-//             <Option  value="Ocean" >Ocean</Option>
-//         </OptGroup>
-//         <OptGroup   label='人力行政'>
-//             <Option  value="Sally"  >Sally</Option>
-//             <Option  value="Ia" >Ia</Option>
-//             <Option  value="Peter">Peter</Option>
-//         </OptGroup>
-//         {/* <OptGroup key='6836' label='研发部'>
-//         <Option key="3336">Martin</Option>
-//         <Option key="5555">April</Option>
-//         <Option key="3566">Taco</Option>
-//         <Option key="111">Peter</Option>
-//     </OptGroup>
-//     <OptGroup key='684396' label='产品部'>
-//         <Option key="333776">Suny</Option>
-//         <Option key="557755">Summer</Option>
-//         <Option key="357766">Rose</Option>
-//         <Option key="8778">An</Option>
-//     </OptGroup> */}
-
-//     </React.Fragment>
-// );
-// const helloOutsider = (data) => {
-//     return <React.Fragment> <Select.Option>I am HelloOutside</Select.Option> {makeGroup()} </React.Fragment>
-// }
-
-// const makePerson = ({ ascriptionId, name }, groupName) => (
-//     <Option  dataid={ascriptionId} value={groupName+name}>{name}</Option>
-//   );
-
-
-const makePerson = ({ ascriptionId, name, key}, i) => (
-    <Option dataid={ascriptionId} value={name} key={key} dataid={ascriptionId}>{name}</Option>
+    <Option dataid={ascriptionId} value={ascriptionId} key={key} >{name}</Option>
 );
 
 const makeGroup = ({ groupName, list }) => (
@@ -71,85 +20,119 @@ const makeGroup = ({ groupName, list }) => (
 const helloOutsider = (data) => {
     return <React.Fragment> <Select.Option>I am HelloOutside</Select.Option>{data.map(makeGroup)} </React.Fragment>
 }
+
+const makeOption = ({ id, content, okrId, parentId, level },) => (
+
+    <Option dataokrid={okrId} value={id} dataparentid={parentId} datalevel={level} key={id + content} >{content}</Option>
+);
+
+const makeOptGroup = ({ groupName, data }) => (
+
+    <OptGroup label={groupName}>
+        {data.map(makeOption)}
+    </OptGroup>
+);
+
+const formatUpperObject = (data) => {
+    return <React.Fragment> <Select.Option>I am HelloOutside</Select.Option>{data.map(makeOptGroup)} </React.Fragment>
+}
+
+const useResetFormOnCloseModal = ({ form, visible }) => {
+    const prevVisibleRef = useRef();
+    useEffect(() => {
+        prevVisibleRef.current = visible;
+    }, [visible]);
+    const prevVisible = prevVisibleRef.current;
+    useEffect(() => {
+        if (!visible && prevVisible) {
+            form.resetFields();
+        }
+    }, [visible]);
+};
+
+
+
 export default class ObjectiveDrawer extends Component {
     state = {
         visible: this.props.visible,
         excutorData: null,
         isLoading: true,
         checkPerson: false,
+        period: null,
+        level: null,
+        excutor: null,
+        keyResults: [],
+        objective: null,
+        upperObjective: null,
+        upperObjectiveData: null,
+        loadingUpperObjective: true,
+        periodFilled: false,
+        levelFilled: false,
+        excutorFilled: false,
+        disabled: false,
+
     }
 
     formRef = React.createRef();
-
-
-    //    useResetFormOnCloseModal({
-    //         form,
-    //         visible
-    //     })
+    useResetFormOnCloseModal = useResetFormOnCloseModal;
 
 
 
-    useResetFormOnCloseModal = ({ form, visible }) => {
-        const prevVisibleRef = useRef();
-        useEffect(() => {
-            prevVisibleRef.current = visible;
-        }, [visible]);
-        const prevVisible = prevVisibleRef.current;
-        useEffect(() => {
-            if (!visible && prevVisible) {
-                form.resetFields();
-            }
-        }, [visible]);
-    };
 
-    onFinish = (values) => {
-        this.formRef.current.resetFields()
+
+    onCancel = (values) => {
         this.setState({
             visible: false,
         })
         this.props.closeDrawer()
+        this.formRef.current.resetFields()
     }
 
-    // onOk = () => {
-    //     this.formRef.onFinish();
-    // };
-    makePerson = ({ ascriptionId, name }, i) => {
-        return <Option key={i} >{name}</Option>
+    onUpperObjectiveChange = (value) => {
+        this.setState({
+            upperObjective: value
+        })
     }
+
+
+    onPeriodChange = (value) => {
+        this.setState({
+            period: value
+        }, (() => {
+            this.setState({
+                periodFilled: true
+            })
+        }))
+    }
+
+    onExcutorChange = (e) => {
+
+        this.setState({
+            excutor: e
+        }, (() => {
+            this.setState({
+                excutorFilled: true
+            })
+        }))
+        this.formRef.current.resetFields([`upperobjective`])
+    }
+
+
+    makePerson = ({ ascriptionId, name }, i) => {
+        return <Option key={i} value={ascriptionId} >{name}</Option>
+    }
+
     makeGroup = (i, { groupName, list }) => {
         return <OptGroup key={i} datagroupname={groupName}>
             {list.map(this.makePerson(groupName))}
         </OptGroup>
-        //    return <OptGroup label={groupName}> {list.map(this.makePerson)} </OptGroup>
     }
-
-    formateOptions = (data) => {
-        const makeGroup = (i, { groupName, list }) => {
-            // return <OptGroup key={i} datagroupname={groupName}>
-            //     {list.map(this.makePerson(groupName))}
-            //     </OptGroup>
-            //    return <OptGroup label={groupName}> {list.map(this.makePerson)} </OptGroup>
-        }
-        const Option = () => {
-
-
-            return <Select.Option>I am options</Select.Option>
-        }
-
-        return Option()
-    }
-    callOption = () => {
-        let ready = false
-
-
-
-    }
-
 
     getExcutorData = (value) => {
         const level = value.target.value;
         Axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/getAscription?level=` + `${level}`)
             .then(res => {
+
                 if (this.state.checkPerson) {
                     res.data.data.map(item => {
                         item.list.map(p => {
@@ -157,42 +140,54 @@ export default class ObjectiveDrawer extends Component {
 
                         })
                     })
-                }
 
-                console.log(res.data.data)
+                }
                 this.setState({
                     excutorData: res.data.data,
 
                 }, (() => {
-
-                    console.log('setstate data', this.state.excutorData)
                     this.setState({
                         isLoading: false
-                    }, (() => { console.log("change isLoading is false") }))
+                    })
 
                 }))
             })
     }
 
 
-    noExcutorOption = () => { }
-
     handelLevelChange = (value) => {
-      
-        this.setState({
-            isLoading: true
-        })
         const level = value.target.value
+        this.setState({
+            isLoading: true,
+            level: level,
+            excutorFilled: false,
+        }, (() => {
+            this.setState({
+                levelFilled: true
+            })
+        }))
         this.formRef.current.resetFields([`excutor`])
-        console.log('after resetField')
-       
+        this.formRef.current.resetFields([`upperobjective`])
+
+
         if (level === "person") {
-            console.log('radio chosed person')
+
             this.setState({ checkPerson: true })
-        } 
+        }
 
         if (level === "company") {
-            this.noExcutorOption()
+            this.setState({
+                excutorData: null,
+                excutorFilled: true,
+
+            }, (() => {
+                this.setState({
+                    disabled: true,
+                    isLoading: false,
+                    excutor: " "
+                })
+            }))
+
         }
         else {
 
@@ -200,7 +195,6 @@ export default class ObjectiveDrawer extends Component {
                 excutorData: null,
 
             }, (() => {
-                console.log('level有变清空state excutor Data ', this.state.excutorData)
                 this.getExcutorData(value)
             }))
 
@@ -208,10 +202,81 @@ export default class ObjectiveDrawer extends Component {
     }
 
 
+    getUpperLevelObjective = () => {
+        const okrId = this.state.period;
+        const level = this.state.level;
+        const ascriptionId = this.state.excutor;
+
+        Axios.get((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/getParentObjective?okrId=` + `${okrId}` + `&level=` + `${level}` + `&ascriptionId=` + `${ascriptionId}`))
+            .then(res => {
+                if (res.status = 200) {
+                    console.log('getUpperObejct data', res.data.data)
+                    this.setState({
+                        upperObjectiveData: res.data.data
+                    }, (() => {
+
+                        this.setState({
+                            loadingUpperObjective: false
+                        })
+                    }))
+
+                }
+                else {
+                }
+            })
+
+    }
+
+    onMouseEnterObjective = () => {
+        const periodFilled = this.state.periodFilled;
+        const levelFilled = this.state.levelFilled;
+        const excutorFilled = this.state.excutorFilled;
+
+        if (periodFilled && levelFilled && excutorFilled) {
+
+            this.getUpperLevelObjective()
+        }
+        else {
+            alert('先填写周期，层级，执行对象')
+        }
+    }
+
+    onValuesChange = (changedValues, allValues) => {
+
+
+        const { excutor, keyresults, level, objective, period, upperobjective } = allValues;
+
+        this.setState({
+            keyResults: keyresults,
+            objective: objective,
+            upperObjective: upperobjective,
+        })
+    }
+
+    onFinish = (values) => {
+
+
+        const { period, level, excutor, objective, upperObjective, keyResults } = this.state;
+
+
+        console.log('onFinish', this.state.keyResults)
+        this.setState({
+            visible: false,
+
+        })
+        this.props.getCreateNewObjective(period, level, excutor, objective, upperObjective, keyResults)
+        this.props.closeDrawer()
+        this.formRef.current.resetFields()
+
+
+
+
+
+    }
 
     render() {
-        const { closeDrawer, listSelect, visible } = this.props;
-        const { isLoading, excutorData, } = this.state;
+        const { listSelect, visible } = this.props;
+        const { isLoading, excutorData, upperObjectiveData } = this.state;
 
         return (
             <Modal
@@ -219,23 +284,23 @@ export default class ObjectiveDrawer extends Component {
                 visible={visible}
                 okText="添加"
                 onOk={this.onFinish}
-                onCancel={closeDrawer}
+                onCancel={this.onCancel}
             >
                 <Form
                     ref={this.formRef}
                     layout="vertical"
                     name="userForm"
-                    onValuesChange={this.onformValueChange}
+                    onFieldsChange={this.onFieldsChange}
+                    onValuesChange={this.onValuesChange}
                 >
                     <Form.Item
                         name="period"
                         label="OKR周期"
-                        rules={[{ required: true }, { message: "选择执OKR周期" }]}
                     >
-                        <Select label="选择执OKR周期">
+                        <Select label="选择执OKR周期" onChange={this.onPeriodChange}>
 
                             {listSelect.map(item => {
-                                return <Option key={item.id} value={item.title}>{item.title}</Option>
+                                return <Option value={item.id}>{item.title}</Option>
                             })}
 
                         </Select>
@@ -258,9 +323,9 @@ export default class ObjectiveDrawer extends Component {
                         label="执行对象"
                         rules={[{ required: true }, { message: "选择执行对象" }]}
                     >
-                        <Select label="选择执行对象" loading={isLoading}>
+                        <Select label="选择执行对象" loading={isLoading} onChange={this.onExcutorChange} disabled={this.state.disabled}>
 
-                            {isLoading ? null
+                            {isLoading || this.state.disabled === true ? null
                                 :
                                 helloOutsider(excutorData)
                             }
@@ -273,10 +338,9 @@ export default class ObjectiveDrawer extends Component {
                         label="上级Objective"
                         rules={[{ required: true }, { message: "选择上级Objective" }]}
                     >
-                        <Select label="选择上级Objective">
+                        <Select label="选择上级Objective" onMouseEnter={this.onMouseEnterObjective} loading={this.state.loadingUpperObjective} onChange={this.onUpperObjectiveChange}>
 
-                            <Option key="qfdfdfd">重要一</Option>
-
+                            {this.state.loadingUpperObjective ? null : formatUpperObject(upperObjectiveData)}
                         </Select>
                     </Form.Item>
 

@@ -6,36 +6,46 @@ export default class HomeTable extends Component {
     state = {
         data: null,
         update: false,
+        columns: [
+            {
+                title: '目标',
+                dataIndex: 'content',
+                key: 'content'
+            },
+            {
+                title: '执行人',
+                dataIndex: 'ascriptionName',
+                key: 'ascriptionName'
+            },
+            {
+                title: '类型',
+                dataIndex: 'level',
+                key: 'level'
+            },
+            {
+                title: '操作',
+                dataIndex: 'operation',
+                // render: () => <span><Button>修改</Button><Button>查看</Button></span>
+                render: (text, record) =>
+                    <Popconfirm title="详情" onClick={() => this.detail(record, text)}>
+                        <a>查看</a>
+                    </Popconfirm>
+    
+            },
+        ],
     }
-    componentDidMount() {
-        console.log('sskjkjfksjfksjkfsj')
-        console.log(this.props.homeData)
-        this.setState({
-            data: this.props.hoemData
-        })
-    }
-
-    shouldUpdate = (nextProp) => {
-
-        console.log(this.props.hoemData)
-
-    }
+   
 
 
 
 
 
     render() {
-        const { columns } = this.props;
-        const { update, data } = this.state;
-        console.log('Comp HomeTable', this.props);
-        console.log(this.props.homeData)
-        this.shouldUpdate()
         return (
             <React.Fragment>
                 {update ? <Table
-                        columns={columns}
-                        dataSource={data}
+                        columns={this.state.columns}
+                        dataSource={this.props.homeData}
                         expandable={this.onExpand}
                         rowKey={record => record.id}
                         childrenColumnName="keyResults"
