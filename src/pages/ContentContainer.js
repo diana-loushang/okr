@@ -94,14 +94,12 @@ export default class ContentContainer extends Component {
 
     //点击查看
     onShowDetail=(id)=>{
-        console.log('hello onHSoeDetail', id)
         this.setState({
             detailId:id
         }, (()=>{
             axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/info/` + `${id}`)
                 .then(res => {
                     if (res.data.msg === '成功') {
-                        console.log(res.data.data)
                         this.setState({
                             detailData:res.data.data
                         },(()=>{
@@ -118,6 +116,12 @@ export default class ContentContainer extends Component {
         }))
     }
 
+    closeDetailModal=(e)=>{
+        this.setState({
+            showDetailModal:false
+        }) 
+        
+    }
 
 
 
@@ -316,7 +320,7 @@ export default class ContentContainer extends Component {
 
     render() {
         const { tableData, listSelect, currentOkrValue, getCreateNewObjective } = this.props;
-        const { columns, onFinish } = this.state;
+        const { columns, onFinish, detailData } = this.state;
         return (
             <div>
 
@@ -443,8 +447,13 @@ export default class ContentContainer extends Component {
                         </Modal>
 
                     </div >
+                    
+                    {this.state.showDetailModal &&  <DetailModal visible={this.state.showDetailModal} closeDetailModal={this.closeDetailModal} data={detailData} />
+}
+        
+                    
 
-                     {this.state.showDetailModal ? <DetailModal  visible={this.state.showDetailModal}  detailData={this.state.detailData} /> : null }                           
+                     {/* {this.state.showDetailModal ? <DetailModal  visible={this.state.showDetailModal}  data={detailData} /> : null }                            */}
 
                     {
                         tableData && tableData.length > 0 ?
