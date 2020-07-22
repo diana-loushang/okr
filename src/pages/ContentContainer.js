@@ -5,7 +5,8 @@ import { Layout, Table, Button, Input, Select, Form, Modal, message, Popconfirm 
 import 'antd/dist/antd.css';
 import { PlusOutlined } from '@ant-design/icons';
 import ObjectiveDrawer from '../components/ObjectiveDrawer';
-import DetailModal from '../components/Modal/DetailModal'
+import DetailModal from '../components/Modal/DetailModal';
+import EditModal from '../components/Modal/EditModal';
 // import HomeTable from '../components/HomeTable'
 const { Content, } = Layout;
 const { Option } = Select;
@@ -46,10 +47,16 @@ export default class ContentContainer extends Component {
                 dataIndex: 'operation',
                 // render: () => <span><Button>修改</Button><Button>查看</Button></span>
                 render: (text, record) =>
-        
-                    <Button  onClick={()=>{ console.log('click check id of',record.id); this.onShowDetail(record.id)}}>
-                        <a>查看</a>
-                    </Button>
+                    <div>
+                        <Button onClick={() => { console.log('click check id of', record.id); this.onShowDetail(record.id) }}>
+                            <a>查看</a>
+                        </Button>
+                        <Button onClick={() => { console.log('click check id of', record.id); this.onShowEditModal(record.id) }}>
+                            <a>修改</a>
+                        </Button>
+
+                    </div>
+
 
             },
         ],
@@ -60,10 +67,13 @@ export default class ContentContainer extends Component {
         currentExcutorList: [],
         visible: false,
         value: 1,
-        
-        showDetailModal:false,
-        detailId:null,
-        detailData:null,
+
+        showDetailModal: false,
+        detailId: null,
+        detailData: null,
+
+        showEditlModal: false,
+
 
         modalVisible: false,
         confirmLoading: false,
@@ -91,37 +101,81 @@ export default class ContentContainer extends Component {
 
     }
 
+     //修改弹窗
+
+    transfer =()=>{
+        console.log('shoe Edit state data', this.state.detailData)
+        this.setState({
+            showEditlModal: true
+        })
+    }
+    
+    getObjectiveInfo = (id) => {
+        axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/info/` + `${id}`)
+            .then(res => {
+                if (res.data.msg === '成功') {
+                    console.log(res.data)
+                    
+                    this.setState({
+                        detailData: res.data.data
+                    }, (()=>{
+                        this.transfer()
+                    }))
+                }
+                else {
+                    console.log('Failed', res.data.msg)
+                }
+
+
+            })
+
+    }
+       
+        onShowEditModal = (id) => {
+            this.getObjectiveInfo(id)
+        }
+  
+        onCloseEditiModal = (e) => {
+            this.setState({
+                showEditlModal: false
+            })
+    
+        }
+
 
     //点击查看
-    onShowDetail=(id)=>{
+    onShowDetail = (id) => {
         this.setState({
-            detailId:id
-        }, (()=>{
-            axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/info/` + `${id}`)
-                .then(res => {
-                    if (res.data.msg === '成功') {
+            detailId: id
+        }, (() => {
+
+        axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/info/` + `${id}`)
+            .then(res => {
+                if (res.data.msg === '成功') {
+                    console.log(res.data)
+                    this.setState({
+                        detailData: res.data.data
+                    }, (() => {
+
                         this.setState({
-                            detailData:res.data.data
-                        },(()=>{
-                            this.setState({
-                                showDetailModal:true
-                            })
-                        }))
-                    }
-                    else {
-                        console.log('Failed', res.data.msg)
-                    }
-                })
-
-        }))
-    }
-
-    closeDetailModal=(e)=>{
-        this.setState({
-            showDetailModal:false
-        }) 
+                            showDetailModal: true
+                        })
+                    }))
+                }
+                else {
+                    console.log('Failed', res.data.msg)
+                }
+            })
         
+        }))}
+
+    closeDetailModal = (e) => {
+        this.setState({
+            showDetailModal: false
+        })
+
     }
+
 
 
 
@@ -447,13 +501,16 @@ export default class ContentContainer extends Component {
                         </Modal>
 
                     </div >
-                    
-                    {this.state.showDetailModal &&  <DetailModal visible={this.state.showDetailModal} closeDetailModal={this.closeDetailModal} data={detailData} />
-}
-        
-                    
 
-                     {/* {this.state.showDetailModal ? <DetailModal  visible={this.state.showDetailModal}  data={detailData} /> : null }                            */}
+
+                    {/* /详情加OKR周期的弹窗 */}
+                    {this.state.showDetailModal && <DetailModal visible={this.state.showDetailModal} closeDetailModal={this.closeDetailModal} data={detailData} />
+                    }
+
+                    {/* /修改的弹窗 */}
+                    {this.state.showEditlModal && <EditModal visible={this.state.showEditlModal} onCloseEditiModal={this.onCloseEditiModal} data={detailData} />
+                    }
+
 
                     {
                         tableData && tableData.length > 0 ?

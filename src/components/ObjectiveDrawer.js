@@ -118,15 +118,15 @@ export default class ObjectiveDrawer extends Component {
     }
 
 
-    makePerson = ({ ascriptionId, name }, i) => {
-        return <Option key={i} value={ascriptionId} >{name}</Option>
-    }
+    // makePerson = ({ ascriptionId, name }, i) => {
+    //     return <Option key={i} value={ascriptionId} >{name}</Option>
+    // }
 
-    makeGroup = (i, { groupName, list }) => {
-        return <OptGroup key={i} datagroupname={groupName}>
-            {list.map(this.makePerson(groupName))}
-        </OptGroup>
-    }
+    // makeGroup = (i, { groupName, list }) => {
+    //     return <OptGroup key={i} datagroupname={groupName}>
+    //         {list.map(this.makePerson(groupName))}
+    //     </OptGroup>
+    // }
 
     getExcutorData = (value) => {
         const level = value.target.value;

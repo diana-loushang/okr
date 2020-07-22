@@ -389,7 +389,7 @@ export default class App extends Component {
     }).then(res => {
      if(res.data.msg ==='成功'){
       console.log('get update of table')
-      // this.updateTable()
+    
      }
      else{
        console.log(res.data.msg)
