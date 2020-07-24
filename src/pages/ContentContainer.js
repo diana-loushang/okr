@@ -51,7 +51,7 @@ export default class ContentContainer extends Component {
                         <Button onClick={() => { console.log('click check id of', record.id); this.onShowDetail(record.id) }}>
                             <a>查看</a>
                         </Button>
-                        <Button onClick={() => { console.log('click check id of', record.id); this.onShowEditModal(record.id) }}>
+                        <Button onClick={() => { console.log('click check id of', record.id); this.onShowEditModal(record ,record.id) }}>
                             <a>修改</a>
                         </Button>
 
@@ -67,7 +67,7 @@ export default class ContentContainer extends Component {
         currentExcutorList: [],
         visible: false,
         value: 1,
-
+        parentId:null,
         showDetailModal: false,
         detailId: null,
         detailData: null,
@@ -109,16 +109,18 @@ export default class ContentContainer extends Component {
             showEditlModal: true
         })
     }
-    
-    getObjectiveInfo = (id) => {
+
+    getObjectiveInfo = (parentId, id) => {
         axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/info/` + `${id}`)
             .then(res => {
                 if (res.data.msg === '成功') {
                     console.log(res.data)
                     
                     this.setState({
-                        detailData: res.data.data
+                        detailData: res.data.data,
+                        parentId:parentId,
                     }, (()=>{
+                        console.log('stsate parent id', parentId)
                         this.transfer()
                     }))
                 }
@@ -131,8 +133,10 @@ export default class ContentContainer extends Component {
 
     }
        
-        onShowEditModal = (id) => {
-            this.getObjectiveInfo(id)
+        onShowEditModal = (record, id) => {
+            const parentId = record.parentId
+            console.log(record,'点击详情')
+            this.getObjectiveInfo(parentId, id)
         }
   
         onCloseEditiModal = (e) => {
@@ -175,14 +179,6 @@ export default class ContentContainer extends Component {
         })
 
     }
-
-
-
-
-
-
-
-
 
     handleChange(value) {
         console.log(`selected ${value}`);
@@ -374,7 +370,8 @@ export default class ContentContainer extends Component {
 
     render() {
         const { tableData, listSelect, currentOkrValue, getCreateNewObjective } = this.props;
-        const { columns, onFinish, detailData } = this.state;
+        const { columns, onFinish, detailData, parentId } = this.state;
+    
         return (
             <div>
 
@@ -508,7 +505,7 @@ export default class ContentContainer extends Component {
                     }
 
                     {/* /修改的弹窗 */}
-                    {this.state.showEditlModal && <EditModal visible={this.state.showEditlModal} onCloseEditiModal={this.onCloseEditiModal} data={detailData} />
+                    {this.state.showEditlModal && <EditModal visible={this.state.showEditlModal} onCloseEditiModal={this.onCloseEditiModal} data={detailData} parentId={parentId}/>
                     }
 
 

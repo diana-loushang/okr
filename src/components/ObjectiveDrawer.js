@@ -18,7 +18,7 @@ const makeGroup = ({ groupName, list }) => (
 );
 
 const helloOutsider = (data) => {
-    return <React.Fragment> <Select.Option>I am HelloOutside</Select.Option>{data.map(makeGroup)} </React.Fragment>
+    return <React.Fragment> {data.map(makeGroup)} </React.Fragment>
 }
 
 const makeOption = ({ id, content, okrId, parentId, level },) => (

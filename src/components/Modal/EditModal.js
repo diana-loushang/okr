@@ -1,16 +1,12 @@
 import React, { Component } from 'react';
 import Modal from 'antd/lib/modal/Modal';
 import { Form, Input, Select, Button, message, Drawer, Spin, Alert } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import Axios from 'axios';
-import ContentFormItem from '../ContentFormItem'
 const { Option, OptGroup } = Select;
 
-
-
 const makePerson = ({ content, id, level, okrId, parentId }, i) => (
-
-    <Option parentid={parentId} level={level} okrid={okrId} value={content} key={id} >{content}</Option>
+    <Option parentid={parentId} level={level} okrid={okrId} key={id} >{content}</Option>
 );
 
 const makeGroup = ({ groupName, data }) => (
@@ -20,25 +16,9 @@ const makeGroup = ({ groupName, data }) => (
 );
 
 const formatOptions = (data) => {
+    console.log(data)
     return <React.Fragment> {data.map(makeGroup)} </React.Fragment>
 }
-
-
-
-// const makeFormItem = (item) => {
-
-//     <Form.Item name={item.name}>
-
-//         </Form.Item>
-
-// }
-// const createFormItem = (data) => {
-
-//     return <React.Fragment>
-//             {data.map(makeFormItem)}
-//         </React.Fragment>
-// }
-
 
 export default class EditModal extends Component {
     formRef = React.createRef();
@@ -47,6 +27,7 @@ export default class EditModal extends Component {
         id: null,
         content: null,
         parentId: null,
+        parentContent: "testing Parent conetne",
         keyResults: [],
         level: null,
         okrId: null,
@@ -65,16 +46,28 @@ export default class EditModal extends Component {
         optionsList: [{ name: 'content1' },
         { name: 'content3' },
         { name: 'content4' }],
-
-
         //testing
-        isContentReday: false
+        isContentReday: false,
+        fieldData: [
+            {
+                name: [
+                    "result1"
+                ],
+                value: "result value 1"
+
+            },
+            {
+                name: [
+                    "result2"
+                ],
+                value: "result value 2"
+            },
+        ]
+
     }
 
     componentDidMount() {
-        console.log('first initsl render')
         const data = this.props.data
-        console.log(this.props.data)
         this.setState({
             id: data.id,
             content: data.content,
@@ -85,11 +78,14 @@ export default class EditModal extends Component {
             ascriptionId: data.ascription,
         }, (() => {
             this.getUpperLevelObjective()
-            this.formatInitialValues()
+            // this.formatInitialValues()
             this.setState({
-                isContentReday: true
+                isContentReday: true,
+                isKeyResultsReady: true
+
             })
         }), (() => {
+
         }))
     }
 
@@ -103,26 +99,38 @@ export default class EditModal extends Component {
 
     getUpperLevelObjective = () => {
         const { okrId, level, ascriptionId } = this.state;
-        console.log('getUpperleve selection function')
         Axios.get((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/getParentObjective?okrId=` + `${okrId}` + `&level=` + `${level}` + `&ascriptionId=` + `${ascriptionId}`))
             .then(res => {
                 if (res.status = 200) {
-                    console.log('getUpperObejct data', res.data.data)
                     if (res.data.data.length === 0) {
                         this.setState({
                             disabledSelect: true
-                        }, (() => {
-                            this.setState({
-                                loading: false,
-
-                            })
-                        }))
+                        },
+                            (() => {
+                                this.setState({
+                                    loading: false,
+                                })
+                            }))
                     }
                     else {
+                        console.log('getUpperObejct', res.data.data)
+                        console.log('sse if get parent id ', this.state.parentId)
+                        const { parentId } = this.state;
+                        let upperSelection = res.data.data[0].data;
+                        console.log('upperselction', upperSelection)
+                        const parentInfo = upperSelection.filter(item => item.id === parentId)
+                        const parentContent = parentInfo.map(item => { return item.content })
+                        // const initialUpperObject = res.data.data[0].data.fitler(item=>item.id ===parentId)
+                        console.log("initialUpperObject", parentContent)
                         this.setState({
+                            parentContent: parentContent,
                             upperObjectiveSelection: res.data.data,
                             disabledSelect: false
-                        })
+                        }, (() => {
+                            this.setState({
+                                loading: false
+                            })
+                        }))
                     }
                 }
                 else {
@@ -133,71 +141,32 @@ export default class EditModal extends Component {
 
     add = () => {
         console.log('add function')
+        const { keyResults } = this.state;
+        let newContainer = []
     }
 
-    formatInitialValues = () => {
-        const { content, keyResults } = this.state;
-
-        //creating{"content":"content1"}
-        var x = [];
-        keyResults.forEach((item, i) => {
-
-            let keyresult = "keyresult" + (i + 1);
-            x.push({ [keyresult]: item.content })
-
-        })
-        let oneKeyObj = Object.assign(...x)
-        let contentObj = { content: content }
-        let oneObj = Object.assign(oneKeyObj, contentObj)
-
-        var oneJsonObj = JSON.stringify(oneObj)
-        console.log('oneJsonObj', oneJsonObj)
-
-
-
-
-        //testing
-
-        keyResults.forEach((item, i) => {
-            item.name = "keyresult" + (i + 1)
-        })
-        let createNewEle = keyResults
-
-        //setState for initialValues
-        this.setNewKeyResults(oneObj, oneJsonObj, createNewEle)
-
+    onChangeInUpperObject = (Option,) => {
+        console.log("choose wichch upper obejct", Option)
 
     }
 
-    setNewKeyResults = (object, oneJsonObj, createNewEle) => {
-        console.log(createNewEle)
-        console.log(object, 'receive props object', this.state.keyResults, 'statae keyResult')
-        this.setState({
-            keyResults: object,
-            initialValues: oneJsonObj,
-            createNewEle: createNewEle,
-        }, (() => {
-            console.log('after formate inintal value', this.state.initialValues)
-            this.setState({
-                isKeyResultsReady: true
-            })
-        }))
-    }
 
-    handleInitialValues = (initialValues) => {
-        console.log(initialValues)
-        return initialValues
+    onFinish = values => {
+        console.log('Received values of form:', values);
+    };
+
+    getInfo = (index) => {
+        console.log('getInfo', index)
     }
 
 
 
     render() {
-        const { visible, data } = this.props;
-        const { content, upperObjectiveSelection, loading, disabledSelect, isKeyResultsReady, initialValues, createNewEle, isContentReday} = this.state;
+        const { visible, data, parentId, } = this.props;
+        const { content, upperObjectiveSelection, loading, disabledSelect, isKeyResultsReady, initialValues, keyResults, createNewEle, parentContent, fieldData } = this.state;
         const x = initialValues;
-        console.log('content', content)
+        console.log(fieldData, "field Data")
         return (
-
             < Modal
                 title="编辑Objective"
                 visible={visible}
@@ -206,8 +175,7 @@ export default class EditModal extends Component {
                 onCancel={this.onCancel}
             >
 
-
-                {loading && isKeyResultsReady ?
+                {loading ?
                     <Spin tip="Loading...">
                         <Alert
                             message="下载中"
@@ -220,11 +188,12 @@ export default class EditModal extends Component {
                         ref={this.formRef}
                         layout="vertical"
                         name="editForm"
+                        onFieldsChange={(changedFields, allFields) => { console.log('changedFields, allFields', changedFields, allFields) }}
                     >
                         <Form.Item
                             name='content'
                             label="Objective"
-                            initialValue= {content}
+                            initialValue={content}
                         >
                             <Input />
                         </Form.Item>
@@ -232,44 +201,135 @@ export default class EditModal extends Component {
                         <Form.Item
                             name="upperObjective"
                             label="上级Object"
+                            initialValue={parentContent}
                         >
-                            <Select disabled={disabledSelect}>
+
+                            <Select disabled={disabledSelect} onSelect={this.onChangeInUpperObject} >
+
                                 {disabledSelect ? null : formatOptions(upperObjectiveSelection)}
                             </Select>
                         </Form.Item>
 
+                        <Form.List
+                            name={fieldData}
+                            
+
+                        >
+                            {(fields, { remove, add }) => {
+
+                                console.log(remove)
+                                fields = fieldData
+
+                                return (
+                                    <div>
+
+                                        {fields.map((field, index) => (
+
+                                            <div style={{ display: 'flex' }} key={field.key}>
+                                                <Form.Item
+                                                    {...field}
+                                                    style={{ width: '95%' }}
+                                                    name={field.name}
+                                                    initialValue={field.value}
+                                                    fieldKey={[field.fieldKey, `${index}`]}
+
+                                                >
+
+                                                    <Input />
+                                                </Form.Item>
+
+                                                <MinusCircleOutlined onClick={() => { console.log(field, index); remove(field.name) }} style={{ marginLeft: '1rem' }} />
 
 
-                        <Form.Item
+                                            </div>
+                                        ))}
+                                        <Button
+                                            type="dashed"
+                                            onClick={() => { add() }}
+                                            style={{ width: '45%' }}
+                                        >
+                                            <PlusOutlined /> 新增
+                                                 </Button>
+                                    </div>
+                                )
+
+                            }}
+
+
+
+
+                        </Form.List>
+
+
+                        {/* <Form.Item
                             name="keyresults"
                             label="Key Results "
                         >
+                          {keyResults.map((item, i) => {
+                                return (
+                                    <Form.Item>
+                                        <div style={{ display: 'flex' }} >
 
+                                            <Form.Item initialValue={item.content} name={`keyResult` + (i + 1)} key={item.id} style={{ width: '95%' }}>
+                                                <Input allowClear/>
+                                            </Form.Item>
+                                            <Form.Item>
+                                                <MinusCircleOutlined onClick={(value, x, _dispatchInstances) => { console.log('remove old key result', value, x, _dispatchInstances) }} style={{ marginLeft: '1rem' }} />
+                                            </Form.Item>
+                                        </div>
+                                    </Form.Item>
+                                )
+                            })} 
+                            <Form.List name="newKeyResult">
+                                
+                                {(fields, { add, remove }) => {
+                                    return (
+                                        <div >
+                                            {fields.map((field, index) => (
+                                                <div style={{ display: 'flex' }} >
 
-                            <Form.Item
-                                name="keyresult1"
-                            >
-                                <Input />
-                            </Form.Item>
+                                                    <Form.Item
+                                                        style={{ width: '95%' }}
+                                                        {...field}
+                                                        validateTrigger={['onChange', 'onBlur']}
+                                                        rules={[
+                                                            {
+                                                                required: true,
+                                                                whitespace: true,
+                                                                message: "please input passenger's name or delete this field."
+                                                            }
+                                                        ]}
+                                                        key={`newKeyResult` + (index + 1)}
+                                                    >
+                                                        <Input />
+                                                    </Form.Item>
+                                                    <Form.Item>
+                                                        <MinusCircleOutlined onClick={() => { remove(field.name) }} style={{ marginLeft: '1rem' }} />
+                                                    </Form.Item>
+                                                </div>
+                                            ))}
+                                            <Form.Item>
 
-                            <Form.Item
-                                name="keyresult2"
-                            >
-                                <Input />
-                            </Form.Item>
+                                                <Button
+                                                    type="dashed"
+                                                    onClick={() => { add() }}
+                                                    style={{ width: '45%' }}
+                                                >
+                                                    <PlusOutlined /> 新增
+                                                 </Button>
+                                            </Form.Item>
 
-                            <Button
-                                type="dashed"
-                                onClick={() => {
-                                    this.add();
+                                        </div>
+                                    )
                                 }}
-                                style={{ width: '60%' }}
-                            >
-                                <PlusOutlined /> Add field
-                          </Button>
-                        </Form.Item>
+
+
+                                
+                            </Form.List>
+                        </Form.Item> */}
                     </Form>}
-            </Modal >
+
+            </Modal>
 
 
         )
