@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import axios from 'axios';
-
 import { Layout, Table, Button, Input, Select, Form, Modal, message, Popconfirm } from 'antd';
 import 'antd/dist/antd.css';
 import { PlusOutlined } from '@ant-design/icons';
@@ -46,7 +45,8 @@ export default class ContentContainer extends Component {
                 title: '操作',
                 dataIndex: 'operation',
                 // render: () => <span><Button>修改</Button><Button>查看</Button></span>
-                render: (text, record) =>
+                render: (text, record) =>{
+                    return(
                     <div>
                         <Button onClick={() => { console.log('click check id of', record.id); this.onShowDetail(record.id) }}>
                             <a>查看</a>
@@ -56,6 +56,8 @@ export default class ContentContainer extends Component {
                         </Button>
 
                     </div>
+                    )
+                }
 
 
             },
@@ -367,7 +369,7 @@ export default class ContentContainer extends Component {
 
 
     render() {
-        const { tableData, listSelect, currentOkrValue, getCreateNewObjective, getNewEditObject } = this.props;
+        const { tableData, listSelect, currentOkrValue, getCreateNewObjective, getNewEditObject, isLoading } = this.props;
         const { columns, onFinish, detailData, parentId } = this.state;
     
         return (
@@ -508,7 +510,7 @@ export default class ContentContainer extends Component {
 
 
                     {
-                        tableData && tableData.length > 0 ?
+                       this.props.homeData ?
 
                             <div>
                                 <Table
@@ -519,13 +521,6 @@ export default class ContentContainer extends Component {
                                     rowKey={record => record.id}
                                     childrenColumnName="keyResults"
                                 />
-
-                                {/* <HomeTable
-                                    columns={columns}
-                                    homeData={this.props.homeData}
-                                    expandable={this.onExpand}
-                                    rowKey={record => record.id} 
-                                /> */}
 
                             </div>
                             :

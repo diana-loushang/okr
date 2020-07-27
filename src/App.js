@@ -1,9 +1,11 @@
+
 import React, { Component } from 'react';
+import * as dd from 'dingtalk-jsapi';
 import axios from 'axios';
 import SiderNav from './pages/SiderNav ';
 import HeaderNav from './pages/HeaderNav';
 import ContentContainer from './pages/ContentContainer';
-import { Layout, Tabs, Spin } from 'antd';
+import { Layout, Tabs, Spin, Alert } from 'antd';
 import 'antd/dist/antd.css';
 import Axios from 'axios';
 
@@ -36,113 +38,261 @@ export default class App extends Component {
 
     collapsed: false,
     expandAllRow: true,
-    tableData: [1, 2, 5.3], //testing
-    // okrRange: [
-    //   { range: '年度' },
-    //   { range: '月度' },
-    //   { range: '2020年第一季度' },
-    //   { range: '2020年第二季度（456月）' },
-    //   { range: '2020年第二季度（456月）' },
-    // ],
 
-    panes: initialPanes,
+    bigLoading: true,
+    isPanesReady:false,
+    panes: null,
+    defaultSelectedKeys:[],
   }
 
 
   componentDidMount() {
-    this.retrieveInfo()
-    this.setState({
-      activeKey: '2111551',
 
-    })
+    axios.all(
+      [
+        this.getMenu(),
+        this.getOkrListSelect(),
+       
+        this.getParentObjective(),
+        this.getObjectListData()
+      ]).then(res=>{
+        console.log(this.state.panes)
+        this.setState({
+          bigLoading:false
+        })
+      }
+      
+      )
+    // this.setState({
+    //   bigLoading: true
+    // }, (() => {
+    //   this.retrieveInfo()
+
+    //   this.setState({
+    //     activeKey: '',
+       
+    //   })
+    // }))
 
   }
 
-  //连接后台读取GET数据
-  retrieveInfo = () => {
-    axios.all(
+// 初始化请求的接口  //连接后台读取GET数据
+  getMenu=()=>{
+    axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/menu/list`)
+            .then(response => {
+              console.log(response)
+              let initialPane = response.data.data[0]
 
-      // 对接左侧导航栏端口
-      [
-        axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/menu/list`)
+              let object = {};
+              object.title = initialPane.name;
+              object.content = '';
+              object.key = '1000';
+              object.closable = false;
+              // const panes = [
+              //   { title: 'Tab 1', content: 'Content of Tab Pane 1', key: '1' },
+              //   { title: 'Tab 2', content: 'Content of Tab Pane 2', key: '2' },
+              // ];
+              
+      
+              
+              
+              const initialPanes=[]
+              initialPanes.push(object)
+              console.log('initPaness', initialPanes)
+
+              
+              this.setState({
+                menu: response.data.data,
+                currentLevel: response.data.data[0].title,
+                panes: initialPanes,
+                
+              }, (() => {
+                const {panes}=this.state;
+                console.log(this.state.panes)
+                // let defaultSelectedKeys=[]
+                // defaultSelectedKeys.push(panes[0].key)
+                // console.log('defaultSelectedKeys', defaultSelectedKeys)
+
+                this.setState({
+                  isPanesReady:true,
+                  activeKey:panes[0].key,
+                  defaultSelectedKeys:panes[0].key,
+                })
+              }));
+
+
+            })
+            .catch(error => {
+              console.log("menu", error)
+            })
+
+  }
+
+  getHomeData=()=>{
+    console.log('getHoemData', this.state.currentOkrId)
+    axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/homeData?okrId=` + `${this.state.currentOkrId}`)
           .then(response => {
-            this.setState({
-              menu: response.data.data,
-              currentLevel: response.data.data[0].title,
+            console.log('first render homeData', response.data.data)
 
+            this.setState({
+              currentLevel: "company",
+              homeData: response.data.data
             }, (() => {
-            }));
-
-
-          })
-          .catch(error => {
-            console.log("menu", error)
-          })
-      ],
-
-      // 对接OKR周期端口
-      [
-        axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
-          .then(response => {
+              console.log('first render homeData', this.state.homeData)
+              
+              console.log(response.data, 'homedatat')
+            }))
+              ;
             this.setState({
-              listSelect: response.data.data,
-              currentOkrId: response.data.data[0].id,
-
-              currentOkrValue: response.data.data[0].title
-
-            });
-
-
-          })
-
+              isLoading: false
+            })
+          }
+          )
           .catch(error => {
-            console.log(error)
-          })
-      ]
-      ,
-      // 对接首页表格端口
-      [axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/homeData?okrId=` + `${this.state.currentOkrId}`)
-        .then(response => {
-          this.setState({
-            currentLevel: "company",
-            homeData: response.data.data
-          })
-            ;
-          this.setState({
-            isLoading: false
-          })
-        }
-        )
-        .catch(error => {
-          console.log('home', error)
+            console.log('home', error)
 
-        })
-      ],
-      // 对接上级可选Objective列表端口
-      [
-        axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/getParentObjective`)
-          .then(response => {
           })
-          .catch(error => {
-            console.log(error)
-          })
-      ]
-      ,
-      // 对接列表数据端口
-      [
-        axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/listData`)
-          .then(response => {
-          })
-          .catch(error => {
-            console.log(error)
-          })
-      ],
-    );
-    this.setState({
-      isLoading: false
+  }
+
+
+  getOkrListSelect=()=>{
+    axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
+            .then(response => {
+              console.log('current okrID',response.data.data[0].id )
+              this.setState({
+                listSelect: response.data.data,
+                currentOkrId: response.data.data[0].id,
+                currentOkrValue: response.data.data[0].title
+              },(()=>{
+                this.getHomeData()
+              }));
+            })
+            .catch(error => {
+              console.log(error)
+            })
+  }
+
+
+  getParentObjective=()=>{
+    axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/getParentObjective`)
+    .then(response => {
     })
+    .catch(error => {
+      console.log(error)
+    })
+  }
+  getObjectListData=()=>{
+    axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/listData`)
+    .then(response => {
+    })
+    .catch(error => {
+      console.log(error)
+    })
+  }
 
-  };
+
+  // retrieveInfo = () => {
+  //   axios.all
+  //     (
+  //       // 对接左侧导航栏端口
+  //       [
+  //         axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/menu/list`)
+  //           .then(response => {
+  //             console.log(response)
+  //             let initialPane = response.data.data[0]
+
+  //             let object = {};
+  //             object.title = initialPane.name;
+  //             object.content = '';
+  //             object.key = initialPane.name;
+  //             object.closable = false;
+
+  //             let initialPanes = [];
+  //             initialPanes.push(initialPane)
+
+  //             this.setState({
+  //               menu: response.data.data,
+  //               currentLevel: response.data.data[0].title,
+  //               panes: initialPanes
+
+  //             }, (() => {
+
+  //             }));
+
+
+  //           })
+  //           .catch(error => {
+  //             console.log("menu", error)
+  //           })
+  //       ],
+
+  //       // 对接OKR周期端口
+  //       [
+  //         axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
+  //           .then(response => {
+  //             this.setState({
+  //               listSelect: response.data.data,
+  //               currentOkrId: response.data.data[0].id,
+
+  //               currentOkrValue: response.data.data[0].title
+
+  //             });
+
+
+  //           })
+
+  //           .catch(error => {
+  //             console.log(error)
+  //           })
+  //       ]
+  //       ,
+  //       // 对接首页表格端口
+  //       [
+  //         axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/homeData?okrId=` + `${this.state.currentOkrId}`)
+  //         .then(response => {
+  //           this.setState({
+  //             currentLevel: "company",
+  //             homeData: response.data.data
+  //           }, (() => {
+  //             console.log(response.data, 'homedatat')
+  //           }))
+  //             ;
+  //           this.setState({
+  //             isLoading: false
+  //           })
+  //         }
+  //         )
+  //         .catch(error => {
+  //           console.log('home', error)
+
+  //         })
+  //       ],
+  //       // 对接上级可选Objective列表端口
+  //       [
+  //         axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/getParentObjective`)
+  //           .then(response => {
+  //           })
+  //           .catch(error => {
+  //             console.log(error)
+  //           })
+  //       ]
+  //       ,
+  //       // 对接列表数据端口
+  //       [
+  //         axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/listData`)
+  //           .then(response => {
+  //           })
+  //           .catch(error => {
+  //             console.log(error)
+  //           })
+  //       ],
+  //     )
+
+  //   this.setState({
+  //     isLoading: false
+  //   })
+
+  // };
 
   getNewPeriod = (period) => {
     axios.post((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/add`), {
@@ -224,11 +374,37 @@ export default class App extends Component {
   };
 
   // Tab 
-  onChange = (activeKey) => {
+  onTabChange = (activeKey) => {
+    if(activeKey==="1000"){
+      this.setState({
+        currentLevel:'company',
+        currentPersonId:"",
+        defaultSelectedKeys:"1000"
+       
+      },(()=>{
+        this.updateTable()
+      }))
+    }
+    else{
+      this.setState({
+        currentPersonId:activeKey,
+        defaultSelectedKeys:activeKey,
+      },(()=>{
+        this.updateTable()
+      }))
+    }
+
+    // const okrId = this.state.currentOkrId
+    // const level = this.state.currentLevel
+    // const ascriptionId = this.state.currentPersonId;
+
+
     //onChange Tab focus change 
+    console.log(activeKey,'tab Change')
     this.setState({
-      activeKey
+      activeKey:activeKey
     })
+    const {currentLevel} = this.state; 
 
   };
 
@@ -246,6 +422,7 @@ export default class App extends Component {
       currentPersonId: ascriptionId,
       currentLevel: level,
       activeKey: ascriptionId,
+      defaultSelectedKeys:ascriptionId
     }, (() => {
       const { panes } = this.state;
       this.checkPane(panes, itemId, itemLevel, itemName)
@@ -253,16 +430,12 @@ export default class App extends Component {
 
     }))
 
-    //check if tab exist in panes list then dtm create newPane or not; 
   };
-
-
 
   checkPane = (panes, itemId, itemLevel, itemName) => {
 
     let isExist = true
     panes.find(pane => {
-
       if (pane.title === itemName) {
 
         isExist = false;
@@ -299,7 +472,7 @@ export default class App extends Component {
 
   //获取表格数据
   updateTable = (updateLevel, updateId) => {
-
+  
     const okrId = this.state.currentOkrId
     const level = this.state.currentLevel
     const ascriptionId = this.state.currentPersonId;
@@ -312,7 +485,7 @@ export default class App extends Component {
       })
       if (res.data.msg === "成功") {
         console.log("跟新表格获取数据", res.data)
-    
+
 
         this.setState({
           homeData: res.data.data,
@@ -353,10 +526,14 @@ export default class App extends Component {
         newActiveKey = newPanes[0].key;
       }
     }
+    
     this.setState({
       panes: newPanes,
       activeKey: newActiveKey,
-    }, (() => { }));
+      // currentPersonId:newActiveKey
+    }, (() => { 
+      this.onTabChange(this.state.activeKey)
+    }));
   };
 
 
@@ -369,7 +546,7 @@ export default class App extends Component {
 
   getCreateNewObjective = (period, level, excutor, objective, upperObjective, keyResults) => {
     console.log(keyResults)
-    let arrayTemp = [{content:`${keyResults}`}];
+    let arrayTemp = [{ content: `${keyResults}` }];
     // console.log(arrayTemp)
     // console.log(((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/add`), {
     //   content: `${objective}`,
@@ -387,39 +564,129 @@ export default class App extends Component {
       ascription: `${excutor}`,
       keyResults: arrayTemp
     }).then(res => {
-     if(res.data.msg ==='成功'){
-      console.log('get update of table')
-    
-     }
-     else{
-       console.log(res.data.msg)
-     }
+      if (res.data.msg === '成功') {
+        console.log('get update of table')
+
+      }
+      else {
+        console.log(res.data.msg)
+      }
     })
 
 
   }
 
-  getNewEditObject=(object)=>{
+  getNewEditObject = (object) => {
     console.log(object)
 
-    Axios.post((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/edit`), object).then(res=>{
-      if(res.data.msg==='成功'){
+    Axios.post((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/edit`), object).then(res => {
+      if (res.data.msg === '成功') {
         console.log('can call update table')
 
       }
-      else{
+      else {
         console.log(res.data.msg)
       }
     })
   }
 
+  onTabClick=(key, event)=>{
+    console.log('tab Clicek', key, event)
+
+  }
+
   render() {
-    const { collapsed, activeKey, menu, listSelect, currentOkrId, currentOkrValue } = this.state;
+    // console.log(this.state.panes)
+    // console.log(this.state.activeKey,'state activeKye')
+    console.log(this.state.defaultSelectedKeys)
+    const { collapsed, activeKey, menu, listSelect, currentOkrId, currentOkrValue, bigLoading, panes, isPanesReady, isLoading, defaultSelectedKeys} = this.state;
     return (
       <div>
         <Layout>
           <div></div>
-          <Sider trigger={null} collapsible collapsed={this.state.collapsed} >
+          {bigLoading ?
+            <Spin tip="Loading...">
+              <Alert
+                message="Alert message title"
+                description="Further details about the context of this alert."
+                type="info"tableData
+
+              />
+            </Spin>
+            :
+            <React.Fragment>
+              <Sider trigger={null} collapsible collapsed={this.state.collapsed} >
+                {menu ?
+                  <SiderNav menu={menu} getItemKey={this.getItemKey} defaultSelectedKeys={defaultSelectedKeys}/>
+                  :
+                  <div className="example" style={{
+                    textAlign: 'center',
+                    background: 'rgba(0, 0, 0, 0.05)',
+                    borderRadius: '4px',
+                    marginBottom: '50px',
+                    padding: '30px 50px',
+                    margin: '20px 0'
+                  }}>
+                    <Spin size="large" tip="Loading..." />
+                  </div>
+                }
+
+
+              </Sider>
+
+              <Layout className="site-layout">
+
+                <HeaderNav collapsed={collapsed} toggle={this.toggle} />
+
+
+                <Tabs size='small' type="editable-card" hideAdd onChange={this.onTabChange} onEdit={this.onEdit} activeKey={activeKey} tabBarGutter={0}>
+                  
+                  {isPanesReady?
+                  <React.Fragment>
+                  {panes.map(pane => (
+                    <TabPane tab={pane.title} key={pane.key} closable={pane.closable} style={{ width: '12rem' }} onTabClick={this.onTabClick} >
+          
+                    </TabPane>
+                  ))}
+                  </React.Fragment>
+                   : null 
+                   }
+               
+                </Tabs>
+
+                {listSelect ?
+                  <ContentContainer expandAllRow={this.state.expandAllRow} 
+                    homeData={this.state.homeData} listSelect={this.state.listSelect}
+                    getNewPeriod={this.getNewPeriod}
+                    currentOkrValue={currentOkrValue} getOkrValue={this.getOkrValue}
+                    deletePeriod={this.deletePeriod} currentOkrId={currentOkrId}
+                    currentOkrValue={currentOkrValue}
+                    getCreateNewObjective={this.getCreateNewObjective}
+                    getNewEditObject={this.getNewEditObject}
+                    isLoading={isLoading}
+                  >
+                    updateExcutorList={this.updateExcutorList}
+
+                  </ContentContainer>
+                  :
+                  <div className="example" style={{
+                    textAlign: 'center',
+                    background: 'rgba(0, 0, 0, 0.05)',
+                    borderRadius: '4px',
+                    marginBottom: '50px',
+                    padding: '30px 50px',
+                    margin: '20px 0'
+                  }}>
+                    <Spin size="large" tip="Loading..." />
+                  </div>
+                }
+              </Layout>
+
+
+
+            </React.Fragment>
+          }
+          {/* <Sider trigger={null} collapsible collapsed={this.state.collapsed} >
             {menu ?
               <SiderNav menu={menu} getItemKey={this.getItemKey} />
               :
@@ -443,7 +710,17 @@ export default class App extends Component {
             <HeaderNav collapsed={collapsed} toggle={this.toggle} />
 
 
-            <Tabs size='small' type="editable-card" hideAdd onChange={this.onChange} onEdit={this.onEdit} activeKey={activeKey} tabBarGutter={0}>
+            <Tabs size='small' type="editable-card" hideAdd 
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            ={this.onChange} onEdit={this.onEdit} activeKey={activeKey} tabBarGutter={0}>
               {this.state.panes.map(pane => (
                 <TabPane tab={pane.title} key={pane.key} closable={pane.closable} style={{ width: '12rem' }} >
                   {pane.content}
@@ -474,8 +751,9 @@ export default class App extends Component {
                 margin: '20px 0'
               }}>
                 <Spin size="large" tip="Loading..." />
-              </div>}
-          </Layout>
+              </div>
+            }
+          </Layout> */}
         </Layout >
       </div>
     );
