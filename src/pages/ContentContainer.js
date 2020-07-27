@@ -104,7 +104,7 @@ export default class ContentContainer extends Component {
      //修改弹窗
 
     transfer =()=>{
-        console.log('shoe Edit state data', this.state.detailData)
+        console.log('Should choose Upper LeveObject', this.state.detailData)
         this.setState({
             showEditlModal: true
         })
@@ -120,7 +120,6 @@ export default class ContentContainer extends Component {
                         detailData: res.data.data,
                         parentId:parentId,
                     }, (()=>{
-                        console.log('stsate parent id', parentId)
                         this.transfer()
                     }))
                 }
@@ -135,7 +134,6 @@ export default class ContentContainer extends Component {
        
         onShowEditModal = (record, id) => {
             const parentId = record.parentId
-            console.log(record,'点击详情')
             this.getObjectiveInfo(parentId, id)
         }
   
@@ -369,7 +367,7 @@ export default class ContentContainer extends Component {
 
 
     render() {
-        const { tableData, listSelect, currentOkrValue, getCreateNewObjective } = this.props;
+        const { tableData, listSelect, currentOkrValue, getCreateNewObjective, getNewEditObject } = this.props;
         const { columns, onFinish, detailData, parentId } = this.state;
     
         return (
@@ -505,7 +503,7 @@ export default class ContentContainer extends Component {
                     }
 
                     {/* /修改的弹窗 */}
-                    {this.state.showEditlModal && <EditModal visible={this.state.showEditlModal} onCloseEditiModal={this.onCloseEditiModal} data={detailData} parentId={parentId}/>
+                    {this.state.showEditlModal && <EditModal visible={this.state.showEditlModal} onCloseEditiModal={this.onCloseEditiModal} data={detailData} parentId={parentId} getNewEditObject={getNewEditObject}/>
                     }
 
 

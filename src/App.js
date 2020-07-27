@@ -370,15 +370,15 @@ export default class App extends Component {
   getCreateNewObjective = (period, level, excutor, objective, upperObjective, keyResults) => {
     console.log(keyResults)
     let arrayTemp = [{content:`${keyResults}`}];
-    console.log(arrayTemp)
-    console.log(((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/add`), {
-      content: `${objective}`,
-      okrId: period,
-      level: `${level}`,
-      parentId: upperObjective,
-      ascription: `${excutor}`,
-      keyResults: arrayTemp
-    }))
+    // console.log(arrayTemp)
+    // console.log(((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/add`), {
+    //   content: `${objective}`,
+    //   okrId: period,
+    //   level: `${level}`,
+    //   parentId: upperObjective,
+    //   ascription: `${excutor}`,
+    //   keyResults: arrayTemp
+    // }))
     Axios.post((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/add`), {
       content: `${objective}`,
       okrId: period,
@@ -397,6 +397,20 @@ export default class App extends Component {
     })
 
 
+  }
+
+  getNewEditObject=(object)=>{
+    console.log(object)
+
+    Axios.post((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/edit`), object).then(res=>{
+      if(res.data.msg==='成功'){
+        console.log('can call update table')
+
+      }
+      else{
+        console.log(res.data.msg)
+      }
+    })
   }
 
   render() {
@@ -445,6 +459,7 @@ export default class App extends Component {
                 deletePeriod={this.deletePeriod} currentOkrId={currentOkrId}
                 currentOkrValue={currentOkrValue}
                 getCreateNewObjective={this.getCreateNewObjective}
+                getNewEditObject={this.getNewEditObject}
               >
                 updateExcutorList={this.updateExcutorList}
 

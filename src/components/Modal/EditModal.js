@@ -16,7 +16,6 @@ const makeGroup = ({ groupName, data }) => (
 );
 
 const formatOptions = (data) => {
-    console.log(data)
     return <React.Fragment> {data.map(makeGroup)} </React.Fragment>
 }
 
@@ -25,22 +24,19 @@ export default class EditModal extends Component {
     state = {
         loading: true,
         id: null,
-        content: null,
-        parentId: null,
-        parentContent: "testing Parent conetne",
-        keyResults: [],
-        level: null,
-        okrId: null,
+        content: null, //content require
+        parentId: null, //parentId require
+        parentContent:null,
+        keyResults: [], //keyResults require
+        level: null,    //level require
+        okrId: null,    //edit require
         ascriptionId: null,
         disabledSelect: true,
         isKeyResultsReady: false,
-        initialValues: null,
+        initialValues: {
+            // upperObjective:['123456']
+        },
         createNewEle: null,
-        options: [
-            { label: 'hello labe', value: 'kjsijijisf' },
-            { label: 'peteree', value: 'petterersvvvs' },
-            { label: 'mike llo labe', value: 'jkjksjkff' }
-        ],
 
         upperObjectiveSelection: null,
         optionsList: [{ name: 'content1' },
@@ -48,21 +44,21 @@ export default class EditModal extends Component {
         { name: 'content4' }],
         //testing
         isContentReday: false,
-        fieldData: [
-            {
-                name: [
-                    "result1"
-                ],
-                value: "result value 1"
+        // fieldData: [
+        //     {
+        //         name: [
+        //             "result1"
+        //         ],
+        //         value: "result value 1"
 
-            },
-            {
-                name: [
-                    "result2"
-                ],
-                value: "result value 2"
-            },
-        ]
+        //     },
+        //     {
+        //         name: [
+        //             "result2"
+        //         ],
+        //         value: "result value 2"
+        //     },
+        // ]
 
     }
 
@@ -78,7 +74,7 @@ export default class EditModal extends Component {
             ascriptionId: data.ascription,
         }, (() => {
             this.getUpperLevelObjective()
-            // this.formatInitialValues()
+            this.formatInitialValues()
             this.setState({
                 isContentReday: true,
                 isKeyResultsReady: true
@@ -89,13 +85,47 @@ export default class EditModal extends Component {
         }))
     }
 
-    onFinish = () => {
-        this.props.onCloseEditiModal()
-    }
+
 
     onCancel = () => {
         this.props.onCloseEditiModal()
     }
+
+    formatInitialValues = () => {
+        const { content, keyResults, parentContent, initialValues } = this.state;
+
+        let tempInitialValues = initialValues;
+
+        let tempContent = []
+        tempContent.push(content) // expect see : ["content"]
+        tempInitialValues.content = tempContent;
+
+        // let tempParentContent = [];
+        // tempParentContent.push(parentContent);
+        // let tempUpperObjective = [];
+        // tempUpperObjective.push(parentContent)
+        // tempInitialValues.upperObjective="目标内容"
+        ;
+        
+        let tempKeyResults = [];
+        keyResults.forEach(item => {
+            tempKeyResults.push(item.content)
+        })
+
+        tempInitialValues.keyResults = tempKeyResults
+
+       
+
+        this.setState({
+            initialValues: tempInitialValues
+        }, (() => {
+            this.setState({ loading: false })
+        }))
+
+
+
+    }
+
 
     getUpperLevelObjective = () => {
         const { okrId, level, ascriptionId } = this.state;
@@ -104,7 +134,8 @@ export default class EditModal extends Component {
                 if (res.status = 200) {
                     if (res.data.data.length === 0) {
                         this.setState({
-                            disabledSelect: true
+                            disabledSelect: true,
+                            placeholder:'无需选择'
                         },
                             (() => {
                                 this.setState({
@@ -113,24 +144,34 @@ export default class EditModal extends Component {
                             }))
                     }
                     else {
-                        console.log('getUpperObejct', res.data.data)
-                        console.log('sse if get parent id ', this.state.parentId)
                         const { parentId } = this.state;
                         let upperSelection = res.data.data[0].data;
-                        console.log('upperselction', upperSelection)
                         const parentInfo = upperSelection.filter(item => item.id === parentId)
-                        const parentContent = parentInfo.map(item => { return item.content })
-                        // const initialUpperObject = res.data.data[0].data.fitler(item=>item.id ===parentId)
-                        console.log("initialUpperObject", parentContent)
-                        this.setState({
-                            parentContent: parentContent,
-                            upperObjectiveSelection: res.data.data,
-                            disabledSelect: false
-                        }, (() => {
+                        // const parentContent = parentInfo.map(item => { return item.content })
+                        parentInfo.forEach(item=>{
                             this.setState({
-                                loading: false
-                            })
-                        }))
+                                parentContent:item.content
+                            }, (()=>{
+                                this.setState({
+                                    upperObjectiveSelection: res.data.data,
+                                    disabledSelect: false
+                                },(()=>{
+                                    this.formatInitialValues()
+                                }))
+                            }))
+                        })
+                        // this.setState({
+                        //     parentContent: parentContent,
+                        //     upperObjectiveSelection: res.data.data,
+                        //     disabledSelect: false
+                        // }, (() => {
+                        //     // this.setState({
+                        //     //     loading: false
+                        //     // })
+                        //     this.formatInitialValues()
+
+                        // }))
+
                     }
                 }
                 else {
@@ -139,81 +180,158 @@ export default class EditModal extends Component {
 
     }
 
+
+
     add = () => {
         console.log('add function')
         const { keyResults } = this.state;
         let newContainer = []
     }
 
-    onChangeInUpperObject = (Option,) => {
+    onChangeInUpperObject = (Option) => {
+        this.setState({
+            parentId:Option
+        })
         console.log("choose wichch upper obejct", Option)
-
     }
 
 
-    onFinish = values => {
-        console.log('Received values of form:', values);
-    };
+
+
 
     getInfo = (index) => {
         console.log('getInfo', index)
     }
 
 
+    onOk = () => {
+        const {id, parentId} = this.state;
+        const formValues = this.formRef.current.getFieldsValue()
+        const newContent = formValues.content[0];
 
-    render() {
-        const { visible, data, parentId, } = this.props;
-        const { content, upperObjectiveSelection, loading, disabledSelect, isKeyResultsReady, initialValues, keyResults, createNewEle, parentContent, fieldData } = this.state;
-        const x = initialValues;
-        console.log(fieldData, "field Data")
-        return (
-            < Modal
-                title="编辑Objective"
-                visible={visible}
-                okText="提交"
-                onOk={this.onFinish}
-                onCancel={this.onCancel}
-            >
+        let newObject={};
+        newObject.id=id;
+        newObject.content=newContent;
+        newObject.parentId=parentId;
+        newObject.keyResults=[];
+        
+        formValues.keyResults.map(i=>{
+            newObject.keyResults.push({content:i})
+        })
+        console.log('newObject', JSON.stringify(newObject))
+        this.props.getNewEditObject(newObject)
+        this.props.onCloseEditiModal()
+    }
 
-                {loading ?
-                    <Spin tip="Loading...">
-                        <Alert
-                            message="下载中"
-                            description=""
-                            type="info"
-                        />
-                    </Spin>
-                    :
-                    <Form
-                        ref={this.formRef}
-                        layout="vertical"
-                        name="editForm"
-                        onFieldsChange={(changedFields, allFields) => { console.log('changedFields, allFields', changedFields, allFields) }}
+
+
+render() {
+    const { visible, data} = this.props;
+    const { content, upperObjectiveSelection, loading, disabledSelect, isKeyResultsReady, initialValues, keyResults, createNewEle, parentContent, fieldData, parentId } = this.state;
+    return (
+        < Modal
+            title="编辑Objective"
+            visible={visible}
+            okText="提交"
+            onOk={this.onOk}
+            onCancel={this.onCancel}
+        >
+
+            {loading ?
+                <Spin tip="Loading...">
+                    <Alert
+                        message="下载中"
+                        description=""
+                        type="info"
+                    />
+                </Spin>
+                :
+                <Form
+                    ref={this.formRef}
+                    layout="vertical"
+                    name="editForm"
+                    initialValues={initialValues} //intie={}
+                >
+                    <Form.Item
+                        name='content'
+                        label="Objective"
+
                     >
-                        <Form.Item
-                            name='content'
-                            label="Objective"
-                            initialValue={content}
-                        >
-                            <Input />
-                        </Form.Item>
+                        <Input />
+                    </Form.Item>
 
-                        <Form.Item
-                            name="upperObjective"
-                            label="上级Object"
-                            initialValue={parentContent}
-                        >
+                    <Form.Item
+                        name='upperObjective'
+                        label="上级Object"
+                    >
+                        {parentContent}
+                        {initialValues.upperObjective}
+                        <Select disabled={disabledSelect} onSelect={this.onChangeInUpperObject} value={String(parentId)} >
 
-                            <Select disabled={disabledSelect} onSelect={this.onChangeInUpperObject} >
+                            {disabledSelect ? null : formatOptions(upperObjectiveSelection)}
+                        </Select>
+                    </Form.Item>
 
-                                {disabledSelect ? null : formatOptions(upperObjectiveSelection)}
-                            </Select>
-                        </Form.Item>
+                    <Form.List name="keyResults">
+                        {(fields, { add, remove }) => {
+                            return (
+                                <div>
+                                    {fields.map((field, index) => (
+                                        <Form.Item
+                                            label={index === 0 ? "Key Results" : ""}
+                                            required={false}
+                                            key={field.key}
+                                        >
+                                            <Form.Item
+                                                {...field}
 
-                        <Form.List
-                            name={fieldData}
-                            
+                                                validateTrigger={["onChange", "onBlur"]}
+                                                rules={[
+                                                    {
+                                                        required: true,
+                                                        whitespace: true,
+                                                        message:
+                                                            "Please input passenger's name or delete this field."
+                                                    }
+                                                ]}
+                                                noStyle
+                                            >
+                                                <Input
+                                                    placeholder="passenger name"
+                                                    style={{ width: "60%" }}
+                                                />
+                                            </Form.Item>
+                                            {fields.length > 1 ? (
+                                                <MinusCircleOutlined
+                                                    className="dynamic-delete-button"
+                                                    style={{ margin: "0 8px" }}
+                                                    onClick={() => {
+                                                        remove(field.name);
+                                                    }}
+                                                />
+                                            ) : null}
+                                        </Form.Item>
+                                    ))}
+                                    <Form.Item>
+                                        <Button
+                                            type="dashed"
+                                            onClick={() => {
+                                                add();
+                                            }}
+                                            style={{ width: "60%" }}
+                                        >
+                                            <PlusOutlined /> Add field
+                                         </Button>
+                                    </Form.Item>
+                                </div>
+                            );
+                        }}
+                    </Form.List>
 
+
+                    {/* <Form.List
+                            name="Results"
+                            label=""
                         >
                             {(fields, { remove, add }) => {
 
@@ -258,10 +376,10 @@ export default class EditModal extends Component {
 
 
 
-                        </Form.List>
+                        </Form.List> */}
 
 
-                        {/* <Form.Item
+                    {/* <Form.Item
                             name="keyresults"
                             label="Key Results "
                         >
@@ -327,13 +445,13 @@ export default class EditModal extends Component {
                                 
                             </Form.List>
                         </Form.Item> */}
-                    </Form>}
+                </Form>}
 
-            </Modal>
+        </Modal>
 
 
-        )
-    }
+    )
+}
 }
 
 
