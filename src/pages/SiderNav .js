@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import 'antd/dist/antd.css';
 import { Menu } from 'antd';
 import SubMenu from 'antd/lib/menu/SubMenu';
+import logo from '../asset/mainlogo.jpg'
 
 
 
@@ -9,7 +10,7 @@ export default class SiderNav extends Component {
 
     state = {
         loading: false,
-        defaultSelectedKeys:null,
+        defaultSelectedKeys: null,
     }
 
     componentDidMount() {
@@ -17,7 +18,7 @@ export default class SiderNav extends Component {
 
     }
 
-    onClikMenuItem=({ item, key })=> {
+    onClikMenuItem = ({ item, key }) => {
         console.log(item, key)
         const id = key //ascription id 
         const level = item.props.datalevel
@@ -25,21 +26,24 @@ export default class SiderNav extends Component {
         console.log(name, id, level)
         this.props.getItemKey(id, level, name)
     }
-    
+
 
 
     render() {
-        const { menu,  defaultSelectedKeys} = this.props;
-        const {  loading } = this.state;
+        const { menu, defaultSelectedKeys } = this.props;
+        const { loading } = this.state;
         return (
             <div>
                 {loading ?
-                 null
-                :
+                    null
+                    :
                     <React.Fragment>
-                        <div className="logo" >掌声OKR</div>
+                        <div className="logo" style={{ height: '3rem', display: 'flex', backgroundColor: '#131629' }} >
+                            <img style={{ width: '3rem' }} src={logo} />
+                            <h1 style={{ color: 'white', fontWeight: 'bold', marginLeft: '10px', marginTop: '5px', fontSize: '26px' }}>OKR管理</h1>
+                        </div>
 
-                        <Menu mode="inline" theme='dark' onSelect={this.onClikMenuItem} selectedKeys={defaultSelectedKeys}>
+                        <Menu mode="inline" theme='dark' onSelect={this.onClikMenuItem} selectedKeys={defaultSelectedKeys} style={{ height: '55rem' }}>
 
                             <Menu.Item key='1000' datalevel={menu[0].level} dataname={menu[0].name} >{menu[0].name}</Menu.Item>
 

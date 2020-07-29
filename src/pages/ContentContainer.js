@@ -34,33 +34,66 @@ export default class ContentContainer extends Component {
             {
                 title: '执行人',
                 dataIndex: 'ascriptionName',
-                key: 'ascriptionName'
+                key: 'ascriptionName',
+                render: (value) => {
+                    if (value = undefined) {
+                        console.log('没有执行人', value)
+                    }
+                    else {
+                        return value
+
+                    }
+                }
             },
             {
                 title: '类型',
                 dataIndex: 'level',
-                key: 'level'
+                key: 'level',
+                render: (value) => {
+
+                    let x = null;
+                    if (value === "company") {
+                        x = "公司"
+                    }
+                    if (value === "department") {
+                        x = "部门"
+                    }
+                    if (value === "person") {
+                        x = "个人"
+                    }
+                    return x
+                }
+
             },
             {
                 title: '操作',
                 dataIndex: 'operation',
                 // render: () => <span><Button>修改</Button><Button>查看</Button></span>
-                render: (text, record) =>{
-                    return(
-                    <div>
-                        <Button onClick={() => { console.log('click check id of', record.id); this.onShowDetail(record.id) }}>
-                            <a>查看</a>
-                        </Button>
-                        <Button onClick={() => { console.log('click check id of', record.id); this.onShowEditModal(record ,record.id) }}>
-                            <a>修改</a>
-                        </Button>
+                render: (text, record, value) => (
+                   
 
-                    </div>
-                    )
-                }
+                    <span>
+                        {this.props.activeKey === '2111551' ?
+                            <div>
+                                <span style={{ marginRight: 8, }} onClick={() => { console.log('click check id of', record.id); this.onShowDetail(record.id) }}>
+                                    <a>查看</a>
+                                </span>
+                                <span onClick={() => { console.log('click check id of', record.id); this.onShowEditModal(record, record.id) }}>
+                                    <a>修改</a>
+                                </span>
+                            </div>
+                            :
+                            <span onClick={() => { console.log('click check id of', record.id); this.onShowEditModal(record, record.id) }}>
+                                <a>修改</a>
+                            </span>
+                        }
+                    
+                    </span>
+                )
+              
 
 
-            },
+            }
         ],
         currentOkrId: null,
         homeData: null, //储存异步父传子的内容
@@ -69,7 +102,7 @@ export default class ContentContainer extends Component {
         currentExcutorList: [],
         visible: false,
         value: 1,
-        parentId:null,
+        parentId: null,
         showDetailModal: false,
         detailId: null,
         detailData: null,
@@ -98,15 +131,15 @@ export default class ContentContainer extends Component {
         //delete OKR Modal
         showDeletePeriodModal: false,
 
-
+        childrenColumnName: ['children'],
         //codeSnad
+        newOkrInputValue:null,
 
     }
 
-     //修改弹窗
+    //修改弹窗
 
-    transfer =()=>{
-        console.log('Should choose Upper LeveObject', this.state.detailData)
+    transfer = () => {
         this.setState({
             showEditlModal: true
         })
@@ -117,11 +150,11 @@ export default class ContentContainer extends Component {
             .then(res => {
                 if (res.data.msg === '成功') {
                     console.log(res.data)
-                    
+
                     this.setState({
                         detailData: res.data.data,
-                        parentId:parentId,
-                    }, (()=>{
+                        parentId: parentId,
+                    }, (() => {
                         this.transfer()
                     }))
                 }
@@ -133,18 +166,18 @@ export default class ContentContainer extends Component {
             })
 
     }
-       
-        onShowEditModal = (record, id) => {
-            const parentId = record.parentId
-            this.getObjectiveInfo(parentId, id)
-        }
-  
-        onCloseEditiModal = (e) => {
-            this.setState({
-                showEditlModal: false
-            })
-    
-        }
+
+    onShowEditModal = (record, id) => {
+        const parentId = record.parentId
+        this.getObjectiveInfo(parentId, id)
+    }
+
+    onCloseEditiModal = (e) => {
+        this.setState({
+            showEditlModal: false
+        })
+
+    }
 
 
     //点击查看
@@ -153,25 +186,25 @@ export default class ContentContainer extends Component {
             detailId: id
         }, (() => {
 
-        axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/info/` + `${id}`)
-            .then(res => {
-                if (res.data.msg === '成功') {
-                    console.log(res.data)
-                    this.setState({
-                        detailData: res.data.data
-                    }, (() => {
-
+            axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/info/` + `${id}`)
+                .then(res => {
+                    if (res.data.msg === '成功') {
                         this.setState({
-                            showDetailModal: true
-                        })
-                    }))
-                }
-                else {
-                    console.log('Failed', res.data.msg)
-                }
-            })
-        
-        }))}
+                            detailData: res.data.data
+                        }, (() => {
+
+                            this.setState({
+                                showDetailModal: true
+                            })
+                        }))
+                    }
+                    else {
+                        console.log('Failed', res.data.msg)
+                    }
+                })
+
+        }))
+    }
 
     closeDetailModal = (e) => {
         this.setState({
@@ -189,7 +222,6 @@ export default class ContentContainer extends Component {
 
 
     handleExcutorChange(option, input) {
-        console.log(option, input)
         // console.log(`selected ${value}`);
 
 
@@ -271,28 +303,28 @@ export default class ContentContainer extends Component {
     //Model function
 
     showModal = () => {
+
         this.setState({
             modalVisible: true,
         });
     };
 
-    onModalFinish = fieldsValue => {
-        const newOkr = fieldsValue.OKR周期
-        console.log(this.state.newOkrPeriod)
+    onModalFinish = () => {
+        const {newOkrInputValue} = this.state;
+    
         this.setState({
             modalVisible: false,
-
         });
-        message.success('添加目标成功', 1);
-        this.props.getNewPeriod(newOkr)
+        this.formRef.current.resetFields()  //清空
+        this.props.getNewPeriod(newOkrInputValue)
     };
 
     onCloseModel = (e) => {
+        this.formRef.current.resetFields()//清空
+
         this.setState({
             modalVisible: false,
-
         });
-
     };
 
     onObejectiveChange = (e) => {
@@ -364,14 +396,22 @@ export default class ContentContainer extends Component {
         })
 
     }
+    handleAddNewOkrInput=(changedValues, allValues)=>{
 
+        console.log('change in okr intpu', changedValues.newOkrPeriod, allValues)
+       this.setState({
+           newOkrInputValue:changedValues.newOkrPeriod
+       }, (()=>{
+           console.log(this.state.newOkrInputValue)
+       }))
+    }
 
 
 
     render() {
         const { tableData, listSelect, currentOkrValue, getCreateNewObjective, getNewEditObject, isLoading } = this.props;
-        const { columns, onFinish, detailData, parentId } = this.state;
-    
+        const { columns, onFinish, detailData, parentId, childrenColumnName } = this.state;
+
         return (
             <div>
 
@@ -380,7 +420,7 @@ export default class ContentContainer extends Component {
 
                     <div className="time-range" style={{ display: 'flex', alignItems: 'center', marginBottom: "1rem" }}>
                         <span style={{ width: '5rem' }}>OKR周期</span>
-                        <Select defaultValue={currentOkrValue} onSelect={this.handleOkrChange} style={{ width: '100%' }}>
+                        <Select value={currentOkrValue} onSelect={this.handleOkrChange} style={{ width: '100%' }}>
                             {this.props.listSelect.map(item => {
                                 return <Option key={item.id} value={item.title}>{item.title}</Option>
                             })}
@@ -432,9 +472,9 @@ export default class ContentContainer extends Component {
                             </Button>
 
                         {this.state.showDeletePeriodModal ?
-                            <Modal title="删除OKR周期"
+                            <Modal 
+                            title="删除OKR周期"
                                 onCancel={this.onCloseDeletePeriodModal}
-
 
                                 visible={this.state.showDeletePeriodModal}
                                 footer={null}>
@@ -469,30 +509,33 @@ export default class ContentContainer extends Component {
                         <Modal
                             title="添加OKR周期"
                             onCancel={this.onCloseModel}
-                            onOk={this.handleAddOkr}
+                            onOk={this.onModalFinish}
+                            okText="提交"
                             visible={this.state.modalVisible}
-                            onChange={this.handldeAddPeriod}
-                            footer={null}
-
                         >
-                            <Form {...layout} hideRequiredMark onFinish={this.onModalFinish} onValuesChange={this.addOkrPeriodChange}>
+                            <Form 
+                            ref={this.formRef}
+                            {...layout} hideRequiredMark
+                            onValuesChange={this.handleAddNewOkrInput}
+                             >
                                 {/* //填写结果 */}
                                 <Form.Item
-                                    name="OKR周期"
+                                    name="newOkrPeriod"
                                     label="OKR周期"
                                     rules={[{ required: true, message: '填写OKR周期' }]}
+                                   
                                 >
 
-                                    <Input style={{ width: '100%' }} value="period" onChange={this.handleAddOkrInput} />
+                                    <Input style={{ width: '100%' }}  />
                                 </Form.Item>
-                                < div style={{ textAlign: 'right' }} >
+                                {/* < div style={{ textAlign: 'right' }} >
                                     <Button onClick={this.onCloseModel} style={{ marginRight: 8 }}>
                                         关闭
                                     </Button>
                                     <Button type="primary" htmlType="submit">
                                         添加
                                     </Button>
-                                </div>
+                                </div> */}
 
                             </Form>
                         </Modal>
@@ -505,12 +548,12 @@ export default class ContentContainer extends Component {
                     }
 
                     {/* /修改的弹窗 */}
-                    {this.state.showEditlModal && <EditModal visible={this.state.showEditlModal} onCloseEditiModal={this.onCloseEditiModal} data={detailData} parentId={parentId} getNewEditObject={getNewEditObject}/>
+                    {this.state.showEditlModal && <EditModal visible={this.state.showEditlModal} onCloseEditiModal={this.onCloseEditiModal} data={detailData} parentId={parentId} getNewEditObject={getNewEditObject} />
                     }
 
 
                     {
-                       this.props.homeData ?
+                        this.props.homeData ?
 
                             <div>
                                 <Table
@@ -520,11 +563,12 @@ export default class ContentContainer extends Component {
                                     defaultExpandAllRows={true}
                                     rowKey={record => record.id}
                                     childrenColumnName="keyResults"
+                        
                                 />
 
                             </div>
                             :
-                            <div>  暂无数据</div>
+                            <div>暂无数据</div>
 
                     }
                 </Content >
