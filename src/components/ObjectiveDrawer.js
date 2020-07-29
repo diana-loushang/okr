@@ -34,7 +34,7 @@ const makeOptGroup = ({ groupName, data }) => (
 );
 
 const formatUpperObject = (data) => {
-    return <React.Fragment> <Select.Option>I am HelloOutside</Select.Option>{data.map(makeOptGroup)} </React.Fragment>
+    return <React.Fragment> {data.map(makeOptGroup)} </React.Fragment>
 }
 
 const useResetFormOnCloseModal = ({ form, visible }) => {
@@ -70,7 +70,7 @@ export default class ObjectiveDrawer extends Component {
         levelFilled: false,
         excutorFilled: false,
         disabled: false,
-
+        disabledSelect:true,
     }
 
     formRef = React.createRef();
@@ -211,14 +211,24 @@ export default class ObjectiveDrawer extends Component {
             .then(res => {
                 if (res.status = 200) {
                     console.log('getUpperObejct data', res.data.data)
-                    this.setState({
-                        upperObjectiveData: res.data.data
-                    }, (() => {
+                    if(res.data.data.length===0){
+                        console.log('no upper obejct')
+                        
+                    }
+                    else{
 
+                        console.log('chose upper obejct')
                         this.setState({
-                            loadingUpperObjective: false
-                        })
-                    }))
+                            disabledSelect:false,
+                            upperObjectiveData: res.data.data
+                        }, (() => {
+    
+                            this.setState({
+                                loadingUpperObjective: false
+                            })
+                        }))
+                    }
+                 
 
                 }
                 else {
@@ -276,7 +286,7 @@ export default class ObjectiveDrawer extends Component {
 
     render() {
         const { listSelect, visible } = this.props;
-        const { isLoading, excutorData, upperObjectiveData } = this.state;
+        const { isLoading, excutorData, upperObjectiveData, disabledSelect } = this.state;
 
         return (
             <Modal
@@ -338,7 +348,7 @@ export default class ObjectiveDrawer extends Component {
                         label="上级Objective"
                         rules={[{ required: true }, { message: "选择上级Objective" }]}
                     >
-                        <Select label="选择上级Objective" onMouseEnter={this.onMouseEnterObjective} loading={this.state.loadingUpperObjective} onChange={this.onUpperObjectiveChange}>
+                        <Select label="选择上级Objective" disabled={disabledSelect} onMouseEnter={this.onMouseEnterObjective} loading={this.state.loadingUpperObjective} onChange={this.onUpperObjectiveChange}>
 
                             {this.state.loadingUpperObjective ? null : formatUpperObject(upperObjectiveData)}
                         </Select>
