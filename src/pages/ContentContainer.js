@@ -44,24 +44,10 @@ export default class ContentContainer extends Component {
                 title: '类型',
                 dataIndex: 'level',
                 key: 'level',
-                render: (value, record) => {
-
-                    // let x = null;
-                    // if (value === "company") {
-                    //     x = "公司"
-                    // }
-                    // if (value === "department") {
-                    //     x = "部门"
-                    // }
-                    // if (value === "person") {
-                    //     x = "个人"
-                    // }
-                    // else{
-                    //     x = value
-                    // }
-                    return record.level
-                }
-
+                render:((text, record, value) => {
+                    let level = record.level
+                    return <span>{level}</span>;
+                })
             },
             {
                 title: '操作',
@@ -74,17 +60,17 @@ export default class ContentContainer extends Component {
                         <span>
                             {this.props.activeKey === '2111551' ?
                                 <div>
-                                    <span style={{ marginRight: 8, }} onClick={() => {  this.onShowDetail(record.id) }}>
+                                    <span style={{ marginRight: 8, }} onClick={() => { this.onShowDetail(record.id) }}>
                                         <a>查看</a>
                                     </span>
-                                    <span onClick={() => {  this.onShowEditModal(record, record.id) }}>
+                                    <span onClick={() => { this.onShowEditModal(record, record.id) }}>
                                         <a>修改</a>
                                     </span>
                                 </div>
                                 :
                                 <span>
                                     {level === "Objective" ?
-                                        <span onClick={() => {  this.onShowEditModal(record, record.id) }}>
+                                        <span onClick={() => { this.onShowEditModal(record, record.id) }}>
                                             <a>修改</a>
                                         </span> : null}
                                 </span>
@@ -137,11 +123,12 @@ export default class ContentContainer extends Component {
         childrenColumnName: ['children'],
         //codeSnad
         newOkrInputValue: null,
+        expandAllRows: true,
+        expKeys: [],
 
     }
 
     //修改弹窗
-
     transfer = () => {
         this.setState({
             showEditlModal: true
@@ -223,11 +210,11 @@ export default class ContentContainer extends Component {
     sendChange = this.props.getOkrValue;
 
 
-    handleExcutorChange(option, input) {
-        // console.log(`selected ${value}`);
+    // handleExcutorChange(option, input) {
+    //     // console.log(`selected ${value}`);
 
 
-    }
+    // }
 
 
     // 添加目标抽屉
@@ -243,9 +230,8 @@ export default class ContentContainer extends Component {
             visible: false,
         });
     };
+
     onFinish = fieldsValue => {
-
-
         message.success('添加目标成功', 1);
     };
 
@@ -274,7 +260,7 @@ export default class ContentContainer extends Component {
             data: temp,
             fetching: false
         }))
-      
+
         const level = e.target.value
         this.setState({
             currentLevel: level,
@@ -331,20 +317,18 @@ export default class ContentContainer extends Component {
 
     //展开折叠按钮
     handleExpand = () => {
+        console.log("expand all row")
         this.setState({
-            expand: true
-        })
+            expandAllRows: !this.state.expandAllRows
+        }, (() => {
+            console.log('check state expandAllrow', this.state.expandAllRows)
+        }))
     }
 
-
-    closeExpand = () => {
-        this.setState({
-            expand: false
-        })
-    }
 
     onExpand = (expanded, record) => {
         console.log(expanded)
+
 
     }
 
@@ -391,8 +375,8 @@ export default class ContentContainer extends Component {
 
 
     render() {
-        const {  listSelect, currentOkrValue, getCreateNewObjective, getNewEditObject } = this.props;
-        const { columns, onFinish, detailData, parentId } = this.state;
+        const { listSelect, currentOkrValue, getCreateNewObjective, getNewEditObject } = this.props;
+        const { columns, onFinish, detailData, parentId, expandAllRows } = this.state;
 
         return (
             <div>
@@ -445,13 +429,17 @@ export default class ContentContainer extends Component {
 
                         </Form.Provider>
 
+                        <Button onClick={this.handleExpand}>
+                            <PlusOutlined />收起
+                        </Button>
+
                         <Button onClick={this.showModal}>
                             <PlusOutlined />添加周期
-                            </Button>
+                        </Button>
 
                         <Button onClick={this.onShowDeletePeriodModal}>
                             <PlusOutlined />删除周期
-                            </Button>
+                        </Button>
 
                         {this.state.showDeletePeriodModal ?
                             <Modal
@@ -494,9 +482,9 @@ export default class ContentContainer extends Component {
 
                                 </Form>
                             </Modal>
-                            : 
+                            :
                             null
-                            }
+                        }
 
 
 
@@ -525,7 +513,7 @@ export default class ContentContainer extends Component {
                                     ]}
 
                                 >
-                                <Input style={{ width: '100%' }} />
+                                    <Input style={{ width: '100%' }} />
                                 </Form.Item>
                                 <div style={{ textAlign: 'right' }} >
                                     <Button onClick={this.onCloseModel} style={{ marginRight: 8 }}>
@@ -538,7 +526,7 @@ export default class ContentContainer extends Component {
 
                             </Form>
                         </Modal>
-                    </div >
+                    </div>
                     {/* /详情加OKR周期的弹窗 */}
                     {this.state.showDetailModal && <DetailModal visible={this.state.showDetailModal} closeDetailModal={this.closeDetailModal} data={detailData} />
                     }
@@ -551,14 +539,26 @@ export default class ContentContainer extends Component {
                         this.props.homeData ?
 
                             <div>
+                                {expandAllRows}
                                 <Table
                                     columns={columns}
                                     dataSource={this.props.homeData}
                                     expandable={true}
-                                    defaultExpandAllRows={true}
+                                    defaultExpandAllRows={expandAllRows}
                                     rowKey={record => record.id}
                                     childrenColumnName="children"
-                                    sxs
+                                    //
+
+                                    // 可控的展开与关闭数组
+                                    expandedRowKeys={this.state.expKeys}
+                                    //单个展开或关闭，操作数组
+                                    onExpand={(b, r) => {
+                                        const { expKeys } = this.state;
+                                        const newExp = b
+                                            ? [...expKeys, r.id]
+                                            : expKeys.filter(i => i !== r.id);
+                                        this.setState({ expKeys: newExp });
+                                    }}
                                 />
 
                             </div>
@@ -566,8 +566,13 @@ export default class ContentContainer extends Component {
                             <div>暂无数据</div>
 
                     }
-                </Content >
 
+
+
+
+
+
+                </Content >
 
 
 

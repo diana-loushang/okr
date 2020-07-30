@@ -73,17 +73,13 @@ export default class ObjectiveDrawer extends Component {
         disabledSelect: true, //Upper Object
         disabledExcutorSelect: true, //excutor Object
         initialValues: { keyResults: [' '] }
-
     }
 
     formRef = React.createRef();
     useResetFormOnCloseModal = useResetFormOnCloseModal;
 
-
-
-
-
     onCancel = () => {
+        console.log('hello')
         this.setState({
             visible: false,
         })
@@ -109,7 +105,6 @@ export default class ObjectiveDrawer extends Component {
     }
 
     onExcutorChange = (e) => {
-
         this.setState({
             excutor: e
         }, (() => {
@@ -123,15 +118,6 @@ export default class ObjectiveDrawer extends Component {
     }
 
 
-    // makePerson = ({ ascriptionId, name }, i) => {
-    //     return <Option key={i} value={ascriptionId} >{name}</Option>
-    // }
-
-    // makeGroup = (i, { groupName, list }) => {
-    //     return <OptGroup key={i} datagroupname={groupName}>
-    //         {list.map(this.makePerson(groupName))}
-    //     </OptGroup>
-    // }
 
     getExcutorData = (value) => {
         this.setState({
@@ -367,19 +353,6 @@ export default class ObjectiveDrawer extends Component {
                     >
                         <Input />
                     </Form.Item>
-
-                    {/* <Form.Item
-                        name="keyresults"
-                        label="Key Results "
-                        rules={[
-                            {
-                                required: true,
-                                message: "填写Key Results"
-                            }
-                        ]}
-                    >
-                        <Input />
-                    </Form.Item> */}
                     <Form.List name="keyResults" >
 
 
@@ -443,9 +416,9 @@ export default class ObjectiveDrawer extends Component {
 
                     </Form.List>
                     <div style={{ textAlign: 'right' }} >
-                        <Button onClick={this.onCloseModel} style={{ marginRight: 8 }}>
+                        <Button onClick={this.onCancel} style={{ marginRight: 8 }}>
                             取消
-                                    </Button>
+                        </Button>
                         <Button type="primary" htmlType="submit">
                             添加
                         </Button>

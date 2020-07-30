@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-// import * as dd from 'dingtalk-jsapi';
+import * as dd from 'dingtalk-jsapi';
 import axios from 'axios';
 import SiderNav from './pages/SiderNav ';
 import HeaderNav from './pages/HeaderNav';
@@ -38,32 +38,65 @@ export default class App extends Component {
     panes: null,
     defaultSelectedKeys: [],
     currentActivePaneInfo: null,
-    isTableReady:null,
+    isTableReady: null,
   }
 
 
   componentDidMount() {
-    axios.all(
-      [
+
+    // const corpId = `${process.env.REACT_CORP_ID}`
+    // console.log(corpId)
+    // dd.ready(function () {
+    //   dd.runtime.permission.requestAuthCode({
+    //     corpId: corpId, // 企业id
+    //     onSuccess: function (info) {
+    //       alert(info.code)// 通过该免登授权码可以获取用户身份
+
+    //       axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=`+`${info.code}`)
+    //       .then(res=>{
+    //         if(res.msg === "success"){
+    //           alert(res.msg)
+    //           axios.all
+    //           ([
+    //             this.getMenu(),
+    //             this.getOkrListSelect(),
+    //             this.getParentObjective(),
+    //             ])
+    //           .then(res => {
+    //             console.log(this.state.panes)
+    //             this.setState({
+    //               bigLoading: false
+    //             })
+    //           })
+    //         }
+     
+    //       })
+       
+
+    //     }
+    //   });
+    // });
+
+    axios.all
+      ([
         this.getMenu(),
         this.getOkrListSelect(),
-
         this.getParentObjective(),
-        // this.getObjectListData()
-      ]).then(res => {
+      ])
+      .then(res => {
         console.log(this.state.panes)
         this.setState({
           bigLoading: false
         })
-      }
-      )
+      })
+
   }
 
   // 初始化请求的接口  //连接后台读取GET数据
   getMenu = () => {
     axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/menu/list`)
       .then(response => {
-    
+
 
         this.setState({
           menu: response.data.data,
@@ -103,7 +136,7 @@ export default class App extends Component {
             ;
           this.setState({
             isLoading: false,
-            isTableReady:true
+            isTableReady: true
           })
         }
         else {
@@ -367,8 +400,8 @@ export default class App extends Component {
 
   };
 
-  setActive=(id)=>{
-  
+  setActive = (id) => {
+
 
   }
 
@@ -425,8 +458,8 @@ export default class App extends Component {
   reFreshPage = () => {
     // const { activeKey } = this.state;
     this.setState({
-      activeKey:'2111551'
-    }, (()=>{
+      activeKey: '2111551'
+    }, (() => {
       this.getActivePane(this.state.activeKey)
     }))
     let secondsToGo = 0;
@@ -453,7 +486,7 @@ export default class App extends Component {
     setTimeout(() => {
       clearInterval(timer);
       modal.destroy();
-    },  1000);
+    }, 1000);
 
 
   }
@@ -461,7 +494,7 @@ export default class App extends Component {
   //获取表格数据
   updateTable = (object) => {
     this.setState({
-      isTableReady:false
+      isTableReady: false
     })
 
     const { level, okrId, key } = object;
@@ -476,23 +509,23 @@ export default class App extends Component {
                 homeData: res.data.data,
               }, (() => {
                 this.setState({
-                  isTableReady:true
+                  isTableReady: true
                 })
               }))
             }
             else {
               this.setState({
                 homeData: res.data.data,
-              },(()=>{
+              }, (() => {
                 this.setState({
-                  isTableReady:true
+                  isTableReady: true
                 })
               }))
             }
           }
           else {
             this.setState({
-              isTableReady:true
+              isTableReady: true
             })
           }
         })
@@ -512,41 +545,41 @@ export default class App extends Component {
       const http = `${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/listData?okrId=` + `${okrId}` + '&ascriptionId=' + `${ascriptionId}` + `&level=` + `${level}`
 
       axios.get(http).then(res => {
-  
-        if (res.data.msg === "成功") {
 
-          if( res.data.data.length !== 0 ){
-            res.data.data.forEach(item=>{
+        if (res.data.msg === "成功") {
+          console.log('更新表格 请求数据，', res.data)
+          if (res.data.data.length !== 0) {
+            res.data.data.forEach(item => {
               item.children = item.keyResults;
-              item.level= "Objective"
-              item.keyResults.forEach(p=>{
-                p.level= "key Result"
+              item.level = "Objective"
+              item.keyResults.forEach(p => {
+                p.level = "key Result"
               })
-  
+
               this.setState({
                 homeData: res.data.data,
-              },(()=>{
+              }, (() => {
                 this.setState({
-                  isTableReady:true
+                  isTableReady: true
                 })
               }))
             })
           }
-          else{
+          else {
             this.setState({
               homeData: res.data.data,
-            },(()=>{
+            }, (() => {
               this.setState({
-                isTableReady:true
+                isTableReady: true
               })
             }))
           }
-      
+
         }
         else (
           console.log(res.data.msg)
         )
-     
+
       }
       )
     }
@@ -652,8 +685,8 @@ export default class App extends Component {
 
   render() {
 
-    const { collapsed, activeKey, menu, listSelect, currentOkrId, currentOkrValue, bigLoading, panes, isPanesReady, isLoading, defaultSelectedKeys, isTableReady} = this.state;
-    
+    const { collapsed, activeKey, menu, listSelect, currentOkrId, currentOkrValue, bigLoading, panes, isPanesReady, isLoading, defaultSelectedKeys, isTableReady } = this.state;
+
     return (
       <div>
         <Layout>
@@ -671,7 +704,7 @@ export default class App extends Component {
             <React.Fragment>
               <Sider trigger={null} collapsible collapsed={collapsed}  >
                 {menu ?
-                  <SiderNav menu={menu} getItemKey={this.getItemKey} defaultSelectedKeys={defaultSelectedKeys}  collapsed={collapsed}/>
+                  <SiderNav menu={menu} getItemKey={this.getItemKey} defaultSelectedKeys={defaultSelectedKeys} collapsed={collapsed} />
                   :
                   <div className="example" style={{
                     textAlign: 'center',
@@ -693,12 +726,12 @@ export default class App extends Component {
                 <HeaderNav collapsed={collapsed} toggle={this.toggle} reFreshPage={this.reFreshPage} />
 
 
-                <Tabs size='small' type="editable-card" hideAdd onChange={this.onTabChange} onEdit={this.onEdit} activeKey={activeKey} tabBarGutter={0}>
+                <Tabs size='small' type="editable-card" hideAdd onChange={this.onTabChange} onEdit={this.onEdit} activeKey={activeKey} tabBarGutter={0}  >
 
                   {isPanesReady ?
                     <React.Fragment>
                       {panes.map(pane => (
-                        <TabPane tab={pane.title} key={pane.key} closable={pane.closable} style={{ width: '8rem' , display:'flex', justifyContent:'center'}} onTabClick={this.onTabClick} >
+                        <TabPane tab={pane.title} key={pane.key} closable={pane.closable} style={{ width: '8rem', display: 'flex', justifyContent: 'center' }} onTabClick={this.onTabClick} >
 
                         </TabPane>
                       ))}
@@ -706,8 +739,8 @@ export default class App extends Component {
                     : null
                   }
                 </Tabs>
-                { isTableReady ?
-          
+                {isTableReady ?
+
                   <ContentContainer expandAllRow={this.state.expandAllRow}
                     homeData={this.state.homeData} listSelect={this.state.listSelect}
                     getNewPeriod={this.getNewPeriod}
@@ -737,7 +770,7 @@ export default class App extends Component {
               </Layout>
             </React.Fragment>
           }
-    
+
         </Layout >
       </div>
     );
