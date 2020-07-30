@@ -316,21 +316,40 @@ export default class ContentContainer extends Component {
 
 
     //展开折叠按钮
+    renderExpandButton=()=>{
+        
+    }
+
+    expandedRowRender=(record)=>{
+        console.log(record)
+        if(record.children === null ){
+            console.log('no children')
+        }
+        else{
+            console.log('expandedRowRender,', record)
+
+        }
+
+    }
     handleExpand = () => {
-        console.log("expand all row")
         this.setState({
             expandAllRows: !this.state.expandAllRows
         }, (() => {
-            console.log('check state expandAllrow', this.state.expandAllRows)
+            this.openOrCloseAll()
         }))
     }
+    openOrCloseAll = () => {
+        let data = this.props.homeData
+        const {expandAllRows} = this.state;
+        console.log('type', expandAllRows, data ,'homeData')
+        this.setState({
+            expKeys: expandAllRows ? [] : data && data.map(i => i.id)
+        }, (()=>{
+            console.log(this.state.expKeys,"state.expkeys")
+        }))
+      };
 
 
-    onExpand = (expanded, record) => {
-        console.log(expanded)
-
-
-    }
 
     handleOkrChange = (value, option) => {
         const id = option.key
@@ -338,10 +357,6 @@ export default class ContentContainer extends Component {
 
     }
 
-    // onObjectiveChange = e => {
-    //     console.log('onchage')
-    //     console.log(e);
-    // };
 
     onShowDeletePeriodModal = e => {
         this.setState({
@@ -559,6 +574,12 @@ export default class ContentContainer extends Component {
                                             : expKeys.filter(i => i !== r.id);
                                         this.setState({ expKeys: newExp });
                                     }}
+
+                                 
+                                    //expandedRowRender={(record )=> { console.log('expandedRowRender', record);  if(record.children === null){ console.log('dont show expand button') }else{this.expandedRowRender(record) }}}
+   
+                                   
+
                                 />
 
                             </div>

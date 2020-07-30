@@ -77,6 +77,10 @@ export default class App extends Component {
     //   });
     // });
 
+
+
+
+
     axios.all
       ([
         this.getMenu(),
@@ -129,15 +133,17 @@ export default class App extends Component {
             this.setState({
               isPanesReady: true,
               activeKey: '2111551'
-            })
+            }, (()=>{
+              this.setState({
+                isLoading: false,
+                isTableReady: true
+              })
+            }))
             // this.getObjectListData()
           }))
 
-            ;
-          this.setState({
-            isLoading: false,
-            isTableReady: true
-          })
+            
+      
         }
         else {
           alert(response.data.msg)
@@ -547,7 +553,7 @@ export default class App extends Component {
       axios.get(http).then(res => {
 
         if (res.data.msg === "成功") {
-          console.log('更新表格 请求数据，', res.data)
+
           if (res.data.data.length !== 0) {
             res.data.data.forEach(item => {
               item.children = item.keyResults;
