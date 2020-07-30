@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Modal from 'antd/lib/modal/Modal';
-import { Form, Input, Select, Button, message, Drawer, Spin, Alert } from 'antd';
+import { Form, Input, Select, Button, Spin, Alert } from 'antd';
 import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import Axios from 'axios';
 const { Option, OptGroup } = Select;
@@ -44,21 +44,6 @@ export default class EditModal extends Component {
         { name: 'content4' }],
         //testing
         isContentReday: false,
-        // fieldData: [
-        //     {
-        //         name: [
-        //             "result1"
-        //         ],
-        //         value: "result value 1"
-
-        //     },
-        //     {
-        //         name: [
-        //             "result2"
-        //         ],
-        //         value: "result value 2"
-        //     },
-        // ]
 
     }
 
@@ -92,7 +77,7 @@ export default class EditModal extends Component {
     }
 
     formatInitialValues = () => {
-        const { content, keyResults, parentContent, initialValues } = this.state;
+        const { content, keyResults, initialValues } = this.state;
 
         let tempInitialValues = initialValues;
 
@@ -100,12 +85,7 @@ export default class EditModal extends Component {
         tempContent.push(content) // expect see : ["content"]
         tempInitialValues.content = tempContent;
 
-        // let tempParentContent = [];
-        // tempParentContent.push(parentContent);
-        // let tempUpperObjective = [];
-        // tempUpperObjective.push(parentContent)
-        // tempInitialValues.upperObjective="目标内容"
-        ;
+ 
         
         let tempKeyResults = [];
         keyResults.forEach(item => {
@@ -160,17 +140,7 @@ export default class EditModal extends Component {
                                 }))
                             }))
                         })
-                        // this.setState({
-                        //     parentContent: parentContent,
-                        //     upperObjectiveSelection: res.data.data,
-                        //     disabledSelect: false
-                        // }, (() => {
-                        //     // this.setState({
-                        //     //     loading: false
-                        //     // })
-                        //     this.formatInitialValues()
-
-                        // }))
+        
 
                     }
                 }
@@ -184,15 +154,13 @@ export default class EditModal extends Component {
 
     add = () => {
         console.log('add function')
-        const { keyResults } = this.state;
-        let newContainer = []
+  
     }
 
     onChangeInUpperObject = (Option) => {
         this.setState({
             parentId:Option
         })
-        console.log("choose wichch upper obejct", Option)
     }
 
 
@@ -226,8 +194,8 @@ export default class EditModal extends Component {
 
 
 render() {
-    const { visible, data} = this.props;
-    const { content, upperObjectiveSelection, loading, disabledSelect, isKeyResultsReady, initialValues, keyResults, createNewEle, parentContent, fieldData, parentId } = this.state;
+    const { visible} = this.props;
+    const {  upperObjectiveSelection, loading, disabledSelect, initialValues,  parentContent, parentId } = this.state;
     return (
         < Modal
             title="编辑Objective"
@@ -235,6 +203,7 @@ render() {
             okText="提交"
             onOk={this.onOk}
             onCancel={this.onCancel}
+            cancelText="取消"
         >
 
             {loading ?

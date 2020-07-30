@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, Component } from 'react';
-import { Form, Input, Select, Radio, message } from 'antd';
+import { Form, Input, Select, Radio, Button } from 'antd';
 import Modal from 'antd/lib/modal/Modal';
+import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import Axios from 'axios';
 const { Option, OptGroup } = Select;
 
@@ -10,9 +11,9 @@ const makePerson = ({ ascriptionId, name, key }, i) => (
     <Option dataid={ascriptionId} value={ascriptionId} key={key} >{name}</Option>
 );
 
-const makeGroup = ({ groupName, list }) => (
+const makeGroup = ({ groupName, list }, i) => (
 
-    <OptGroup label={groupName}>
+    <OptGroup label={groupName} key={i}>
         {list.map(makePerson)}
     </OptGroup>
 );
@@ -26,9 +27,9 @@ const makeOption = ({ id, content, okrId, parentId, level },) => (
     <Option dataokrid={okrId} value={id} dataparentid={parentId} datalevel={level} key={id + content} >{content}</Option>
 );
 
-const makeOptGroup = ({ groupName, data }) => (
+const makeOptGroup = ({ groupName, data }, i) => (
 
-    <OptGroup label={groupName}>
+    <OptGroup label={groupName} key={i + groupName}>
         {data.map(makeOption)}
     </OptGroup>
 );
@@ -65,12 +66,14 @@ export default class ObjectiveDrawer extends Component {
         objective: null,
         upperObjective: null,
         upperObjectiveData: null,
-        loadingUpperObjective: true,
         periodFilled: false,
         levelFilled: false,
         excutorFilled: false,
         disabled: false,
-        disabledSelect:true,
+        disabledSelect: true, //Upper Object
+        disabledExcutorSelect: true, //excutor Object
+        initialValues: { keyResults: [' '] }
+
     }
 
     formRef = React.createRef();
@@ -80,7 +83,7 @@ export default class ObjectiveDrawer extends Component {
 
 
 
-    onCancel = (values) => {
+    onCancel = () => {
         this.setState({
             visible: false,
         })
@@ -112,7 +115,9 @@ export default class ObjectiveDrawer extends Component {
         }, (() => {
             this.setState({
                 excutorFilled: true
-            })
+            }, (() => {
+                this.checkRequireFill()
+            }))
         }))
         this.formRef.current.resetFields([`upperobjective`])
     }
@@ -129,15 +134,18 @@ export default class ObjectiveDrawer extends Component {
     // }
 
     getExcutorData = (value) => {
+        this.setState({
+            disabledExcutorSelect: true
+        })
         const level = value.target.value;
         Axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/getAscription?level=` + `${level}`)
             .then(res => {
+
 
                 if (this.state.checkPerson) {
                     res.data.data.map(item => {
                         item.list.map(p => {
                             p.key = `${item.groupName + p.name}`
-
                         })
                     })
 
@@ -147,7 +155,7 @@ export default class ObjectiveDrawer extends Component {
 
                 }, (() => {
                     this.setState({
-                        isLoading: false
+                        disabledExcutorSelect: false
                     })
 
                 }))
@@ -161,6 +169,8 @@ export default class ObjectiveDrawer extends Component {
             isLoading: true,
             level: level,
             excutorFilled: false,
+            disabledExcutorSelect: true,
+            disabledSelect: true,
         }, (() => {
             this.setState({
                 levelFilled: true
@@ -206,29 +216,25 @@ export default class ObjectiveDrawer extends Component {
         const okrId = this.state.period;
         const level = this.state.level;
         const ascriptionId = this.state.excutor;
-
+        console.log(okrId, level, ascriptionId)
         Axios.get((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/getParentObjective?okrId=` + `${okrId}` + `&level=` + `${level}` + `&ascriptionId=` + `${ascriptionId}`))
             .then(res => {
                 if (res.status = 200) {
                     console.log('getUpperObejct data', res.data.data)
-                    if(res.data.data.length===0){
+                    if (res.data.data.length === 0) {
                         console.log('no upper obejct')
-                        
                     }
-                    else{
-
-                        console.log('chose upper obejct')
+                    else {
+                        console.log('chose upper obejct', res.data.data)
                         this.setState({
-                            disabledSelect:false,
                             upperObjectiveData: res.data.data
                         }, (() => {
-    
                             this.setState({
-                                loadingUpperObjective: false
+                                disabledSelect: false,
                             })
                         }))
                     }
-                 
+
 
                 }
                 else {
@@ -237,7 +243,8 @@ export default class ObjectiveDrawer extends Component {
 
     }
 
-    onMouseEnterObjective = () => {
+    checkRequireFill = () => {
+        console.log('fill in upper info')
         const periodFilled = this.state.periodFilled;
         const levelFilled = this.state.levelFilled;
         const excutorFilled = this.state.excutorFilled;
@@ -245,17 +252,15 @@ export default class ObjectiveDrawer extends Component {
         if (periodFilled && levelFilled && excutorFilled) {
 
             this.getUpperLevelObjective()
+            console.log('required fills fullfill, call get Upper Object')
         }
         else {
             alert('先填写周期，层级，执行对象')
         }
     }
 
-    onValuesChange = (changedValues, allValues) => {
-
-
-        const { excutor, keyresults, level, objective, period, upperobjective } = allValues;
-
+    onValuesChange = (allValues) => {
+        const {  keyresults, objective, upperobjective } = allValues;
         this.setState({
             keyResults: keyresults,
             objective: objective,
@@ -263,38 +268,28 @@ export default class ObjectiveDrawer extends Component {
         })
     }
 
-    onFinish = (values) => {
-
-
+    onFinish = () => {
         const { period, level, excutor, objective, upperObjective, keyResults } = this.state;
-
-
-        console.log('onFinish', this.state.keyResults)
+        console.log('onFinish valideate form',)
         this.setState({
             visible: false,
-
         })
         this.props.getCreateNewObjective(period, level, excutor, objective, upperObjective, keyResults)
         this.props.closeDrawer()
         this.formRef.current.resetFields()
 
-
-
-
-
     }
 
     render() {
         const { listSelect, visible } = this.props;
-        const { isLoading, excutorData, upperObjectiveData, disabledSelect } = this.state;
+        const { excutorData, upperObjectiveData, disabledSelect, disabledExcutorSelect, initialValues } = this.state;
 
         return (
             <Modal
                 title="添加目标"
                 visible={visible}
-                okText="添加"
-                onOk={this.onFinish}
                 onCancel={this.onCancel}
+                footer={null}
             >
                 <Form
                     ref={this.formRef}
@@ -302,15 +297,18 @@ export default class ObjectiveDrawer extends Component {
                     name="userForm"
                     onFieldsChange={this.onFieldsChange}
                     onValuesChange={this.onValuesChange}
+                    initialValues={initialValues}
+                    onFinish={this.onFinish}
                 >
                     <Form.Item
                         name="period"
                         label="OKR周期"
+                        rules={[{ required: true }]}
                     >
                         <Select label="选择执OKR周期" onChange={this.onPeriodChange}>
 
                             {listSelect.map(item => {
-                                return <Option value={item.id}>{item.title}</Option>
+                                return <Option value={item.id} key={'key' + item.id}>{item.title}</Option>
                             })}
 
                         </Select>
@@ -328,37 +326,38 @@ export default class ObjectiveDrawer extends Component {
                         </Radio.Group>
                     </Form.Item>
 
+
                     <Form.Item
                         name="excutor"
                         label="执行对象"
-                        rules={[{ required: true }, { message: "选择执行对象" }]}
+                        rules={[{ required: true }]}
                     >
-                        <Select label="选择执行对象" loading={isLoading} onChange={this.onExcutorChange} disabled={this.state.disabled}>
+                        <Select label="选择执行对象" onChange={this.onExcutorChange} disabled={disabledExcutorSelect}>
 
-                            {isLoading || this.state.disabled === true ? null
+                            {disabledExcutorSelect ? null
                                 :
                                 helloOutsider(excutorData)
                             }
 
                         </Select>
                     </Form.Item>
-
+                
                     <Form.Item
                         name="upperobjective"
                         label="上级Objective"
-                        rules={[{ required: true }, { message: "选择上级Objective" }]}
+                        rules={[{ required: true }]}
                     >
-                        <Select label="选择上级Objective" disabled={disabledSelect} onMouseEnter={this.onMouseEnterObjective} loading={this.state.loadingUpperObjective} onChange={this.onUpperObjectiveChange}>
 
-                            {this.state.loadingUpperObjective ? null : formatUpperObject(upperObjectiveData)}
+                        <Select label="选择上级Objective" disabled={disabledSelect} onMouseEnter={this.onMouseEnterObjective} onChange={this.onUpperObjectiveChange}>
+
+                            {disabledSelect ? null : formatUpperObject(upperObjectiveData)}
                         </Select>
                     </Form.Item>
 
 
                     <Form.Item
                         name="objective"
-                        label="Objective "
-
+                        label="Objective"
                         rules={[
                             {
                                 required: true,
@@ -369,7 +368,7 @@ export default class ObjectiveDrawer extends Component {
                         <Input />
                     </Form.Item>
 
-                    <Form.Item
+                    {/* <Form.Item
                         name="keyresults"
                         label="Key Results "
                         rules={[
@@ -380,7 +379,78 @@ export default class ObjectiveDrawer extends Component {
                         ]}
                     >
                         <Input />
-                    </Form.Item>
+                    </Form.Item> */}
+                    <Form.List name="keyResults" >
+
+
+                        {(fields, { add, remove }) => {
+                            return (
+                                <div>
+                                    {fields.map((field, index) => (
+                                        <div>
+                                            <Form.Item
+                                                label={index === 0 ? "Key Results" : ""}
+                                                rules={[{ required: true }]}
+                                                key={field.key}
+                                            >
+
+                                                <Form.Item
+                                                    {...field}
+                                                    validateTrigger={["onChange", "onBlur"]}
+                                                    rules={[
+                                                        {
+                                                            required: true,
+                                                            whitespace: true,
+                                                            message:
+                                                                "请填写key Results "
+                                                        }
+                                                    ]}
+                                                    noStyle
+                                                >
+                                                    <Input
+
+                                                        style={{ width: "93%" }}
+                                                    />
+                                                </Form.Item>
+                                                {fields.length > 1 ? (
+                                                    <MinusCircleOutlined
+                                                        className="dynamic-delete-button"
+                                                        style={{ margin: "0 8px" }}
+                                                        onClick={() => {
+                                                            remove(field.name);
+                                                        }}
+                                                    />
+                                                ) : null}
+
+                                            </Form.Item>
+                                        </div>
+                                    ))}
+
+                                    <Form.Item>
+                                        <Button
+                                            type="dashed"
+                                            onClick={() => {
+                                                add();
+                                            }}
+                                            style={{ width: "93%" }}
+                                        >
+                                            <PlusOutlined /> Add field
+                                         </Button>
+                                    </Form.Item>
+                                </div>
+                            );
+                        }}
+
+                    </Form.List>
+                    <div style={{ textAlign: 'right' }} >
+                        <Button onClick={this.onCloseModel} style={{ marginRight: 8 }}>
+                            取消
+                                    </Button>
+                        <Button type="primary" htmlType="submit">
+                            添加
+                        </Button>
+                    </div>
+
 
                 </Form>
             </Modal>

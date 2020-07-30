@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import * as dd from 'dingtalk-jsapi';
+// import * as dd from 'dingtalk-jsapi';
 import axios from 'axios';
 import SiderNav from './pages/SiderNav ';
 import HeaderNav from './pages/HeaderNav';
@@ -12,13 +12,7 @@ import Axios from 'axios';
 const { Sider } = Layout;
 const { TabPane } = Tabs;
 
-// const initialPanes = [
-//   // {title:"displayName", content:'', key:'id'}
-//   { title: '全部目标', content: '', key: '2111551', closable: false },
-//   { title: 'test', content: '', key: 'dadf235353', },
-//   { title: 'Peter', content: '', key: 'Peter23123', }
 
-// ];
 
 export default class App extends Component {
   state = {
@@ -44,6 +38,7 @@ export default class App extends Component {
     panes: null,
     defaultSelectedKeys: [],
     currentActivePaneInfo: null,
+    isTableReady:null,
   }
 
 
@@ -68,48 +63,12 @@ export default class App extends Component {
   getMenu = () => {
     axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/menu/list`)
       .then(response => {
-        // const {currentOkrId}= this.state;
-        // console.log(response)
-        // let initialPane = response.data.data[0]
-
-        // let object = {};
-        // object.title = initialPane.name;
-        // object.content = '';
-        // object.key = '1000';
-        // object.closable = false;
-        // object.level=initialPane.level;
-        // object.okrId=currentOkrId;
-        // const panes = [
-        //   { title: 'Tab 1', content: 'Content of Tab Pane 1', key: '1' },
-        //   { title: 'Tab 2', content: 'Content of Tab Pane 2', key: '2' },
-        // ];
-
-
-
-
-        // const initialPanes=[]
-        // initialPanes.push(object)
-        // console.log('initPaness', initialPanes)
-
+    
 
         this.setState({
           menu: response.data.data,
-          // currentLevel: response.data.data[0].title,
-          // panes: initialPanes,
 
-        }, (() => {
-          const { panes } = this.state;
-          console.log(this.state.panes)
-          // let defaultSelectedKeys=[]
-          // defaultSelectedKeys.push(panes[0].key)
-          // console.log('defaultSelectedKeys', defaultSelectedKeys)
-
-          this.setState({
-            // isPanesReady:true,
-            // activeKey:panes[0].key,
-            // defaultSelectedKeys:panes[0].key,
-          })
-        }));
+        });
 
 
       })
@@ -129,26 +88,22 @@ export default class App extends Component {
           let panes = []
           let initialPane = { title: '首页', content: '', key: '2111551', closable: false, okrValue: currentOkrValue, okrId: currentOkrId, level: ' ' }
           panes.push(initialPane)
-          console.log('getHoemData', currentOkrId, 'res', response.data)
-          response.data.data.forEach(item => {
-            item.keyResults = item.children
+          this.setState({
+            currentLevel: " ",
+            homeData: response.data.data,
+            panes: panes,
+          }, (() => {
             this.setState({
-              currentLevel: " ",
-              homeData: response.data.data,
-              panes: panes,
-            }, (() => {
-              console.log('after setStateHome Data', this.state.homeData)
-              this.setState({
-                isPanesReady: true,
-                activeKey: '2111551'
-              })
-              // this.getObjectListData()
-            }))
-          })
+              isPanesReady: true,
+              activeKey: '2111551'
+            })
+            // this.getObjectListData()
+          }))
 
             ;
           this.setState({
-            isLoading: false
+            isLoading: false,
+            isTableReady:true
           })
         }
         else {
@@ -344,18 +299,6 @@ export default class App extends Component {
 
   };
 
-  //负责去state pane 找到和activeKey匹配的object
-  getActivePane = (activeKey) => {
-    const { panes } = this.state
-    const activePaneObject = panes.find(item => item.key === activeKey)
-    console.log(activePaneObject)
-    this.setState({
-      currentOkrValue: activePaneObject.okrValue,
-      currentOkrId: activePaneObject.okrId,
-    })
-    this.updateTable(activePaneObject)
-
-  }
 
   // Tab 
   onTabChange = (activeKey) => {
@@ -410,34 +353,32 @@ export default class App extends Component {
   //create tab 
   getItemKey = (itemId, itemLevel, itemName) => {
 
-    const { currentOkrId, currentOkrValue, listSelect } = this.state;
-
-    console.log('clicke on side Menu', currentOkrId, currentOkrValue)
     // 定义传来的值及绑定当前state
-    const ascriptionId = itemId;
-    const level = itemLevel;
+
     this.setState({
-      currentPersonId: ascriptionId,
-      currentLevel: level,
-      activeKey: ascriptionId,
-      defaultSelectedKeys: ascriptionId,
+      // currentPersonId: itemId,
+      currentLevel: itemLevel,
+      activeKey: itemId, //active pane
+      defaultSelectedKeys: itemId, //active menu
     }, (() => {
-      console.log('getItme state', this.state.currentOkrId, this.state.currentOkrValue)
       const { panes } = this.state;
       this.checkPane(panes, itemId, itemLevel, itemName)
     }))
 
   };
 
+  setActive=(id)=>{
+  
+
+  }
+
   checkPane = (panes, itemId, itemLevel, itemName) => {
-    console.log('checkPane', itemId, itemName)
     let isExist = true
     panes.find(pane => {
       if (pane.title === itemName) {
         isExist = false;
         this.getActivePane(itemId)
       }
-
     })
 
     if (isExist) {
@@ -446,9 +387,7 @@ export default class App extends Component {
   }
 
   createNewPanes = (proppanes, itemId, itemLevel, itemName) => {
-    console.log('createNewpane,', itemId, itemLevel, itemName)
     const { panes, currentOkrId, currentOkrValue } = this.state;
-    console.log('createNewpane,currentOkrId, currentOkrValue', currentOkrId, currentOkrValue)
 
     const ascriptionId = itemId;
     const level = itemLevel;
@@ -457,26 +396,31 @@ export default class App extends Component {
     let newpaneKey = ascriptionId;
     const newPanes = [...panes];
     newPanes.push({ title: `${name}`, key: `${newpaneKey}`, content: "", level: level, okrId: currentOkrId, okrValue: currentOkrValue });
-    console.log(newPanes)
     this.setState({
       panes: newPanes,
       activeKey: newpaneKey,
     }, (() => {
 
       this.getActivePane(newpaneKey)
-      console.log('createNewPane, newpaneKey id and name are', this.state.panes, name)
     }))
-    console.log(this.state.currentOkrId)
     //update the table according to the newTan 
     // this.updateTable(level, ascriptionId)
   }
 
-  doSomething = () => {
+
+  //负责去state pane 找到和activeKey匹配的object
+  getActivePane = (activeKey) => {
+
+    const { panes } = this.state
+    const activePaneObject = panes.find(item => item.key === activeKey)
     this.setState({
-      bigLoading: true
+      currentOkrValue: activePaneObject.okrValue,
+      currentOkrId: activePaneObject.okrId,
     })
+    this.updateTable(activePaneObject)
 
   }
+
 
   reFreshPage = () => {
     // const { activeKey } = this.state;
@@ -516,72 +460,93 @@ export default class App extends Component {
 
   //获取表格数据
   updateTable = (object) => {
+    this.setState({
+      isTableReady:false
+    })
+
     const { level, okrId, key } = object;
 
     if (key === '2111551') {
-      console.log('http', `${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/homeData?okrId=` + `${okrId}`)
+
       axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/homeData?okrId=` + `${okrId}`)
         .then(res => {
           if (res.data.msg === '成功') {
-            console.log('updatetable tab ==首页', res.data.data)
             if (res.data.data.length > 0) {
-              res.data.data.forEach(item => {
-                item.keyResults = item.children
-                this.setState({
-                  homeData: res.data.data,
-                }, (() => {
-                  console.log(this.state.homeData, 'change 首页data colu')
-                }))
-              })
-            }
-            else {
-              console.log('this url data is empty', res)
               this.setState({
                 homeData: res.data.data,
-              })
+              }, (() => {
+                this.setState({
+                  isTableReady:true
+                })
+              }))
             }
-
+            else {
+              this.setState({
+                homeData: res.data.data,
+              },(()=>{
+                this.setState({
+                  isTableReady:true
+                })
+              }))
+            }
           }
           else {
-            console.log(res.data.msg)
+            this.setState({
+              isTableReady:true
+            })
           }
-
-
-
         })
-
-
     }
     else {
+
       //判断当前读取level是否是company 
+
       let ascriptionId = null;
       if (key === "1000") {
         ascriptionId = " ";
-        console.log('if is 1000 id = ', ascriptionId)
       }
       else {
         ascriptionId = key
-        console.log('if is 1000 id = ', ascriptionId)
       }
+
       const http = `${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/listData?okrId=` + `${okrId}` + '&ascriptionId=' + `${ascriptionId}` + `&level=` + `${level}`
-      console.log(http)
+
       axios.get(http).then(res => {
-        this.setState({
-          isLoading: true
-        })
+  
         if (res.data.msg === "成功") {
-          console.log('first render home datat', this.state.homeData)
-          console.log("跟新表格获取数据", res.data)
-          this.setState({
-            homeData: res.data.data,
-          })
+
+          if( res.data.data.length !== 0 ){
+            res.data.data.forEach(item=>{
+              item.children = item.keyResults;
+              item.level= "Objective"
+              item.keyResults.forEach(p=>{
+                p.level= "key Result"
+              })
+  
+              this.setState({
+                homeData: res.data.data,
+              },(()=>{
+                this.setState({
+                  isTableReady:true
+                })
+              }))
+            })
+          }
+          else{
+            this.setState({
+              homeData: res.data.data,
+            },(()=>{
+              this.setState({
+                isTableReady:true
+              })
+            }))
+          }
+      
         }
         else (
           console.log(res.data.msg)
         )
-        this.setState({
-          isLoading: false
-        })
+     
       }
       )
     }
@@ -625,6 +590,7 @@ export default class App extends Component {
 
 
   toggle = () => {
+    console.log('toggle collape')
     this.setState({
       collapsed: !this.state.collapsed,
     });
@@ -686,8 +652,8 @@ export default class App extends Component {
 
   render() {
 
-    const { collapsed, activeKey, menu, listSelect, currentOkrId, currentOkrValue, bigLoading, panes, isPanesReady, isLoading, defaultSelectedKeys } = this.state;
-
+    const { collapsed, activeKey, menu, listSelect, currentOkrId, currentOkrValue, bigLoading, panes, isPanesReady, isLoading, defaultSelectedKeys, isTableReady} = this.state;
+    
     return (
       <div>
         <Layout>
@@ -703,9 +669,9 @@ export default class App extends Component {
             </Spin>
             :
             <React.Fragment>
-              <Sider trigger={null} collapsible collapsed={this.state.collapsed} >
+              <Sider trigger={null} collapsible collapsed={collapsed}  >
                 {menu ?
-                  <SiderNav menu={menu} getItemKey={this.getItemKey} defaultSelectedKeys={defaultSelectedKeys} />
+                  <SiderNav menu={menu} getItemKey={this.getItemKey} defaultSelectedKeys={defaultSelectedKeys}  collapsed={collapsed}/>
                   :
                   <div className="example" style={{
                     textAlign: 'center',
@@ -732,17 +698,16 @@ export default class App extends Component {
                   {isPanesReady ?
                     <React.Fragment>
                       {panes.map(pane => (
-                        <TabPane tab={pane.title} key={pane.key} closable={pane.closable} style={{ width: '12rem' }} onTabClick={this.onTabClick} >
+                        <TabPane tab={pane.title} key={pane.key} closable={pane.closable} style={{ width: '8rem' , display:'flex', justifyContent:'center'}} onTabClick={this.onTabClick} >
 
                         </TabPane>
                       ))}
                     </React.Fragment>
                     : null
                   }
-
                 </Tabs>
-
-                {listSelect ?
+                { isTableReady ?
+          
                   <ContentContainer expandAllRow={this.state.expandAllRow}
                     homeData={this.state.homeData} listSelect={this.state.listSelect}
                     getNewPeriod={this.getNewPeriod}
@@ -770,79 +735,9 @@ export default class App extends Component {
                   </div>
                 }
               </Layout>
-
-
-
             </React.Fragment>
           }
-          {/* <Sider trigger={null} collapsible collapsed={this.state.collapsed} >
-            {menu ?
-              <SiderNav menu={menu} getItemKey={this.getItemKey} />
-              :
-              <div className="example" style={{
-                textAlign: 'center',
-                background: 'rgba(0, 0, 0, 0.05)',
-                borderRadius: '4px',
-                marginBottom: '50px',
-                padding: '30px 50px',
-                margin: '20px 0'
-              }}>
-                <Spin size="large" tip="Loading..." />
-              </div>
-            }
-
-
-          </Sider>
-
-          <Layout className="site-layout">
-
-            <HeaderNav collapsed={collapsed} toggle={this.toggle} />
-
-
-            <Tabs size='small' type="editable-card" hideAdd 
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            ={this.onChange} onEdit={this.onEdit} activeKey={activeKey} tabBarGutter={0}>
-              {this.state.panes.map(pane => (
-                <TabPane tab={pane.title} key={pane.key} closable={pane.closable} style={{ width: '12rem' }} >
-                  {pane.content}
-                </TabPane>
-              ))}
-            </Tabs>
-
-            {listSelect ?
-              <ContentContainer expandAllRow={this.state.expandAllRow} tableData={this.state.tableData}
-                homeData={this.state.homeData} listSelect={this.state.listSelect}
-                getNewPeriod={this.getNewPeriod}
-                currentOkrValue={currentOkrValue} getOkrValue={this.getOkrValue}
-                deletePeriod={this.deletePeriod} currentOkrId={currentOkrId}
-                currentOkrValue={currentOkrValue}
-                getCreateNewObjective={this.getCreateNewObjective}
-                getNewEditObject={this.getNewEditObject}
-              >
-                updateExcutorList={this.updateExcutorList}
-
-              </ContentContainer>
-              :
-              <div className="example" style={{
-                textAlign: 'center',
-                background: 'rgba(0, 0, 0, 0.05)',
-                borderRadius: '4px',
-                marginBottom: '50px',
-                padding: '30px 50px',
-                margin: '20px 0'
-              }}>
-                <Spin size="large" tip="Loading..." />
-              </div>
-            }
-          </Layout> */}
+    
         </Layout >
       </div>
     );

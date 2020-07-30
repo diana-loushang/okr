@@ -1,22 +1,18 @@
 import React, { Component } from 'react';
 import 'antd/dist/antd.css';
-import { Menu } from 'antd';
+import { Menu} from 'antd';
 import SubMenu from 'antd/lib/menu/SubMenu';
-import logo from '../asset/mainlogo.jpg'
+import logo from '../asset/mainlogo.jpg';
+import {UserOutlined, HomeOutlined,ApartmentOutlined} from '@ant-design/icons';
 
 
 
 export default class SiderNav extends Component {
-
     state = {
         loading: false,
         defaultSelectedKeys: null,
     }
 
-    componentDidMount() {
-        console.log('cMD', this.props.defaultSelectedKeys)
-
-    }
 
     onClikMenuItem = ({ item, key }) => {
         console.log(item, key)
@@ -30,8 +26,9 @@ export default class SiderNav extends Component {
 
 
     render() {
-        const { menu, defaultSelectedKeys } = this.props;
+        const { menu, defaultSelectedKeys, collapsed } = this.props;
         const { loading } = this.state;
+
         return (
             <div>
                 {loading ?
@@ -39,15 +36,23 @@ export default class SiderNav extends Component {
                     :
                     <React.Fragment>
                         <div className="logo" style={{ height: '3rem', display: 'flex', backgroundColor: '#131629' }} >
-                            <img style={{ width: '3rem' }} src={logo} />
-                            <h1 style={{ color: 'white', fontWeight: 'bold', marginLeft: '10px', marginTop: '5px', fontSize: '26px' }}>OKR管理</h1>
+                            <img className="logo-img" style={{ width: '3rem' }} src={logo} />
+                            
+                            {collapsed ?
+
+                            <div></div>
+                            : 
+                            <div style={{ color: 'white', fontWeight: 'bold', marginLeft: '10px', marginTop: '5px', fontSize: '20px' }}>OKR管理</div>
+                            }
+
+
                         </div>
 
                         <Menu mode="inline" theme='dark' onSelect={this.onClikMenuItem} selectedKeys={defaultSelectedKeys} style={{ height: '55rem' }}>
 
-                            <Menu.Item key='1000' datalevel={menu[0].level} dataname={menu[0].name} >{menu[0].name}</Menu.Item>
+                            <Menu.Item key='1000' icon={<HomeOutlined />} datalevel={menu[0].level} dataname={menu[0].name} >{menu[0].name}</Menu.Item>
 
-                            <SubMenu key="123456" title={menu[1].name}>
+                            <SubMenu key="123456" title={menu[1].name} icon={<ApartmentOutlined />}>
                                 {menu[1].childs.map(item => {
                                     return <Menu.Item key={item.id} datalevel={item.level} dataname={item.name}>{item.name}</Menu.Item>
                                 })}
@@ -55,11 +60,11 @@ export default class SiderNav extends Component {
 
                             </SubMenu>
 
-                            <SubMenu key="12543" title={menu[2].name}>
+                            <SubMenu key="12543" title={menu[2].name} icon={ <UserOutlined />}>
                                 {menu[2].childs.map(item => {
                                     return <SubMenu key={item.id} title={item.name}>
                                         {item.childs.map(child => {
-                                            return <Menu.Item key={child.id} datalevel={child.level} dataname={child.name}> {child.name}</Menu.Item>
+                                            return <Menu.Item  key={child.id} datalevel={child.level} dataname={child.name}> {child.name}</Menu.Item>
                                         })}
 
 

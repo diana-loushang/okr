@@ -15,9 +15,7 @@ const HeaderNav = ({ collapsed, toggle, reFreshPage }) => {
                     className: 'trigger',
                     onClick: toggle,
                 })}
-                {/* <Menu theme="light" mode="inline" >
-                    <Menu.Item key="sub1" icon={<HomeOutlined />}> 公司OKR</Menu.Item>
-                </Menu> */}
+         
             </div>
             <div style={{ padding: 0, display: 'flex',alignItems: 'center', }}>
                 <SyncOutlined style={{ margin:12}} onClick={()=>{

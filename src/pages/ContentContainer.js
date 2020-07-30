@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import axios from 'axios';
-import { Layout, Table, Button, Input, Select, Form, Modal, message, Popconfirm } from 'antd';
+import { Layout, Table, Button, Input, Select, Form, Modal, message } from 'antd';
 import 'antd/dist/antd.css';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, } from '@ant-design/icons';
 import ObjectiveDrawer from '../components/ObjectiveDrawer';
 import DetailModal from '../components/Modal/DetailModal';
 import EditModal from '../components/Modal/EditModal';
@@ -35,33 +35,31 @@ export default class ContentContainer extends Component {
                 title: '执行人',
                 dataIndex: 'ascriptionName',
                 key: 'ascriptionName',
-                render: (value) => {
-                    if (value = undefined) {
-                        console.log('没有执行人', value)
-                    }
-                    else {
-                        return value
+                render: ((text, record, value) => {
 
-                    }
-                }
+                    return <span>{record.ascriptionName}</span>;
+                })
             },
             {
                 title: '类型',
                 dataIndex: 'level',
                 key: 'level',
-                render: (value) => {
+                render: (value, record) => {
 
-                    let x = null;
-                    if (value === "company") {
-                        x = "公司"
-                    }
-                    if (value === "department") {
-                        x = "部门"
-                    }
-                    if (value === "person") {
-                        x = "个人"
-                    }
-                    return x
+                    // let x = null;
+                    // if (value === "company") {
+                    //     x = "公司"
+                    // }
+                    // if (value === "department") {
+                    //     x = "部门"
+                    // }
+                    // if (value === "person") {
+                    //     x = "个人"
+                    // }
+                    // else{
+                    //     x = value
+                    // }
+                    return record.level
                 }
 
             },
@@ -69,28 +67,33 @@ export default class ContentContainer extends Component {
                 title: '操作',
                 dataIndex: 'operation',
                 // render: () => <span><Button>修改</Button><Button>查看</Button></span>
-                render: (text, record, value) => (
-                   
+                render: (text, record, value) => {
+                    let level = record.level
 
-                    <span>
-                        {this.props.activeKey === '2111551' ?
-                            <div>
-                                <span style={{ marginRight: 8, }} onClick={() => { console.log('click check id of', record.id); this.onShowDetail(record.id) }}>
-                                    <a>查看</a>
+                    return (
+                        <span>
+                            {this.props.activeKey === '2111551' ?
+                                <div>
+                                    <span style={{ marginRight: 8, }} onClick={() => {  this.onShowDetail(record.id) }}>
+                                        <a>查看</a>
+                                    </span>
+                                    <span onClick={() => {  this.onShowEditModal(record, record.id) }}>
+                                        <a>修改</a>
+                                    </span>
+                                </div>
+                                :
+                                <span>
+                                    {level === "Objective" ?
+                                        <span onClick={() => {  this.onShowEditModal(record, record.id) }}>
+                                            <a>修改</a>
+                                        </span> : null}
                                 </span>
-                                <span onClick={() => { console.log('click check id of', record.id); this.onShowEditModal(record, record.id) }}>
-                                    <a>修改</a>
-                                </span>
-                            </div>
-                            :
-                            <span onClick={() => { console.log('click check id of', record.id); this.onShowEditModal(record, record.id) }}>
-                                <a>修改</a>
-                            </span>
-                        }
-                    
-                    </span>
-                )
-              
+                            }
+                        </span>
+                    )
+
+                }
+
 
 
             }
@@ -133,7 +136,7 @@ export default class ContentContainer extends Component {
 
         childrenColumnName: ['children'],
         //codeSnad
-        newOkrInputValue:null,
+        newOkrInputValue: null,
 
     }
 
@@ -149,7 +152,6 @@ export default class ContentContainer extends Component {
         axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/info/` + `${id}`)
             .then(res => {
                 if (res.data.msg === '成功') {
-                    console.log(res.data)
 
                     this.setState({
                         detailData: res.data.data,
@@ -237,28 +239,22 @@ export default class ContentContainer extends Component {
     };
 
     closeDrawer = () => {
-        console.log('befroe reset')
-        console.log('after reset')
         this.setState({
             visible: false,
         });
     };
     onFinish = fieldsValue => {
 
-        console.log(fieldsValue)
 
         message.success('添加目标成功', 1);
     };
 
     onFinishFailed = errorInfo => {
-        console.log('Failed:', errorInfo);
     };
 
     //选择执行对象
     onChange = e => {
         console.log('radio checked', e);
-
-
     };
 
     fetchUser = value => {
@@ -278,26 +274,19 @@ export default class ContentContainer extends Component {
             data: temp,
             fetching: false
         }))
-        console.log(this)
-
-        console.log(this.state)
-        console.log('应该清空对象')
+      
         const level = e.target.value
-        console.log('level', level)
         this.setState({
             currentLevel: level,
         }, function () {
             this.setState({ radioType: level })
-            console.log(this.state.radioType)
         })
 
-        console.log(this.state.radioType)
         this.fetchUser(level)
 
     }
 
     onSelectExcutor = (string, number, labeledValue, Option) => {
-        console.log(string, number, labeledValue, Option)
     }
 
     //Model function
@@ -310,8 +299,8 @@ export default class ContentContainer extends Component {
     };
 
     onModalFinish = () => {
-        const {newOkrInputValue} = this.state;
-    
+        const { newOkrInputValue } = this.state;
+
         this.setState({
             modalVisible: false,
         });
@@ -327,22 +316,18 @@ export default class ContentContainer extends Component {
         });
     };
 
-    onObejectiveChange = (e) => {
+    // onObejectiveChange = (e) => {
 
-        console.log("obejchange", e)
-    }
+    //     console.log("obejchange", e)
+    // }
 
-    onResultChange = e => {
-        console.log('draw result', e)
-    }
+    // onResultChange = e => {
+    //     console.log('draw result', e)
+    // }
 
     ondrawerOkrPeriodChange = e => {
     }
 
-    testOnChange = (e) => {
-        console.log(this.state.testValue)
-        console.log('test', e)
-    }
 
     //展开折叠按钮
     handleExpand = () => {
@@ -364,16 +349,15 @@ export default class ContentContainer extends Component {
     }
 
     handleOkrChange = (value, option) => {
-        console.log('handle Okr period change', value, option.key)
         const id = option.key
         this.props.getOkrValue(id)
 
     }
 
-    onObjectiveChange = e => {
-        console.log('onchage')
-        console.log(e);
-    };
+    // onObjectiveChange = e => {
+    //     console.log('onchage')
+    //     console.log(e);
+    // };
 
     onShowDeletePeriodModal = e => {
         this.setState({
@@ -396,21 +380,19 @@ export default class ContentContainer extends Component {
         })
 
     }
-    handleAddNewOkrInput=(changedValues, allValues)=>{
+    handleAddNewOkrInput = (changedValues, allValues) => {
 
-        console.log('change in okr intpu', changedValues.newOkrPeriod, allValues)
-       this.setState({
-           newOkrInputValue:changedValues.newOkrPeriod
-       }, (()=>{
-           console.log(this.state.newOkrInputValue)
-       }))
+        this.setState({
+            newOkrInputValue: changedValues.newOkrPeriod
+        }, (() => {
+        }))
     }
 
 
 
     render() {
-        const { tableData, listSelect, currentOkrValue, getCreateNewObjective, getNewEditObject, isLoading } = this.props;
-        const { columns, onFinish, detailData, parentId, childrenColumnName } = this.state;
+        const {  listSelect, currentOkrValue, getCreateNewObjective, getNewEditObject } = this.props;
+        const { columns, onFinish, detailData, parentId } = this.state;
 
         return (
             <div>
@@ -472,17 +454,28 @@ export default class ContentContainer extends Component {
                             </Button>
 
                         {this.state.showDeletePeriodModal ?
-                            <Modal 
-                            title="删除OKR周期"
+                            <Modal
+                                title="删除OKR周期"
                                 onCancel={this.onCloseDeletePeriodModal}
-
                                 visible={this.state.showDeletePeriodModal}
-                                footer={null}>
+                                footer={null}
+                            >
 
-                                <Form ref={this.formRef} {...layout} hideRequiredMark onFinish={this.onFinishDeletPeriod} >
+                                <Form
+                                    ref={this.formRef}
+                                    {...layout} hideRequiredMark
+                                    onFinish={this.onFinishDeletPeriod}
+                                >
                                     {/* //填写结果 */}
                                     <Form.Item name="delete"
-                                        label="选择OKR周期">
+                                        label="选择OKR周期"
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message: '选择OKR周期',
+                                            },
+                                        ]}
+                                    >
                                         <Select>
 
                                             {this.props.listSelect.map(item => {
@@ -490,7 +483,7 @@ export default class ContentContainer extends Component {
                                             })}
                                         </Select>
                                     </Form.Item>
-                                    < div style={{ textAlign: 'right' }} >
+                                    <div style={{ textAlign: 'right' }} >
                                         <Button onClick={this.onCloseDeletePeriodModal} style={{ marginRight: 8 }}>
                                             关闭
                                     </Button>
@@ -501,7 +494,9 @@ export default class ContentContainer extends Component {
 
                                 </Form>
                             </Modal>
-                            : null}
+                            : 
+                            null
+                            }
 
 
 
@@ -509,40 +504,41 @@ export default class ContentContainer extends Component {
                         <Modal
                             title="添加OKR周期"
                             onCancel={this.onCloseModel}
-                            onOk={this.onModalFinish}
-                            okText="提交"
                             visible={this.state.modalVisible}
+                            footer={null}
                         >
-                            <Form 
-                            ref={this.formRef}
-                            {...layout} hideRequiredMark
-                            onValuesChange={this.handleAddNewOkrInput}
-                             >
+                            <Form
+                                ref={this.formRef}
+                                {...layout} hideRequiredMark
+                                onValuesChange={this.handleAddNewOkrInput}
+                                onFinish={this.onModalFinish}
+                            >
                                 {/* //填写结果 */}
                                 <Form.Item
                                     name="newOkrPeriod"
                                     label="OKR周期"
-                                    rules={[{ required: true, message: '填写OKR周期' }]}
-                                   
-                                >
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: '填写OKR周期名称',
+                                        },
+                                    ]}
 
-                                    <Input style={{ width: '100%' }}  />
+                                >
+                                <Input style={{ width: '100%' }} />
                                 </Form.Item>
-                                {/* < div style={{ textAlign: 'right' }} >
+                                <div style={{ textAlign: 'right' }} >
                                     <Button onClick={this.onCloseModel} style={{ marginRight: 8 }}>
-                                        关闭
+                                        取消
                                     </Button>
                                     <Button type="primary" htmlType="submit">
                                         添加
                                     </Button>
-                                </div> */}
+                                </div>
 
                             </Form>
                         </Modal>
-
                     </div >
-
-
                     {/* /详情加OKR周期的弹窗 */}
                     {this.state.showDetailModal && <DetailModal visible={this.state.showDetailModal} closeDetailModal={this.closeDetailModal} data={detailData} />
                     }
@@ -550,7 +546,6 @@ export default class ContentContainer extends Component {
                     {/* /修改的弹窗 */}
                     {this.state.showEditlModal && <EditModal visible={this.state.showEditlModal} onCloseEditiModal={this.onCloseEditiModal} data={detailData} parentId={parentId} getNewEditObject={getNewEditObject} />
                     }
-
 
                     {
                         this.props.homeData ?
@@ -562,8 +557,8 @@ export default class ContentContainer extends Component {
                                     expandable={true}
                                     defaultExpandAllRows={true}
                                     rowKey={record => record.id}
-                                    childrenColumnName="keyResults"
-                        
+                                    childrenColumnName="children"
+                                    sxs
                                 />
 
                             </div>
