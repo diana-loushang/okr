@@ -45,55 +45,59 @@ export default class App extends Component {
 
   componentDidMount() {
 
-    // const corpId = `${process.env.REACT_CORP_ID}`
-    // console.log(corpId)
-    // dd.ready(function () {
-    //   dd.runtime.permission.requestAuthCode({
-    //     corpId: corpId, // 企业id
-    //     onSuccess: function (info) {
-    //       alert(info.code)// 通过该免登授权码可以获取用户身份
+    const corpId =  `${process.env.REACT_APP_CORP_ID}`
+    console.log('corpId', corpId)
+    console.log('http', `${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=`)
 
-    //       axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=`+`${info.code}`)
-    //       .then(res=>{
-    //         if(res.msg === "success"){
-    //           alert(res.msg)
-    //           axios.all
-    //           ([
-    //             this.getMenu(),
-    //             this.getOkrListSelect(),
-    //             this.getParentObjective(),
-    //             ])
-    //           .then(res => {
-    //             console.log(this.state.panes)
-    //             this.setState({
-    //               bigLoading: false
-    //             })
-    //           })
-    //         }
+        //叮叮环境使用
+    dd.ready(function () {
+      alert('进入Ding环境')
+      dd.runtime.permission.requestAuthCode({
 
-    //       })
+        corpId: corpId, // 企业id
+        onSuccess: function (info) {
+          alert('获取Permission成功', info.code)// 通过该免登授权码可以获取用户身份
+          
+          axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=`+`${info.code}`)
+          .then(res=>{
+            if(res.msg === "success"){
+              alert(res.msg)
+              axios.all
+              ([
+                this.getMenu(),
+                this.getOkrListSelect(),
+                this.getParentObjective(),
+                ])
+              .then(res => {
+                console.log(this.state.panes)
+                this.setState({
+                  bigLoading: false
+                })
+              })
+            }
 
-
-    //     }
-    //   });
-    // });
-
-
+          })
 
 
+        }
+      });
+    });
 
-    axios.all
-      ([
-        this.getMenu(),
-        this.getOkrListSelect(),
-        this.getParentObjective(),
-      ])
-      .then(res => {
-        console.log(this.state.panes)
-        this.setState({
-          bigLoading: false
-        })
-      })
+
+
+    //不授权使用
+    // axios.all
+    //   ([
+    //     this.getMenu(),
+    //     this.getOkrListSelect(),
+    //     this.getParentObjective(),
+    //   ])
+    //   .then(res => {
+    //     console.log(this.state.panes)
+    //     this.setState({
+    //       bigLoading: false
+    //     })
+    //   })
 
   }
 
@@ -463,10 +467,10 @@ export default class App extends Component {
     const modal = Modal.success({
       title: '',
       content: <Spin tip="Loading...">
-        <Alert
+        {/* <Alert
 
 
-        />
+        /> */}
       </Spin>,
     });
     const timer = setInterval(() => {

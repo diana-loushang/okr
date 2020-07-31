@@ -26,7 +26,7 @@ const HeaderNav = ({ collapsed, toggle, reFreshPage }) => {
                     console.log('clikck fresh')}}/>
                 <FullscreenExitOutlined style={{ margin:12}}/>
                 <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" style={{ marginRight: '1rem' }} />
-                <MoreOutlined onClick={onMore}/>
+                
             </div>
         </Header>
       
