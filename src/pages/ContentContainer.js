@@ -210,13 +210,6 @@ export default class ContentContainer extends Component {
     sendChange = this.props.getOkrValue;
 
 
-    // handleExcutorChange(option, input) {
-    //     // console.log(`selected ${value}`);
-
-
-    // }
-
-
     // 添加目标抽屉
     showDrawer = () => {
         this.setState({
@@ -301,15 +294,6 @@ export default class ContentContainer extends Component {
             modalVisible: false,
         });
     };
-
-    // onObejectiveChange = (e) => {
-
-    //     console.log("obejchange", e)
-    // }
-
-    // onResultChange = e => {
-    //     console.log('draw result', e)
-    // }
 
     ondrawerOkrPeriodChange = e => {
     }
@@ -445,7 +429,7 @@ export default class ContentContainer extends Component {
                         </Form.Provider>
 
                         <Button onClick={this.handleExpand}>
-                            <PlusOutlined />收起
+                            收起 <PlusOutlined />打开
                         </Button>
 
                         <Button onClick={this.showModal}>

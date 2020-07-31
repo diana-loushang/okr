@@ -7,6 +7,9 @@ const { Header } = Layout;
 
 const HeaderNav = ({ collapsed, toggle, reFreshPage }) => {
 
+    const onMore =()=>{
+        console.log()
+    }
     return (
    
         <Header className="site-layout-background" style={{ padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }} >
@@ -23,7 +26,7 @@ const HeaderNav = ({ collapsed, toggle, reFreshPage }) => {
                     console.log('clikck fresh')}}/>
                 <FullscreenExitOutlined style={{ margin:12}}/>
                 <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" style={{ marginRight: '1rem' }} />
-                <MoreOutlined />
+                <MoreOutlined onClick={onMore}/>
             </div>
         </Header>
       

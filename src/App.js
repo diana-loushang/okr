@@ -5,9 +5,10 @@ import axios from 'axios';
 import SiderNav from './pages/SiderNav ';
 import HeaderNav from './pages/HeaderNav';
 import ContentContainer from './pages/ContentContainer';
-import { Layout, Tabs, Spin, Alert, Modal } from 'antd';
+import { Layout, Tabs, Spin, Alert, Modal, Button } from 'antd';
 import 'antd/dist/antd.css';
 import Axios from 'axios';
+import invokeThingService$ from 'dingtalk-jsapi/api/biz/iot/invokeThingService';
 
 const { Sider } = Layout;
 const { TabPane } = Tabs;
@@ -69,9 +70,9 @@ export default class App extends Component {
     //             })
     //           })
     //         }
-     
+
     //       })
-       
+
 
     //     }
     //   });
@@ -133,7 +134,7 @@ export default class App extends Component {
             this.setState({
               isPanesReady: true,
               activeKey: '2111551'
-            }, (()=>{
+            }, (() => {
               this.setState({
                 isLoading: false,
                 isTableReady: true
@@ -142,8 +143,8 @@ export default class App extends Component {
             // this.getObjectListData()
           }))
 
-            
-      
+
+
         }
         else {
           alert(response.data.msg)
@@ -342,7 +343,7 @@ export default class App extends Component {
   // Tab 
   onTabChange = (activeKey) => {
 
-    const { panes } = this.state;
+    // const { panes } = this.state;
     this.getActivePane(activeKey)
 
     this.setState({
@@ -350,39 +351,8 @@ export default class App extends Component {
       activeKey: activeKey,
     })
 
-    // if(activeKey==="1000"){
-    //   this.setState({
-    //     currentLevel:'company',
-    //     currentPersonId:"",
-    //     defaultSelectedKeys:"1000"     
-    //   },(()=>{
-    //     // this.updateTable()
-    //   }))
-    // }
-    // else{
-    //   console.log('tab changed others than compay')
-    //   const {panes}=this.state;
-    //   const test =  panes.filter(item=>item.key===activeKey)
-    //   console.log('tab changed others than compay', test)
-    //   this.setState({
-    //     currentPersonId:activeKey,
-    //     defaultSelectedKeys:activeKey,
-    //   },(()=>{
-
-    //     // this.updateTable()
-    //   }))
-    // }
-
-    // const okrId = this.state.currentOkrId
-    // const level = this.state.currentLevel
-    // const ascriptionId = this.state.currentPersonId;
-
-
-    //onChange Tab focus change 
-    // this.setState({
-    //   activeKey: activeKey
-    // })
-    const { currentLevel } = this.state;
+   
+    // const { currentLevel } = this.state;
   };
 
   onEdit = (targetKey, action) => {
@@ -406,10 +376,7 @@ export default class App extends Component {
 
   };
 
-  setActive = (id) => {
 
-
-  }
 
   checkPane = (panes, itemId, itemLevel, itemName) => {
     let isExist = true
@@ -451,12 +418,36 @@ export default class App extends Component {
   getActivePane = (activeKey) => {
 
     const { panes } = this.state
-    const activePaneObject = panes.find(item => item.key === activeKey)
+    console.log('getActivePane', panes, activeKey,)
+    console.log(panes.find(item => item.key === activeKey ))
+    let activePaneObject = panes.find(item => item.key === activeKey )
     this.setState({
       currentOkrValue: activePaneObject.okrValue,
       currentOkrId: activePaneObject.okrId,
     })
     this.updateTable(activePaneObject)
+
+  }
+
+  onCloseAllTabs = () => {
+    this.setState({
+      isPanesReady:false
+    })
+    let paneArray=[]
+    let initialPane = this.state.panes[0]
+    paneArray.push(initialPane)
+    this.setState({
+      panes:paneArray
+    }, (()=>{
+      this.getActivePane('2111551')
+      this.setState({
+        isPanesReady:true,
+        activeKey:'2111551',
+        defaultSelectedKeys:'2111551'
+      })
+  
+    }))
+
 
   }
 
@@ -637,17 +628,8 @@ export default class App extends Component {
 
 
   getCreateNewObjective = (period, level, excutor, objective, upperObjective, keyResults) => {
-    console.log(keyResults)
     let arrayTemp = [{ content: `${keyResults}` }];
-    // console.log(arrayTemp)
-    // console.log(((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/add`), {
-    //   content: `${objective}`,
-    //   okrId: period,
-    //   level: `${level}`,
-    //   parentId: upperObjective,
-    //   ascription: `${excutor}`,
-    //   keyResults: arrayTemp
-    // }))
+
     Axios.post((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/add`), {
       content: `${objective}`,
       okrId: period,
@@ -689,10 +671,11 @@ export default class App extends Component {
 
 
 
+
   render() {
 
-    const { collapsed, activeKey, menu, listSelect, currentOkrId, currentOkrValue, bigLoading, panes, isPanesReady, isLoading, defaultSelectedKeys, isTableReady } = this.state;
-
+    const { collapsed, activeKey, menu, currentOkrId, currentOkrValue, bigLoading, panes, isPanesReady, isLoading, defaultSelectedKeys, isTableReady } = this.state;
+    console.log('this.state.pane',panes)
     return (
       <div>
         <Layout>
@@ -731,20 +714,30 @@ export default class App extends Component {
 
                 <HeaderNav collapsed={collapsed} toggle={this.toggle} reFreshPage={this.reFreshPage} />
 
+                <div className='tabContainer'
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between'
+                  }}>
 
-                <Tabs size='small' type="editable-card" hideAdd onChange={this.onTabChange} onEdit={this.onEdit} activeKey={activeKey} tabBarGutter={0}  >
+                  <Tabs size='small' type="editable-card" hideAdd onChange={this.onTabChange} onEdit={this.onEdit} activeKey={activeKey} tabBarGutter={0} style={{ display: 'flex', justifyContent: 'center', alignItems: 'space-between' }}  >
+                    
+                    {isPanesReady ?
+                      <React.Fragment>
+                        {panes.map(pane => (
+                          <TabPane tab={pane.title} key={pane.key} closable={pane.closable} style={{ width: '8rem', display: 'flex', justifyContent: 'center' }} onTabClick={this.onTabClick} >
 
-                  {isPanesReady ?
-                    <React.Fragment>
-                      {panes.map(pane => (
-                        <TabPane tab={pane.title} key={pane.key} closable={pane.closable} style={{ width: '8rem', display: 'flex', justifyContent: 'center' }} onTabClick={this.onTabClick} >
+                          </TabPane>
+                        ))}
+                      </React.Fragment>
+                      : null
+                    }
+                  </Tabs>
+                
+                  {isPanesReady && panes.length> 1 ? <div className="closeAllButton"><Button onClick={this.onCloseAllTabs}>全部关闭</Button> </div> : null }
+                </div>
 
-                        </TabPane>
-                      ))}
-                    </React.Fragment>
-                    : null
-                  }
-                </Tabs>
+
                 {isTableReady ?
 
                   <ContentContainer expandAllRow={this.state.expandAllRow}
@@ -778,7 +771,7 @@ export default class App extends Component {
           }
 
         </Layout >
-      </div>
+      </div >
     );
   }
 }
