@@ -5,7 +5,7 @@ import { MenuUnfoldOutlined, MenuFoldOutlined, SyncOutlined, FullscreenExitOutli
 const { Header } = Layout;
 
 
-const HeaderNav = ({ collapsed, toggle, reFreshPage }) => {
+const HeaderNav = ({ collapsed, toggle, reFreshPage, avatar, userId, dingUserId, userName }) => {
 
     const onMore =()=>{
         console.log()
@@ -25,8 +25,7 @@ const HeaderNav = ({ collapsed, toggle, reFreshPage }) => {
                     reFreshPage()
                     console.log('clikck fresh')}}/>
                 <FullscreenExitOutlined style={{ margin:12}}/>
-                <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" style={{ marginRight: '1rem' }} />
-                
+                <Avatar src={avatar} alt="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" shape={circle} size={small} style={{ marginRight: '1rem' }} datauserid={userId} datadingUserId={dingUserId}  userName={userName}/>  
             </div>
         </Header>
       

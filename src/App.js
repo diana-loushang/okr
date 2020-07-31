@@ -40,66 +40,110 @@ export default class App extends Component {
     defaultSelectedKeys: [],
     currentActivePaneInfo: null,
     isTableReady: null,
+    avatar: null,
+    userId: null,
+    dingUserId: null,
+    userName: null
   }
 
 
   componentDidMount() {
+    alert('1， 首次登陆')
+    
+    const outThis= this; 
+    //叮叮环境使用
+    dd.ready(() => {
+      alert('2， 进入dingingReady ')
 
-    const corpId =  `${process.env.REACT_APP_CORP_ID}`
-    console.log('corpId', corpId)
-    console.log('http', `${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=`)
+      const corpId = `${process.env.REACT_APP_CORP_ID}`
+      console.log('corpId', corpId)
+      console.log('http', `${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=`)
 
-        //叮叮环境使用
-    dd.ready(function () {
-      alert('进入Ding环境')
       dd.runtime.permission.requestAuthCode({
 
         corpId: corpId, // 企业id
         onSuccess: function (info) {
-          alert('获取Permission成功', info.code)// 通过该免登授权码可以获取用户身份
-          
-          axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=`+`${info.code}`)
-          .then(res=>{
-            if(res.msg === "success"){
-              alert(res.msg)
-              axios.all
-              ([
-                this.getMenu(),
-                this.getOkrListSelect(),
-                this.getParentObjective(),
-                ])
-              .then(res => {
-                console.log(this.state.panes)
-                this.setState({
-                  bigLoading: false
-                })
-              })
+          alert('3， dingding 成功 ')
+
+          alert('获取Permission成功' + info.code)// 通过该免登授权码可以获取用户身份
+
+          axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=` + `${info.code}`)
+            .then(res => {
+              alert('get res')
+              alert(JSON.stringify(res.data))
+              alert('aafter parse')
+              if (res.data.code === 0) {
+                let data = res.data.data
+                alert('code===0')
+                alert('4， 准备传递data  ')
+                outThis.getAllData(data)
+                
+              }
+              else {
+                alert('error')
+              }
             }
-
-          })
-
-
+            )
         }
       });
-    });
+    },(()=>{
+      this.getAllData()
+    }))
 
 
+    // 不授权使用
+    //  axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=sfsfsfsffs`)
+    //  .then(res=>{
+    //    alert('get res')
+    //    alert(JSON.stringify(res.data))
+    //    alert('aafter parse')
+    //    if(res.data.code === 0){
+    //      alert('code===0')
+    //      axios.all
+    //      ([
+    //        this.getMenu(),
+    //        this.getOkrListSelect(),
+    //        this.getParentObjective(),
+    //        ])
+    //      .then(res => {
+    //        console.log(this.state.panes)
+    //        this.setState({
+    //          bigLoading: false
+    //        })
+    //      })
+    //    }
+    //    else{
+    //      alert('error')
+    //    }
+    //  }
+    //  )
+    //  .catch()
 
-    //不授权使用
-    // axios.all
-    //   ([
-    //     this.getMenu(),
-    //     this.getOkrListSelect(),
-    //     this.getParentObjective(),
-    //   ])
-    //   .then(res => {
-    //     console.log(this.state.panes)
-    //     this.setState({
-    //       bigLoading: false
-    //     })
-    //   })
+
 
   }
+
+  getAllData = (data) => {
+    alert('5， 请求所以接口 ')
+
+    console.log(data, "login来的打他")
+    axios.all
+      ([
+        this.getMenu(),
+        this.getOkrListSelect(),
+        this.getParentObjective(),
+      ])
+      .then(res => {
+        console.log(this.state.panes)
+        this.setState({
+          bigLoading: false
+        })
+      })
+  }
+
+
+
+
 
   // 初始化请求的接口  //连接后台读取GET数据
   getMenu = () => {
@@ -126,6 +170,7 @@ export default class App extends Component {
     // console.log( 'currentOkrId', currentOkrId,'level', currentLevel, 'okrvalue', currentOkrValue)
     axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/homeData?okrId=` + `${currentOkrId}`)
       .then(response => {
+
         if (response.data.msg === '成功') {
           let panes = []
           let initialPane = { title: '首页', content: '', key: '2111551', closable: false, okrValue: currentOkrValue, okrId: currentOkrId, level: ' ' }
@@ -167,6 +212,7 @@ export default class App extends Component {
   getOkrListSelect = () => {
     axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
       .then(response => {
+
         console.log('current okrID', response.data.data[0].id)
         this.setState({
           listSelect: response.data.data,
@@ -197,6 +243,7 @@ export default class App extends Component {
     axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/listData?okrId=` + `${currentOkrId}` + `&level=` + `${currentLevel}` + `&ascriptionId=`)
       .then(response => {
         console.log(response)
+
         this.setState({
           homeData: response.data.data
         })
@@ -355,7 +402,7 @@ export default class App extends Component {
       activeKey: activeKey,
     })
 
-   
+
     // const { currentLevel } = this.state;
   };
 
@@ -423,8 +470,8 @@ export default class App extends Component {
 
     const { panes } = this.state
     console.log('getActivePane', panes, activeKey,)
-    console.log(panes.find(item => item.key === activeKey ))
-    let activePaneObject = panes.find(item => item.key === activeKey )
+    console.log(panes.find(item => item.key === activeKey))
+    let activePaneObject = panes.find(item => item.key === activeKey)
     this.setState({
       currentOkrValue: activePaneObject.okrValue,
       currentOkrId: activePaneObject.okrId,
@@ -435,21 +482,21 @@ export default class App extends Component {
 
   onCloseAllTabs = () => {
     this.setState({
-      isPanesReady:false
+      isPanesReady: false
     })
-    let paneArray=[]
+    let paneArray = []
     let initialPane = this.state.panes[0]
     paneArray.push(initialPane)
     this.setState({
-      panes:paneArray
-    }, (()=>{
+      panes: paneArray
+    }, (() => {
       this.getActivePane('2111551')
       this.setState({
-        isPanesReady:true,
-        activeKey:'2111551',
-        defaultSelectedKeys:'2111551'
+        isPanesReady: true,
+        activeKey: '2111551',
+        defaultSelectedKeys: '2111551'
       })
-  
+
     }))
 
 
@@ -679,7 +726,7 @@ export default class App extends Component {
   render() {
 
     const { collapsed, activeKey, menu, currentOkrId, currentOkrValue, bigLoading, panes, isPanesReady, isLoading, defaultSelectedKeys, isTableReady } = this.state;
-    console.log('this.state.pane',panes)
+    console.log('this.state.pane', panes)
     return (
       <div>
         <Layout>
@@ -725,7 +772,7 @@ export default class App extends Component {
                   }}>
 
                   <Tabs size='small' type="editable-card" hideAdd onChange={this.onTabChange} onEdit={this.onEdit} activeKey={activeKey} tabBarGutter={0} style={{ display: 'flex', justifyContent: 'center', alignItems: 'space-between' }}  >
-                    
+
                     {isPanesReady ?
                       <React.Fragment>
                         {panes.map(pane => (
@@ -737,8 +784,8 @@ export default class App extends Component {
                       : null
                     }
                   </Tabs>
-                
-                  {isPanesReady && panes.length> 1 ? <div className="closeAllButton"><Button onClick={this.onCloseAllTabs}>全部关闭</Button> </div> : null }
+
+                  {isPanesReady && panes.length > 1 ? <div className="closeAllButton"><Button onClick={this.onCloseAllTabs}>全部关闭</Button> </div> : null}
                 </div>
 
 
@@ -774,8 +821,8 @@ export default class App extends Component {
             </React.Fragment>
           }
 
-        </Layout >
-      </div >
+        </Layout>
+      </div>
     );
   }
 }
