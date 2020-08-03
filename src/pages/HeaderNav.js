@@ -8,7 +8,7 @@ import logo from '../asset/mainlogo.jpg';
 const { Header } = Layout;
 
 
-const HeaderNav = ({ collapsed, toggle, reFreshPage, avatar, userId, dingUserId, userName }) => {
+const HeaderNav = ({ collapsed, toggle, reFreshPage, avatar, userId, dingUserId, userName,  fullScreen}) => {
 
     const onMore = () => {
         console.log()
@@ -33,6 +33,8 @@ const HeaderNav = ({ collapsed, toggle, reFreshPage, avatar, userId, dingUserId,
                         reFreshPage()
                         console.log('clikck fresh')
                     }} />
+                    <FullscreenExitOutlined style={{ margin: 12 }} onClick={fullScreen} />
+
                     {/* <FullscreenExitOutlined style={{ margin:12}}/> */}
                     <Avatar src={avatar ? avatar : "https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" } shape='circle' size='small' style={{ marginRight: '1rem' }} datauserid={userId} datadingUserId={dingUserId} userName={userName} />
                 </div>

@@ -49,25 +49,24 @@ export default class ContentContainer extends Component {
 
             },
             {
-                title: (()=>{ 
+                title: (() => {
                     let activeKey = this.props.activeKey
-                    console.log(activeKey,' activeKey')
                     let x = null
-                    if(activeKey === "2111551"){
+                    if (activeKey === "2111551") {
                         x = '执行人'
                     }
-                    else{
-                        x = null 
+                    else {
+                        x = null
                     }
                     ; return x
-                    
+
                 }
-                    ), 
+                ),
                 dataIndex: 'ascriptionName',
                 key: 'ascriptionName',
                 render: ((text, record, value) => {
-                        
-                        // console.log('excutor', record)
+
+                    // console.log('excutor', record)
                     return <span>{record.ascriptionName}</span>;
                 })
             },
@@ -76,18 +75,18 @@ export default class ContentContainer extends Component {
                 dataIndex: 'level',
                 key: 'level',
                 render: ((text, record, value) => {
-                    
+
                     let level = record.level
                     console.log('level retrun name', level)
-                    let name= null
-                    if (level === 'company'){
-                        name='公司'
+                    let name = null
+                    if (level === 'company') {
+                        name = '公司'
                     }
-                    if(level === 'department'){
-                        name='部门'
+                    if (level === 'department') {
+                        name = '部门'
                     }
-                    if(level === 'person'){
-                        name="个人"
+                    if (level === 'person') {
+                        name = "个人"
                     }
                     return <span>{name}</span>;
                 })
@@ -483,7 +482,7 @@ export default class ContentContainer extends Component {
                         </Button>
                         <Button onClick={this.handleExpand}>
 
-                        {expandAllRows ? <span><PlusOutlined />展开列表</span> : <span> <MinusOutlined /> 折叠列表</span>}
+                            {expandAllRows ? <span><PlusOutlined />展开列表</span> : <span> <MinusOutlined /> 折叠列表</span>}
                         </Button>
 
 
@@ -556,7 +555,7 @@ export default class ContentContainer extends Component {
                             <div>
                                 {/* {expandAllRows} */}
                                 <Table
-                                    
+
                                     columns={columns}
                                     dataSource={this.props.homeData}
                                     expandable={true}

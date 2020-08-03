@@ -5,7 +5,11 @@ import SiderNav from './pages/SiderNav ';
 import HeaderNav from './pages/HeaderNav';
 import ContentContainer from './pages/ContentContainer';
 import { Layout, Tabs, Spin, Alert, Modal, Button } from 'antd';
+import { FullscreenExitOutlined } from '@ant-design/icons';
+
 import 'antd/dist/antd.css';
+import '../src/';
+
 import Axios from 'axios';
 // import invokeThingService$ from 'dingtalk-jsapi/api/biz/iot/invokeThingService';
 const { Sider } = Layout;
@@ -39,43 +43,49 @@ export default class App extends Component {
     avatar: null,
     userId: null,
     dingUserId: null,
-    userName: null
+    userName: null,
+    isFullScreen: false,
   }
 
   // 初始化请求钉钉环境取得当前用户info
   componentDidMount() {
     const outThis = this;
-  //   //叮叮环境使用
-  //   dd.ready(() => {
 
-  //     const corpId = `${process.env.REACT_APP_CORP_ID}`
-  //     dd.runtime.permission.requestAuthCode({
 
-  //       corpId: corpId, // 企业id
-  //       onSuccess: function (info) {
-  //         axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=` + `${info.code}`)
-  //           .then(res => {
-  //             if (res.data.code === 0) {
-  //               const data = res.data.data
-  //               outThis.getAllData(data)
 
-  //             }
-  //             else {
-  //               alert(JSON.stringify(res.data))
-  //             }
-  //           }
-  //           )
-  //       }
-  //     });
-  //   })
+    //   //叮叮环境使用
+      // dd.ready(() => {
+
+      //   const corpId = `${process.env.REACT_APP_CORP_ID}`
+      //   dd.runtime.permission.requestAuthCode({
+
+      //     corpId: corpId, // 企业id
+      //     onSuccess: function (info) {
+      //       axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=` + `${info.code}`)
+      //         .then(res => {
+      //           if (res.data.code === 0) {
+      //             const data = res.data.data
+      //             outThis.getAllData(data)
+
+      //           }
+      //           else {
+      //             alert(JSON.stringify(res.data))
+      //           }
+      //         }
+      //         )
+      //     }
+      //   });
+      // })
 
     outThis.getAllData()
+  
+
   }
 
   // 初始化请求的接口  //连接后台读取GET数据
 
   getAllData = (data) => {
-    
+
     // this.setState({
     //   avatar: data.avatar,
     //   userId: data.userId,
@@ -495,14 +505,14 @@ export default class App extends Component {
         .then(res => {
           if (res.data.msg === '成功') {
             if (res.data.data.length > 0) {
-              res.data.data.forEach(item=>{
-                item.excutor= item.level;
-                item.className="notshow"
+              res.data.data.forEach(item => {
+                item.excutor = item.level;
+                item.className = "notshow"
               })
               this.setState({
                 homeData: res.data.data,
               }, (() => {
-                console.log(res.data.data,'find excutor4')
+                console.log(res.data.data, 'find excutor4')
 
                 this.setState({
                   isTableReady: true
@@ -548,7 +558,7 @@ export default class App extends Component {
             res.data.data.forEach(item => {
               item.children = item.keyResults
               item.level = "Objective"
-              item.className= "notshow"
+              item.className = "notshow"
               // item.excutor= item.level
               item.keyResults.forEach(p => {
                 p.level = "key Result"
@@ -673,13 +683,91 @@ export default class App extends Component {
     })
   }
 
+
+
+
+  //进入全屏
+  requestFullScreen = () => {
+    console.log('requestFullScreen')
+    var de = document.documentElement;
+    if (de.requestFullscreen) {
+      de.requestFullscreen();
+      this.setState({
+        isFullScreen:true
+      })
+    } else if (de.mozRequestFullScreen) {
+      de.mozRequestFullScreen();
+      this.setState({
+        isFullScreen:true
+      })
+    } else if (de.webkitRequestFullScreen) {
+      de.webkitRequestFullScreen();
+      this.setState({
+        isFullScreen:true
+      })
+    
+    }
+  };
+
+  //退出全屏
+  exitFullscreen = () => {
+    console.log('exitFullscreen')
+    var de = document;
+    if (de.exitFullscreen) {
+      de.exitFullscreen();
+      this.setState({
+        isFullScreen:false
+      })
+    } else if (de.mozCancelFullScreen) {
+      de.mozCancelFullScreen();
+      this.setState({
+        isFullScreen:false
+      })
+    } else if (de.webkitCancelFullScreen) {
+      de.webkitCancelFullScreen();
+      this.setState({
+        isFullScreen:false
+      })
+    }
+  };
+
+  //监听fullscreenchange事件
+  watchFullScreen = () => {
+    const _self = this;
+    document.addEventListener(
+      "webkitfullscreenchange",
+      function () {
+        _self.setState({
+          isFullScreen: document.webkitIsFullScreen
+        });
+        console.log('webkitfullscreenchange',document.webkitIsFullScreen )
+      },
+      false
+    );
+  };
+
+  fullScreen = () => {
+    console.log('click on fullscreen:', this.state.isFullScreen);
+    if (!this.state.isFullScreen) {
+      console.log('request full screen')
+      this.requestFullScreen();
+    } else {
+      console.log('request exist full screen')
+
+      this.exitFullscreen();
+    }
+  };
+
+
+
+
   render() {
     const { collapsed, activeKey, menu, currentOkrId, currentOkrValue,
       bigLoading, panes, isPanesReady, isLoading, defaultSelectedKeys,
       isTableReady, avatar, userId, dingUserId, userName } = this.state;
     return (
       <div>
-        <Layout  style={{height:'100%'}}>
+        <Layout style={{ height: '100%' }}>
 
           {bigLoading ?
             <Spin tip="Loading...">
@@ -692,6 +780,7 @@ export default class App extends Component {
             </Spin>
             :
             <React.Fragment>
+
               <HeaderNav
                 collapsed={collapsed}
                 toggle={this.toggle}
@@ -700,12 +789,15 @@ export default class App extends Component {
                 userId={userId}
                 dingUserId={dingUserId}
                 userName={userName}
+                watchFullScreen={this.watchFullScreen}
+                fullScreen={this.fullScreen}
               />
 
 
 
 
               <Layout className="site-layout">
+
 
                 <Sider trigger={null} collapsible collapsed={collapsed}  >
                   {menu ?
@@ -730,9 +822,9 @@ export default class App extends Component {
 
                   <div className='tabContainer'
                     style={{
-                      display:'flex',
+                      display: 'flex',
                       justifyContent: 'space-between',
-                      marginRight:'1rem'
+                      marginRight: '1rem'
                     }}>
 
 
