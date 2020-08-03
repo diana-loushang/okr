@@ -369,8 +369,19 @@ export default class ContentContainer extends Component {
         let data = this.props.homeData
         const { expandAllRows } = this.state;
         console.log('type', expandAllRows, data, 'homeData')
+        let keys= []
+        data.map(i=>{
+            
+            i.children.map(d=>(
+                keys.push(d.id)
+            ))
+
+          
+           keys.push(i.id) 
+        })
         this.setState({
-            expKeys: expandAllRows ? [] : data && data.map(i => i.id)
+            expKeys: expandAllRows ? [] : data && keys
+             
         }, (() => {
             console.log(this.state.expKeys, "state.expkeys")
         }))
