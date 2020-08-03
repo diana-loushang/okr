@@ -330,7 +330,7 @@ export default class ObjectiveDrawer extends Component {
                 
                     <Form.Item
                         name="upperobjective"
-                        label="上级Objective"
+                        label="上级目标"
                         rules={[{ required: true }]}
                     >
 
@@ -343,7 +343,7 @@ export default class ObjectiveDrawer extends Component {
 
                     <Form.Item
                         name="objective"
-                        label="Objective"
+                        label="目标"
                         rules={[
                             {
                                 required: true,
@@ -362,7 +362,7 @@ export default class ObjectiveDrawer extends Component {
                                     {fields.map((field, index) => (
                                         <div>
                                             <Form.Item
-                                                label={index === 0 ? "Key Results" : ""}
+                                                label={index === 0 ? "结果" : ""}
                                                 rules={[{ required: true }]}
                                                 key={field.key}
                                             >
@@ -407,7 +407,7 @@ export default class ObjectiveDrawer extends Component {
                                             }}
                                             style={{ width: "93%" }}
                                         >
-                                            <PlusOutlined /> Add field
+                                            <PlusOutlined /> 添加结果
                                          </Button>
                                     </Form.Item>
                                 </div>

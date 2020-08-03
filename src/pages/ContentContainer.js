@@ -2,10 +2,14 @@ import React, { Component } from 'react'
 import axios from 'axios';
 import { Layout, Table, Button, Input, Select, Form, Modal, message } from 'antd';
 import 'antd/dist/antd.css';
-import { PlusOutlined, } from '@ant-design/icons';
+import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import ObjectiveDrawer from '../components/ObjectiveDrawer';
 import DetailModal from '../components/Modal/DetailModal';
 import EditModal from '../components/Modal/EditModal';
+import DeletePeriodModal from '../components/Modal/DeletePeriodModal';
+import AddPeriodModal from '../components/Modal/AddPeriodModal';
+
+
 // import HomeTable from '../components/HomeTable'
 const { Content, } = Layout;
 const { Option } = Select;
@@ -21,6 +25,15 @@ const layout = {
     },
 };
 
+const smallFormLayout = {
+    labelCol: {
+        span: 5.5,
+    },
+    wrapperCol: {
+        span: 20,
+    },
+};
+
 export default class ContentContainer extends Component {
     formRef = React.createRef();
     props = this.props;
@@ -29,7 +42,10 @@ export default class ContentContainer extends Component {
             {
                 title: '目标',
                 dataIndex: 'content',
-                key: 'content'
+                key: 'content',
+                // align: 'center'
+
+
             },
             {
                 title: '执行人',
@@ -37,14 +53,14 @@ export default class ContentContainer extends Component {
                 key: 'ascriptionName',
                 render: ((text, record, value) => {
 
-                    return <span>{record.ascriptionName}</span>;
+                    return <span>{}</span>;
                 })
             },
             {
                 title: '类型',
                 dataIndex: 'level',
                 key: 'level',
-                render:((text, record, value) => {
+                render: ((text, record, value) => {
                     let level = record.level
                     return <span>{level}</span>;
                 })
@@ -300,22 +316,23 @@ export default class ContentContainer extends Component {
 
 
     //展开折叠按钮
-    renderExpandButton=()=>{
-        
+    renderExpandButton = () => {
+
     }
 
-    expandedRowRender=(record)=>{
+    expandedRowRender = (record) => {
         console.log(record)
-        if(record.children === null ){
+        if (record.children === null) {
             console.log('no children')
         }
-        else{
+        else {
             console.log('expandedRowRender,', record)
 
         }
 
     }
     handleExpand = () => {
+        console.log('state of handle Expand Row', this.state.expandAllRows)
         this.setState({
             expandAllRows: !this.state.expandAllRows
         }, (() => {
@@ -324,14 +341,14 @@ export default class ContentContainer extends Component {
     }
     openOrCloseAll = () => {
         let data = this.props.homeData
-        const {expandAllRows} = this.state;
-        console.log('type', expandAllRows, data ,'homeData')
+        const { expandAllRows } = this.state;
+        console.log('type', expandAllRows, data, 'homeData')
         this.setState({
             expKeys: expandAllRows ? [] : data && data.map(i => i.id)
-        }, (()=>{
-            console.log(this.state.expKeys,"state.expkeys")
+        }, (() => {
+            console.log(this.state.expKeys, "state.expkeys")
         }))
-      };
+    };
 
 
 
@@ -428,9 +445,7 @@ export default class ContentContainer extends Component {
 
                         </Form.Provider>
 
-                        <Button onClick={this.handleExpand}>
-                            收起 <PlusOutlined />打开
-                        </Button>
+
 
                         <Button onClick={this.showModal}>
                             <PlusOutlined />添加周期
@@ -439,55 +454,29 @@ export default class ContentContainer extends Component {
                         <Button onClick={this.onShowDeletePeriodModal}>
                             <PlusOutlined />删除周期
                         </Button>
+                        <Button onClick={this.handleExpand}>
+
+                        {expandAllRows ? <span><PlusOutlined />展开列表</span> : <span> <MinusOutlined /> 折叠列表</span>}
+                        </Button>
+
 
                         {this.state.showDeletePeriodModal ?
-                            <Modal
-                                title="删除OKR周期"
+                            <DeletePeriodModal
+                                onCloseDeletePeriodModal={this.onCloseDeletePeriodModal}
                                 onCancel={this.onCloseDeletePeriodModal}
-                                visible={this.state.showDeletePeriodModal}
-                                footer={null}
-                            >
-
-                                <Form
-                                    ref={this.formRef}
-                                    {...layout} hideRequiredMark
-                                    onFinish={this.onFinishDeletPeriod}
-                                >
-                                    {/* //填写结果 */}
-                                    <Form.Item name="delete"
-                                        label="选择OKR周期"
-                                        rules={[
-                                            {
-                                                required: true,
-                                                message: '选择OKR周期',
-                                            },
-                                        ]}
-                                    >
-                                        <Select>
-
-                                            {this.props.listSelect.map(item => {
-                                                return <Option key={item.title} value={item.id}>{item.title}</Option>
-                                            })}
-                                        </Select>
-                                    </Form.Item>
-                                    <div style={{ textAlign: 'right' }} >
-                                        <Button onClick={this.onCloseDeletePeriodModal} style={{ marginRight: 8 }}>
-                                            关闭
-                                    </Button>
-                                        <Button type="primary" htmlType="submit">
-                                            删除
-                                    </Button>
-                                    </div>
-
-                                </Form>
-                            </Modal>
+                                showDeletePeriodModal={this.state.showDeletePeriodModal}
+                                ref={this.formRef}
+                                {...smallFormLayout}
+                                onFinishDeletPeriod={this.onFinishDeletPeriod}
+                                listSelect={listSelect}
+                            />
                             :
                             null
                         }
 
 
-
                         {/* //添加OKR周期的弹窗 */}
+
                         <Modal
                             title="添加OKR周期"
                             onCancel={this.onCloseModel}
@@ -496,7 +485,7 @@ export default class ContentContainer extends Component {
                         >
                             <Form
                                 ref={this.formRef}
-                                {...layout} hideRequiredMark
+                                {...smallFormLayout} hideRequiredMark
                                 onValuesChange={this.handleAddNewOkrInput}
                                 onFinish={this.onModalFinish}
                             >
@@ -538,7 +527,7 @@ export default class ContentContainer extends Component {
                         this.props.homeData ?
 
                             <div>
-                                {expandAllRows}
+                                {/* {expandAllRows} */}
                                 <Table
                                     columns={columns}
                                     dataSource={this.props.homeData}
@@ -559,10 +548,12 @@ export default class ContentContainer extends Component {
                                         this.setState({ expKeys: newExp });
                                     }}
 
-                                 
-                                    //expandedRowRender={(record )=> { console.log('expandedRowRender', record);  if(record.children === null){ console.log('dont show expand button') }else{this.expandedRowRender(record) }}}
-   
-                                   
+
+
+
+                                //expandedRowRender={(record )=> { console.log('expandedRowRender', record);  if(record.children === null){ console.log('dont show expand button') }else{this.expandedRowRender(record) }}}
+
+
 
                                 />
 
@@ -585,6 +576,7 @@ export default class ContentContainer extends Component {
         )
     }
 }
+
 
 
 

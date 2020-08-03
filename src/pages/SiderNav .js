@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import 'antd/dist/antd.css';
-import { Menu} from 'antd';
+import { Menu } from 'antd';
 import SubMenu from 'antd/lib/menu/SubMenu';
 import logo from '../asset/mainlogo.jpg';
-import {UserOutlined, HomeOutlined,ApartmentOutlined} from '@ant-design/icons';
+import { UserOutlined, HomeOutlined, ApartmentOutlined } from '@ant-design/icons';
 
 
 
@@ -35,18 +35,34 @@ export default class SiderNav extends Component {
                     null
                     :
                     <React.Fragment>
-                        <div className="logo" style={{ height: '3rem', display: 'flex', backgroundColor: '#131629' }} >
+                        {/* <div className="logo" style={{ height: '3rem', display: 'flex',}} >
                             <img className="logo-img" style={{ width: '3rem' }} src={logo} />
                             
                             {collapsed ?
 
                             <div></div>
                             : 
-                            <div style={{ color: 'white', fontWeight: 'bold', marginLeft: '10px', marginTop: '5px', fontSize: '20px' }}>OKR管理</div>
+                            <div style={{ color: '#333333', fontWeight: 'bold', marginLeft: '10px', marginTop: '5px', fontSize: '20px' }}>OKR管理</div>
                             }
 
 
-                        </div>
+                        </div> */}
+                        {/* <Menu theme='light'> <Menu.Item style={{ height: '3.5rem', }} >
+                            <div className="logo" style={{ height: '3rem', display: 'flex', backgroundColor: 'white' }} >
+                                <img className="logo-img" style={{ width: '2.5rem' }} src={logo} />
+
+                                {collapsed ?
+
+                                    <div></div>
+                                    :
+                                    <div style={{ color: '#333333', fontWeight: 'bold', marginLeft: '10px', marginTop: '5px', fontSize: '20px' }}>OKR管理</div>
+                                }
+
+
+                            </div>
+
+                        </Menu.Item> */}
+                        {/* </Menu> */}
 
                         <Menu mode="inline" theme='dark' onSelect={this.onClikMenuItem} selectedKeys={defaultSelectedKeys} style={{ height: '55rem' }}>
 
@@ -60,11 +76,11 @@ export default class SiderNav extends Component {
 
                             </SubMenu>
 
-                            <SubMenu key="12543" title={menu[2].name} icon={ <UserOutlined />}>
+                            <SubMenu key="12543" title={menu[2].name} icon={<UserOutlined />}>
                                 {menu[2].childs.map(item => {
                                     return <SubMenu key={item.id} title={item.name}>
                                         {item.childs.map(child => {
-                                            return <Menu.Item  key={child.id} datalevel={child.level} dataname={child.name}> {child.name}</Menu.Item>
+                                            return <Menu.Item key={child.id} datalevel={child.level} dataname={child.name}> {child.name}</Menu.Item>
                                         })}
 
 

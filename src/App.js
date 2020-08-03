@@ -1,4 +1,3 @@
-
 import React, { Component } from 'react';
 import * as dd from 'dingtalk-jsapi';
 import axios from 'axios';
@@ -8,12 +7,9 @@ import ContentContainer from './pages/ContentContainer';
 import { Layout, Tabs, Spin, Alert, Modal, Button } from 'antd';
 import 'antd/dist/antd.css';
 import Axios from 'axios';
-import invokeThingService$ from 'dingtalk-jsapi/api/biz/iot/invokeThingService';
-
+// import invokeThingService$ from 'dingtalk-jsapi/api/biz/iot/invokeThingService';
 const { Sider } = Layout;
 const { TabPane } = Tabs;
-
-
 
 export default class App extends Component {
   state = {
@@ -46,87 +42,44 @@ export default class App extends Component {
     userName: null
   }
 
-
+  // 初始化请求钉钉环境取得当前用户info
   componentDidMount() {
-    alert('1， 首次登陆')
-    
-    const outThis= this; 
-    //叮叮环境使用
-    dd.ready(() => {
-      alert('2， 进入dingingReady ')
+    // const outThis = this;
+    // //叮叮环境使用
+    // dd.ready(() => {
 
-      const corpId = `${process.env.REACT_APP_CORP_ID}`
-      console.log('corpId', corpId)
-      console.log('http', `${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=`)
+    //   const corpId = `${process.env.REACT_APP_CORP_ID}`
+    //   dd.runtime.permission.requestAuthCode({
 
-      dd.runtime.permission.requestAuthCode({
+    //     corpId: corpId, // 企业id
+    //     onSuccess: function (info) {
+    //       axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=` + `${info.code}`)
+    //         .then(res => {
+    //           if (res.data.code === 0) {
+    //             outThis.getAllData(data)
 
-        corpId: corpId, // 企业id
-        onSuccess: function (info) {
-          alert('3， dingding 成功 ')
-
-          alert('获取Permission成功' + info.code)// 通过该免登授权码可以获取用户身份
-
-          axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=` + `${info.code}`)
-            .then(res => {
-              alert('get res')
-              alert(JSON.stringify(res.data))
-              alert('aafter parse')
-              if (res.data.code === 0) {
-                let data = res.data.data
-                alert('code===0')
-                alert('4， 准备传递data  ')
-                outThis.getAllData(data)
-                
-              }
-              else {
-                alert('error')
-              }
-            }
-            )
-        }
-      });
-    },(()=>{
-      this.getAllData()
-    }))
-
-
-    // 不授权使用
-    //  axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=sfsfsfsffs`)
-    //  .then(res=>{
-    //    alert('get res')
-    //    alert(JSON.stringify(res.data))
-    //    alert('aafter parse')
-    //    if(res.data.code === 0){
-    //      alert('code===0')
-    //      axios.all
-    //      ([
-    //        this.getMenu(),
-    //        this.getOkrListSelect(),
-    //        this.getParentObjective(),
-    //        ])
-    //      .then(res => {
-    //        console.log(this.state.panes)
-    //        this.setState({
-    //          bigLoading: false
-    //        })
-    //      })
-    //    }
-    //    else{
-    //      alert('error')
-    //    }
-    //  }
-    //  )
-    //  .catch()
-
-
-
+    //           }
+    //           else {
+    //             alert('error')
+    //           }
+    //         }
+    //         )
+    //     }
+    //   });
+    // }, (() => {
+    this.getAllData()
+    // }))
   }
 
-  getAllData = (data) => {
-    alert('5， 请求所以接口 ')
+  // 初始化请求的接口  //连接后台读取GET数据
 
-    console.log(data, "login来的打他")
+  getAllData = () => {
+    // this.setState({
+    //   avatar: data.avatar,
+    //   userId: data.userId,
+    //   dingUserId: data.dingUserId,
+    //   userName: data.userName
+    // })
     axios.all
       ([
         this.getMenu(),
@@ -141,11 +94,6 @@ export default class App extends Component {
       })
   }
 
-
-
-
-
-  // 初始化请求的接口  //连接后台读取GET数据
   getMenu = () => {
     axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/menu/list`)
       .then(response => {
@@ -208,7 +156,6 @@ export default class App extends Component {
       )
   }
 
-
   getOkrListSelect = () => {
     axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
       .then(response => {
@@ -227,6 +174,7 @@ export default class App extends Component {
       })
   }
 
+  //连接后台读取GET数据
 
   getParentObjective = () => {
     axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/getParentObjective`)
@@ -327,7 +275,6 @@ export default class App extends Component {
   }
 
   updatePanes = (id, title, activeKey) => {
-    console.log('updatePane', id, title)
     const { panes } = this.state;
 
     panes.forEach(item => {
@@ -339,7 +286,6 @@ export default class App extends Component {
           panes: panes
         }, (() => {
           this.getActivePane(activeKey)
-          console.log('change pnes info setstate', this.state.panes)
         }))
       }
       else {
@@ -385,11 +331,6 @@ export default class App extends Component {
 
   };
 
-  //update 上级Object
-  updateExcutorList = (level) => {
-
-  };
-
 
   // Tab 
   onTabChange = (activeKey) => {
@@ -410,9 +351,8 @@ export default class App extends Component {
     this[action](targetKey);
   };
 
-  //create tab 
+  //  点击左侧导航栏 
   getItemKey = (itemId, itemLevel, itemName) => {
-
     // 定义传来的值及绑定当前state
 
     this.setState({
@@ -428,7 +368,7 @@ export default class App extends Component {
   };
 
 
-
+  //检查当前Pane是否存在
   checkPane = (panes, itemId, itemLevel, itemName) => {
     let isExist = true
     panes.find(pane => {
@@ -443,6 +383,7 @@ export default class App extends Component {
     }
   }
 
+  //创建当前Pane是否存在
   createNewPanes = (proppanes, itemId, itemLevel, itemName) => {
     const { panes, currentOkrId, currentOkrValue } = this.state;
 
@@ -469,8 +410,6 @@ export default class App extends Component {
   getActivePane = (activeKey) => {
 
     const { panes } = this.state
-    console.log('getActivePane', panes, activeKey,)
-    console.log(panes.find(item => item.key === activeKey))
     let activePaneObject = panes.find(item => item.key === activeKey)
     this.setState({
       currentOkrValue: activePaneObject.okrValue,
@@ -480,6 +419,7 @@ export default class App extends Component {
 
   }
 
+  //关闭所有 Pane
   onCloseAllTabs = () => {
     this.setState({
       isPanesReady: false
@@ -502,7 +442,7 @@ export default class App extends Component {
 
   }
 
-
+  //更新
   reFreshPage = () => {
     // const { activeKey } = this.state;
     this.setState({
@@ -553,9 +493,14 @@ export default class App extends Component {
         .then(res => {
           if (res.data.msg === '成功') {
             if (res.data.data.length > 0) {
+              res.data.data.forEach(item=>{
+                item.excutor= item.level
+              })
               this.setState({
                 homeData: res.data.data,
               }, (() => {
+                console.log(res.data.data,'find excutor4')
+
                 this.setState({
                   isTableReady: true
                 })
@@ -600,6 +545,7 @@ export default class App extends Component {
             res.data.data.forEach(item => {
               item.children = item.keyResults;
               item.level = "Objective"
+              // item.excutor= item.level
               item.keyResults.forEach(p => {
                 p.level = "key Result"
               })
@@ -607,6 +553,7 @@ export default class App extends Component {
               this.setState({
                 homeData: res.data.data,
               }, (() => {
+                console.log('formate data excutro = item.level', res.data.data)
                 this.setState({
                   isTableReady: true
                 })
@@ -636,6 +583,7 @@ export default class App extends Component {
   };
 
 
+  //关闭Tab
   remove = targetKey => {
     const { panes, activeKey } = this.state;
     let key = targetKey;
@@ -677,7 +625,7 @@ export default class App extends Component {
     });
   };
 
-
+  //发送新建表单去后台
   getCreateNewObjective = (period, level, excutor, objective, upperObjective, keyResults) => {
     let arrayTemp = [{ content: `${keyResults}` }];
 
@@ -704,6 +652,7 @@ export default class App extends Component {
 
   }
 
+  //发送编辑后表单去后台
   getNewEditObject = (object) => {
 
     Axios.post((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/edit`), object).then(res => {
@@ -720,21 +669,18 @@ export default class App extends Component {
     })
   }
 
-
-
-
   render() {
-
-    const { collapsed, activeKey, menu, currentOkrId, currentOkrValue, bigLoading, panes, isPanesReady, isLoading, defaultSelectedKeys, isTableReady } = this.state;
-    console.log('this.state.pane', panes)
+    const { collapsed, activeKey, menu, currentOkrId, currentOkrValue,
+      bigLoading, panes, isPanesReady, isLoading, defaultSelectedKeys,
+      isTableReady, avatar, userId, dingUserId, userName } = this.state;
     return (
       <div>
-        <Layout>
-          <div></div>
+        <Layout  style={{height:'100%'}}>
+
           {bigLoading ?
             <Spin tip="Loading...">
               <Alert
-                message="Alert message title"
+                message="NBBBB"
                 description="Further details about the context of this alert."
                 type="info" tableData
 
@@ -742,81 +688,97 @@ export default class App extends Component {
             </Spin>
             :
             <React.Fragment>
-              <Sider trigger={null} collapsible collapsed={collapsed}  >
-                {menu ?
-                  <SiderNav menu={menu} getItemKey={this.getItemKey} defaultSelectedKeys={defaultSelectedKeys} collapsed={collapsed} />
-                  :
-                  <div className="example" style={{
-                    textAlign: 'center',
-                    background: 'rgba(0, 0, 0, 0.05)',
-                    borderRadius: '4px',
-                    marginBottom: '50px',
-                    padding: '30px 50px',
-                    margin: '20px 0'
-                  }}>
-                    <Spin size="large" tip="Loading..." />
-                  </div>
-                }
+              <HeaderNav
+                collapsed={collapsed}
+                toggle={this.toggle}
+                reFreshPage={this.reFreshPage}
+                avatar={avatar}
+                userId={userId}
+                dingUserId={dingUserId}
+                userName={userName}
+              />
 
 
-              </Sider>
+
 
               <Layout className="site-layout">
 
-                <HeaderNav collapsed={collapsed} toggle={this.toggle} reFreshPage={this.reFreshPage} />
-
-                <div className='tabContainer'
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between'
-                  }}>
-
-                  <Tabs size='small' type="editable-card" hideAdd onChange={this.onTabChange} onEdit={this.onEdit} activeKey={activeKey} tabBarGutter={0} style={{ display: 'flex', justifyContent: 'center', alignItems: 'space-between' }}  >
-
-                    {isPanesReady ?
-                      <React.Fragment>
-                        {panes.map(pane => (
-                          <TabPane tab={pane.title} key={pane.key} closable={pane.closable} style={{ width: '8rem', display: 'flex', justifyContent: 'center' }} onTabClick={this.onTabClick} >
-
-                          </TabPane>
-                        ))}
-                      </React.Fragment>
-                      : null
-                    }
-                  </Tabs>
-
-                  {isPanesReady && panes.length > 1 ? <div className="closeAllButton"><Button onClick={this.onCloseAllTabs}>全部关闭</Button> </div> : null}
-                </div>
+                <Sider trigger={null} collapsible collapsed={collapsed}  >
+                  {menu ?
+                    <SiderNav menu={menu} getItemKey={this.getItemKey} defaultSelectedKeys={defaultSelectedKeys} collapsed={collapsed} />
+                    :
+                    <div className="example" style={{
+                      textAlign: 'center',
+                      background: 'rgba(0, 0, 0, 0.05)',
+                      borderRadius: '4px',
+                      marginBottom: '50px',
+                      padding: '30px 50px',
+                      margin: '20px 0'
+                    }}>
+                      <Spin size="large" tip="Loading..." />
+                    </div>
+                  }
 
 
-                {isTableReady ?
+                </Sider>
 
-                  <ContentContainer expandAllRow={this.state.expandAllRow}
-                    homeData={this.state.homeData} listSelect={this.state.listSelect}
-                    getNewPeriod={this.getNewPeriod}
-                    currentOkrValue={currentOkrValue} getOkrValue={this.getOkrValue}
-                    deletePeriod={this.deletePeriod} currentOkrId={currentOkrId}
-                    currentOkrValue={currentOkrValue}
-                    getCreateNewObjective={this.getCreateNewObjective}
-                    getNewEditObject={this.getNewEditObject}
-                    isLoading={isLoading}
-                    activeKey={activeKey}
-                  >
-                    updateExcutorList={this.updateExcutorList}
+                <Layout>
 
-                  </ContentContainer>
-                  :
-                  <div className="example" style={{
-                    textAlign: 'center',
-                    background: 'rgba(0, 0, 0, 0.05)',
-                    borderRadius: '4px',
-                    marginBottom: '50px',
-                    padding: '30px 50px',
-                    margin: '20px 0'
-                  }}>
-                    <Spin size="large" tip="Loading..." />
+                  <div className='tabContainer'
+                    style={{
+                      display:'flex',
+                      justifyContent: 'space-between',
+                      marginRight:'1rem'
+                    }}>
+
+
+                    <Tabs size='small' type="editable-card" hideAdd onChange={this.onTabChange} onEdit={this.onEdit} activeKey={activeKey} tabBarGutter={0} style={{ display: 'flex', justifyContent: 'center', alignItems: 'space-between' }}  >
+
+                      {isPanesReady ?
+                        <React.Fragment>
+                          {panes.map(pane => (
+                            <TabPane tab={pane.title} key={pane.key} closable={pane.closable} style={{ width: '8rem', display: 'flex', justifyContent: 'center' }} onTabClick={this.onTabClick} >
+
+                            </TabPane>
+                          ))}
+                        </React.Fragment>
+                        : null
+                      }
+                    </Tabs>
+
+                    {isPanesReady && panes.length > 1 ? <div className="closeAllButton"><Button onClick={this.onCloseAllTabs}>全部关闭</Button> </div> : null}
                   </div>
-                }
+
+
+                  {isTableReady ?
+
+                    <ContentContainer expandAllRow={this.state.expandAllRow}
+                      homeData={this.state.homeData} listSelect={this.state.listSelect}
+                      getNewPeriod={this.getNewPeriod}
+                      currentOkrValue={currentOkrValue} getOkrValue={this.getOkrValue}
+                      deletePeriod={this.deletePeriod} currentOkrId={currentOkrId}
+                      currentOkrValue={currentOkrValue}
+                      getCreateNewObjective={this.getCreateNewObjective}
+                      getNewEditObject={this.getNewEditObject}
+                      isLoading={isLoading}
+                      activeKey={activeKey}
+                    >
+                      updateExcutorList={this.updateExcutorList}
+
+                    </ContentContainer>
+                    :
+                    <div className="example" style={{
+                      textAlign: 'center',
+                      background: 'rgba(0, 0, 0, 0.05)',
+                      borderRadius: '4px',
+                      marginBottom: '50px',
+                      padding: '30px 50px',
+                      margin: '20px 0'
+                    }}>
+                      <Spin size="large" tip="Loading..." />
+                    </div>
+                  }
+                </Layout>
               </Layout>
             </React.Fragment>
           }
