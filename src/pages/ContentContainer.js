@@ -16,6 +16,7 @@ const { Option } = Select;
 
 
 
+
 const layout = {
     labelCol: {
         span: 8,
@@ -48,12 +49,26 @@ export default class ContentContainer extends Component {
 
             },
             {
-                title: '执行人',
+                title: (()=>{ 
+                    let activeKey = this.props.activeKey
+                    console.log(activeKey,' activeKey')
+                    let x = null
+                    if(activeKey === "2111551"){
+                        x = '执行人'
+                    }
+                    else{
+                        x = null 
+                    }
+                    ; return x
+                    
+                }
+                    ), 
                 dataIndex: 'ascriptionName',
                 key: 'ascriptionName',
                 render: ((text, record, value) => {
-
-                    return <span>{}</span>;
+                        
+                        // console.log('excutor', record)
+                    return <span>{record.ascriptionName}</span>;
                 })
             },
             {
@@ -61,8 +76,20 @@ export default class ContentContainer extends Component {
                 dataIndex: 'level',
                 key: 'level',
                 render: ((text, record, value) => {
+                    
                     let level = record.level
-                    return <span>{level}</span>;
+                    console.log('level retrun name', level)
+                    let name= null
+                    if (level === 'company'){
+                        name='公司'
+                    }
+                    if(level === 'department'){
+                        name='部门'
+                    }
+                    if(level === 'person'){
+                        name="个人"
+                    }
+                    return <span>{name}</span>;
                 })
             },
             {
@@ -529,6 +556,7 @@ export default class ContentContainer extends Component {
                             <div>
                                 {/* {expandAllRows} */}
                                 <Table
+                                    
                                     columns={columns}
                                     dataSource={this.props.homeData}
                                     expandable={true}

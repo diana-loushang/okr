@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import 'antd/dist/antd.css';
 import { Menu } from 'antd';
 import SubMenu from 'antd/lib/menu/SubMenu';
-import logo from '../asset/mainlogo.jpg';
 import { UserOutlined, HomeOutlined, ApartmentOutlined } from '@ant-design/icons';
 
 

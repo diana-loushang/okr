@@ -44,36 +44,38 @@ export default class App extends Component {
 
   // 初始化请求钉钉环境取得当前用户info
   componentDidMount() {
-    // const outThis = this;
-    // //叮叮环境使用
-    // dd.ready(() => {
+    const outThis = this;
+  //   //叮叮环境使用
+  //   dd.ready(() => {
 
-    //   const corpId = `${process.env.REACT_APP_CORP_ID}`
-    //   dd.runtime.permission.requestAuthCode({
+  //     const corpId = `${process.env.REACT_APP_CORP_ID}`
+  //     dd.runtime.permission.requestAuthCode({
 
-    //     corpId: corpId, // 企业id
-    //     onSuccess: function (info) {
-    //       axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=` + `${info.code}`)
-    //         .then(res => {
-    //           if (res.data.code === 0) {
-    //             outThis.getAllData(data)
+  //       corpId: corpId, // 企业id
+  //       onSuccess: function (info) {
+  //         axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=` + `${info.code}`)
+  //           .then(res => {
+  //             if (res.data.code === 0) {
+  //               const data = res.data.data
+  //               outThis.getAllData(data)
 
-    //           }
-    //           else {
-    //             alert('error')
-    //           }
-    //         }
-    //         )
-    //     }
-    //   });
-    // }, (() => {
-    this.getAllData()
-    // }))
+  //             }
+  //             else {
+  //               alert(JSON.stringify(res.data))
+  //             }
+  //           }
+  //           )
+  //       }
+  //     });
+  //   })
+
+    outThis.getAllData()
   }
 
   // 初始化请求的接口  //连接后台读取GET数据
 
-  getAllData = () => {
+  getAllData = (data) => {
+    
     // this.setState({
     //   avatar: data.avatar,
     //   userId: data.userId,
@@ -494,7 +496,8 @@ export default class App extends Component {
           if (res.data.msg === '成功') {
             if (res.data.data.length > 0) {
               res.data.data.forEach(item=>{
-                item.excutor= item.level
+                item.excutor= item.level;
+                item.className="notshow"
               })
               this.setState({
                 homeData: res.data.data,
@@ -543,8 +546,9 @@ export default class App extends Component {
 
           if (res.data.data.length !== 0) {
             res.data.data.forEach(item => {
-              item.children = item.keyResults;
+              item.children = item.keyResults
               item.level = "Objective"
+              item.className= "notshow"
               // item.excutor= item.level
               item.keyResults.forEach(p => {
                 p.level = "key Result"
@@ -680,8 +684,8 @@ export default class App extends Component {
           {bigLoading ?
             <Spin tip="Loading...">
               <Alert
-                message="NBBBB"
-                description="Further details about the context of this alert."
+                message="掌上OKR"
+                description="下载掌上OKR。。。。。。"
                 type="info" tableData
 
               />
