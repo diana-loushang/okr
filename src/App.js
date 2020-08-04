@@ -54,31 +54,31 @@ export default class App extends Component {
 
 
     //   //叮叮环境使用
-      // dd.ready(() => {
+    // dd.ready(() => {
 
-      //   const corpId = `${process.env.REACT_APP_CORP_ID}`
-      //   dd.runtime.permission.requestAuthCode({
+    //   const corpId = `${process.env.REACT_APP_CORP_ID}`
+    //   dd.runtime.permission.requestAuthCode({
 
-      //     corpId: corpId, // 企业id
-      //     onSuccess: function (info) {
-      //       axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=` + `${info.code}`)
-      //         .then(res => {
-      //           if (res.data.code === 0) {
-      //             const data = res.data.data
-      //             outThis.getAllData(data)
+    //     corpId: corpId, // 企业id
+    //     onSuccess: function (info) {
+    //       axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=` + `${info.code}`)
+    //         .then(res => {
+    //           if (res.data.code === 0) {
+    //             const data = res.data.data
+    //             outThis.getAllData(data)
 
-      //           }
-      //           else {
-      //             alert(JSON.stringify(res.data))
-      //           }
-      //         }
-      //         )
-      //     }
-      //   });
-      // })
+    //           }
+    //           else {
+    //             alert(JSON.stringify(res.data))
+    //           }
+    //         }
+    //         )
+    //     }
+    //   });
+    // })
 
     outThis.getAllData()
-  
+
 
   }
 
@@ -693,19 +693,19 @@ export default class App extends Component {
     if (de.requestFullscreen) {
       de.requestFullscreen();
       this.setState({
-        isFullScreen:true
+        isFullScreen: true
       })
     } else if (de.mozRequestFullScreen) {
       de.mozRequestFullScreen();
       this.setState({
-        isFullScreen:true
+        isFullScreen: true
       })
     } else if (de.webkitRequestFullScreen) {
       de.webkitRequestFullScreen();
       this.setState({
-        isFullScreen:true
+        isFullScreen: true
       })
-    
+
     }
   };
 
@@ -716,17 +716,17 @@ export default class App extends Component {
     if (de.exitFullscreen) {
       de.exitFullscreen();
       this.setState({
-        isFullScreen:false
+        isFullScreen: false
       })
     } else if (de.mozCancelFullScreen) {
       de.mozCancelFullScreen();
       this.setState({
-        isFullScreen:false
+        isFullScreen: false
       })
     } else if (de.webkitCancelFullScreen) {
       de.webkitCancelFullScreen();
       this.setState({
-        isFullScreen:false
+        isFullScreen: false
       })
     }
   };
@@ -740,7 +740,7 @@ export default class App extends Component {
         _self.setState({
           isFullScreen: document.webkitIsFullScreen
         });
-        console.log('webkitfullscreenchange',document.webkitIsFullScreen )
+        console.log('webkitfullscreenchange', document.webkitIsFullScreen)
       },
       false
     );
@@ -793,11 +793,7 @@ export default class App extends Component {
                 fullScreen={this.fullScreen}
               />
 
-
-
-
               <Layout className="site-layout">
-
 
                 <Sider trigger={null} collapsible collapsed={collapsed}  >
                   {menu ?
@@ -814,22 +810,16 @@ export default class App extends Component {
                       <Spin size="large" tip="Loading..." />
                     </div>
                   }
-
-
                 </Sider>
 
                 <Layout>
-
                   <div className='tabContainer'
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
                       marginRight: '1rem'
                     }}>
-
-
                     <Tabs size='small' type="editable-card" hideAdd onChange={this.onTabChange} onEdit={this.onEdit} activeKey={activeKey} tabBarGutter={0} style={{ display: 'flex', justifyContent: 'center', alignItems: 'space-between' }}  >
-
                       {isPanesReady ?
                         <React.Fragment>
                           {panes.map(pane => (
@@ -841,13 +831,10 @@ export default class App extends Component {
                         : null
                       }
                     </Tabs>
-
                     {isPanesReady && panes.length > 1 ? <div className="closeAllButton"><Button onClick={this.onCloseAllTabs}>全部关闭</Button> </div> : null}
                   </div>
 
-
                   {isTableReady ?
-
                     <ContentContainer expandAllRow={this.state.expandAllRow}
                       homeData={this.state.homeData} listSelect={this.state.listSelect}
                       getNewPeriod={this.getNewPeriod}
@@ -859,8 +846,7 @@ export default class App extends Component {
                       isLoading={isLoading}
                       activeKey={activeKey}
                     >
-                      updateExcutorList={this.updateExcutorList}
-
+                      {/* updateExcutorList={this.updateExcutorList} */}
                     </ContentContainer>
                     :
                     <div className="example" style={{
@@ -878,7 +864,6 @@ export default class App extends Component {
               </Layout>
             </React.Fragment>
           }
-
         </Layout>
       </div>
     );

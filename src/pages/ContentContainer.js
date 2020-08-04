@@ -307,8 +307,6 @@ export default class ContentContainer extends Component {
 
     }
 
-    onSelectExcutor = (string, number, labeledValue, Option) => {
-    }
 
     //Model function
 
@@ -319,15 +317,7 @@ export default class ContentContainer extends Component {
         });
     };
 
-    onModalFinish = () => {
-        const { newOkrInputValue } = this.state;
 
-        this.setState({
-            modalVisible: false,
-        });
-        this.formRef.current.resetFields()  //清空
-        this.props.getNewPeriod(newOkrInputValue)
-    };
 
     onCloseModel = (e) => {
         this.formRef.current.resetFields()//清空
@@ -369,19 +359,19 @@ export default class ContentContainer extends Component {
         let data = this.props.homeData
         const { expandAllRows } = this.state;
         console.log('type', expandAllRows, data, 'homeData')
-        let keys= []
-        data.map(i=>{
-            
-            i.children.map(d=>(
+        let keys = []
+        data.map(i => {
+
+            i.children.map(d => (
                 keys.push(d.id)
             ))
 
-          
-           keys.push(i.id) 
+
+            keys.push(i.id)
         })
         this.setState({
             expKeys: expandAllRows ? [] : data && keys
-             
+
         }, (() => {
             console.log(this.state.expKeys, "state.expkeys")
         }))
@@ -394,7 +384,6 @@ export default class ContentContainer extends Component {
         this.props.getOkrValue(id)
 
     }
-
 
     onShowDeletePeriodModal = e => {
         this.setState({
@@ -417,13 +406,24 @@ export default class ContentContainer extends Component {
         })
 
     }
-    handleAddNewOkrInput = (changedValues, allValues) => {
 
+
+    handleAddNewOkrInput = (changedValues) => {
+        console.log('handle add new Okr Input', changedValues)
         this.setState({
             newOkrInputValue: changedValues.newOkrPeriod
         }, (() => {
         }))
     }
+
+    onModalFinish = () => {
+        const { newOkrInputValue } = this.state;
+
+        this.setState({
+            modalVisible: false,
+        });
+        this.props.getNewPeriod(newOkrInputValue)
+    };
 
 
 
@@ -434,23 +434,20 @@ export default class ContentContainer extends Component {
         return (
             <div>
 
-
                 <Content className="site-layout-background" style={{ margin: '24px 16px', padding: 24, minHeight: 280 }}>
 
+                    {/* OK人周期选择器  */}
                     <div className="time-range" style={{ display: 'flex', alignItems: 'center', marginBottom: "1rem" }}>
                         <span style={{ width: '5rem' }}>OKR周期</span>
                         <Select value={currentOkrValue} onSelect={this.handleOkrChange} style={{ width: '100%' }}>
                             {this.props.listSelect.map(item => {
                                 return <Option key={item.id} value={item.title}>{item.title}</Option>
                             })}
-
                         </Select>
-
                     </div>
 
 
                     <div style={{ display: 'flex' }}>
-                        {/* <Button  onClick={this.handleExpand}>全部折叠</Button> <Button onClick={this.closeExpand}>全部展开</Button> */}
 
                         <Form.Provider
                             onFormFinish={(name, { values, forms }) => {
@@ -468,7 +465,6 @@ export default class ContentContainer extends Component {
                             }}
                         >
                             <Form {...layout} name="basicForm" onFinish={onFinish}>
-
                                 <Form.Item>
                                     <Button htmlType="submit" onClick={this.showDrawer}>
                                         <PlusOutlined />添加目标
@@ -476,13 +472,8 @@ export default class ContentContainer extends Component {
 
                                 </Form.Item>
                             </Form>
-
                             <ObjectiveDrawer closeDrawer={this.closeDrawer} visible={this.state.visible} listSelect={listSelect} getCreateNewObjective={getCreateNewObjective} />
-
-
                         </Form.Provider>
-
-
 
                         <Button onClick={this.showModal}>
                             <PlusOutlined />添加周期
@@ -491,12 +482,13 @@ export default class ContentContainer extends Component {
                         <Button onClick={this.onShowDeletePeriodModal}>
                             <PlusOutlined />删除周期
                         </Button>
-                        <Button onClick={this.handleExpand}>
 
+                        <Button onClick={this.handleExpand}>
                             {expandAllRows ? <span><PlusOutlined />展开列表</span> : <span> <MinusOutlined /> 折叠列表</span>}
                         </Button>
 
 
+                        {/* /删除OKR周期的弹窗 */}
                         {this.state.showDeletePeriodModal ?
                             <DeletePeriodModal
                                 onCloseDeletePeriodModal={this.onCloseDeletePeriodModal}
@@ -513,8 +505,16 @@ export default class ContentContainer extends Component {
 
 
                         {/* //添加OKR周期的弹窗 */}
+                        {this.state.modalVisible &&
+                            <AddPeriodModal
+                                onCloseModel={this.onCloseModel} modalVisible={this.state.modalVisible} formRef={this.formRef}
+                                onModalFinish={this.onModalFinish}
+                                handleAddNewOkrInput={this.handleAddNewOkrInput}
 
-                        <Modal
+                            />
+                        }
+
+                        {/* <Modal
                             title="添加OKR周期"
                             onCancel={this.onCloseModel}
                             visible={this.state.modalVisible}
@@ -526,7 +526,7 @@ export default class ContentContainer extends Component {
                                 onValuesChange={this.handleAddNewOkrInput}
                                 onFinish={this.onModalFinish}
                             >
-                                {/* //填写结果 */}
+                                
                                 <Form.Item
                                     name="newOkrPeriod"
                                     label="OKR周期"
@@ -536,7 +536,6 @@ export default class ContentContainer extends Component {
                                             message: '填写OKR周期名称',
                                         },
                                     ]}
-
                                 >
                                     <Input style={{ width: '100%' }} />
                                 </Form.Item>
@@ -548,69 +547,47 @@ export default class ContentContainer extends Component {
                                         添加
                                     </Button>
                                 </div>
-
                             </Form>
-                        </Modal>
+                        </Modal> */}
+
                     </div>
-                    {/* /详情加OKR周期的弹窗 */}
+
+                    {/* /详情弹窗 */}
                     {this.state.showDetailModal && <DetailModal visible={this.state.showDetailModal} closeDetailModal={this.closeDetailModal} data={detailData} />
                     }
 
-                    {/* /修改的弹窗 */}
+                    {/* /修改弹窗 */}
                     {this.state.showEditlModal && <EditModal visible={this.state.showEditlModal} onCloseEditiModal={this.onCloseEditiModal} data={detailData} parentId={parentId} getNewEditObject={getNewEditObject} />
                     }
 
-                    {
-                        this.props.homeData ?
-
-                            <div>
-                                {/* {expandAllRows} */}
-                                <Table
-
-                                    columns={columns}
-                                    dataSource={this.props.homeData}
-                                    expandable={true}
-                                    defaultExpandAllRows={expandAllRows}
-                                    rowKey={record => record.id}
-                                    childrenColumnName="children"
-                                    //
-
-                                    // 可控的展开与关闭数组
-                                    expandedRowKeys={this.state.expKeys}
-                                    //单个展开或关闭，操作数组
-                                    onExpand={(b, r) => {
-                                        const { expKeys } = this.state;
-                                        const newExp = b
-                                            ? [...expKeys, r.id]
-                                            : expKeys.filter(i => i !== r.id);
-                                        this.setState({ expKeys: newExp });
-                                    }}
-
-
-
-
-                                //expandedRowRender={(record )=> { console.log('expandedRowRender', record);  if(record.children === null){ console.log('dont show expand button') }else{this.expandedRowRender(record) }}}
-
-
-
-                                />
-
-                            </div>
-                            :
-                            <div>暂无数据</div>
-
+                    {/* /表格 */}
+                    {this.props.homeData ?
+                        <div>
+                            <Table
+                                columns={columns}
+                                dataSource={this.props.homeData}
+                                expandable={true}
+                                defaultExpandAllRows={expandAllRows}
+                                rowKey={record => record.id}
+                                childrenColumnName="children"
+                                // 可控的展开与关闭数组
+                                expandedRowKeys={this.state.expKeys}
+                                //单个展开或关闭，操作数组
+                                onExpand={(b, r) => {
+                                    const { expKeys } = this.state;
+                                    const newExp = b
+                                        ? [...expKeys, r.id]
+                                        : expKeys.filter(i => i !== r.id);
+                                    this.setState({ expKeys: newExp });
+                                }}
+                            />
+                        </div>
+                        :
+                        <div>暂无数据</div>
                     }
+                </Content>
 
-
-
-
-
-
-                </Content >
-
-
-
-            </div >
+            </div>
         )
     }
 }
