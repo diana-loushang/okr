@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import axios from 'axios';
-import { Layout, Table, Button, Input, Select, Form, Modal, message } from 'antd';
+import { Layout, Table, Button, Select, Form, message } from 'antd';
 import 'antd/dist/antd.css';
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import ObjectiveDrawer from '../components/ObjectiveDrawer';
@@ -348,7 +348,6 @@ export default class ContentContainer extends Component {
 
     }
     handleExpand = () => {
-        console.log('state of handle Expand Row', this.state.expandAllRows)
         this.setState({
             expandAllRows: !this.state.expandAllRows
         }, (() => {
@@ -358,25 +357,20 @@ export default class ContentContainer extends Component {
     openOrCloseAll = () => {
         let data = this.props.homeData
         const { expandAllRows } = this.state;
-        console.log('type', expandAllRows, data, 'homeData')
         let keys = []
         data.map(i => {
 
             i.children.map(d => (
                 keys.push(d.id)
             ))
-
-
             keys.push(i.id)
         })
         this.setState({
             expKeys: expandAllRows ? [] : data && keys
 
         }, (() => {
-            console.log(this.state.expKeys, "state.expkeys")
         }))
     };
-
 
 
     handleOkrChange = (value, option) => {

@@ -18,7 +18,7 @@ export default class DeletPeriodModal extends Component {
     render() {
         const {onCloseDeletePeriodModal, showDeletePeriodModal, ref, onFinishDeletPeriod, listSelect} = this.props; 
         return (
-                 <Modal
+            <Modal
             title="删除OKR周期"
             onCancel={onCloseDeletePeriodModal}
             visible={showDeletePeriodModal}
