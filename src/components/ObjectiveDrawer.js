@@ -90,7 +90,9 @@ export default class ObjectiveDrawer extends Component {
     onUpperObjectiveChange = (value) => {
         this.setState({
             upperObjective: value
-        })
+        },(()=>{
+
+        }))
     }
 
 
@@ -100,7 +102,9 @@ export default class ObjectiveDrawer extends Component {
         }, (() => {
             this.setState({
                 periodFilled: true
-            })
+            },(()=>{
+                this.checkRequireFill()
+            }))
         }))
     }
 
@@ -212,13 +216,17 @@ export default class ObjectiveDrawer extends Component {
                     }
                     else {
                         console.log('chose upper obejct', res.data.data)
-                        this.setState({
-                            upperObjectiveData: res.data.data
-                        }, (() => {
+                        console.log(res.data.data[0].data, "")
+                        if (res.data.data[0].data.length !== 0) {
                             this.setState({
-                                disabledSelect: false,
-                            })
-                        }))
+                                upperObjectiveData: res.data.data
+                            }, (() => {
+                                this.setState({
+                                    disabledSelect: false,
+                                })
+                            }))
+                        }
+
                     }
 
 
@@ -241,12 +249,13 @@ export default class ObjectiveDrawer extends Component {
             console.log('required fills fullfill, call get Upper Object')
         }
         else {
-            alert('先填写周期，层级，执行对象')
+            
+            
         }
     }
 
     onValuesChange = (allValues) => {
-        const {  keyresults, objective, upperobjective } = allValues;
+        const { keyresults, objective, upperobjective } = allValues;
         this.setState({
             keyResults: keyresults,
             objective: objective,
@@ -263,8 +272,9 @@ export default class ObjectiveDrawer extends Component {
         this.props.getCreateNewObjective(period, level, excutor, objective, upperObjective, keyResults)
         this.props.closeDrawer()
         this.formRef.current.resetFields()
-
     }
+
+
 
     render() {
         const { listSelect, visible } = this.props;
@@ -306,9 +316,9 @@ export default class ObjectiveDrawer extends Component {
                         rules={[{ required: true }, { message: "选择OKR周期" }]}
                     >
                         <Radio.Group onChange={this.handelLevelChange}>
-                            <Radio value={"company"}>公司</Radio>
-                            <Radio value={"department"}>部门</Radio>
-                            <Radio value={"person"}>个人</Radio>
+                            <Radio key={"company1"} value={"company"}>公司</Radio>
+                            <Radio key={'department2'} value={"department"}>部门</Radio>
+                            <Radio key={'person3'} value={"person"}>个人</Radio>
                         </Radio.Group>
                     </Form.Item>
 
@@ -327,14 +337,15 @@ export default class ObjectiveDrawer extends Component {
 
                         </Select>
                     </Form.Item>
-                
+
                     <Form.Item
                         name="upperobjective"
                         label="上级目标"
                         rules={[{ required: true }]}
+
                     >
 
-                        <Select label="选择上级Objective" disabled={disabledSelect} onMouseEnter={this.onMouseEnterObjective} onChange={this.onUpperObjectiveChange}>
+                        <Select label="选择上级Objective" disabled={disabledSelect} onChange={this.onUpperObjectiveChange} >
 
                             {disabledSelect ? null : formatUpperObject(upperObjectiveData)}
                         </Select>
