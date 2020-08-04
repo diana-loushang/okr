@@ -6,53 +6,6 @@ import Axios from 'axios';
 const { Option, OptGroup } = Select;
 
 
-const makePerson = ({ ascriptionId, name, key }, i) => (
-
-    <Option dataid={ascriptionId} value={ascriptionId} key={key} >{name}</Option>
-);
-
-const makeGroup = ({ groupName, list }, i) => (
-
-    <OptGroup label={groupName} key={i}>
-        {list.map(makePerson)}
-    </OptGroup>
-);
-
-const helloOutsider = (data) => {
-    return <React.Fragment> {data.map(makeGroup)} </React.Fragment>
-}
-
-const makeOption = ({ id, content, okrId, parentId, level },) => (
-
-    <Option dataokrid={okrId} value={id} dataparentid={parentId} datalevel={level} key={id + content} >{content}</Option>
-);
-
-const makeOptGroup = ({ groupName, data }, i) => (
-
-    <OptGroup label={groupName} key={i + groupName}>
-        {data.map(makeOption)}
-    </OptGroup>
-);
-
-const formatUpperObject = (data) => {
-    return <React.Fragment> {data.map(makeOptGroup)} </React.Fragment>
-}
-
-const useResetFormOnCloseModal = ({ form, visible }) => {
-    const prevVisibleRef = useRef();
-    useEffect(() => {
-        prevVisibleRef.current = visible;
-    }, [visible]);
-    const prevVisible = prevVisibleRef.current;
-    useEffect(() => {
-        if (!visible && prevVisible) {
-            form.resetFields();
-        }
-    }, [visible]);
-};
-
-
-
 export default class ObjectiveDrawer extends Component {
     state = {
         visible: this.props.visible,
@@ -90,7 +43,7 @@ export default class ObjectiveDrawer extends Component {
     onUpperObjectiveChange = (value) => {
         this.setState({
             upperObjective: value
-        },(()=>{
+        }, (() => {
 
         }))
     }
@@ -101,8 +54,11 @@ export default class ObjectiveDrawer extends Component {
             period: value
         }, (() => {
             this.setState({
-                periodFilled: true
-            },(()=>{
+                periodFilled: true,
+                disabledSelect: true,
+
+            }, (() => {
+                this.formRef.current.resetFields([`upperobjective`])
                 this.checkRequireFill()
             }))
         }))
@@ -120,8 +76,6 @@ export default class ObjectiveDrawer extends Component {
         }))
         this.formRef.current.resetFields([`upperobjective`])
     }
-
-
 
     getExcutorData = (value) => {
         this.setState({
@@ -151,7 +105,6 @@ export default class ObjectiveDrawer extends Component {
                 }))
             })
     }
-
 
     handelLevelChange = (value) => {
         const level = value.target.value
@@ -201,7 +154,6 @@ export default class ObjectiveDrawer extends Component {
         }
     }
 
-
     getUpperLevelObjective = () => {
         const okrId = this.state.period;
         const level = this.state.level;
@@ -226,6 +178,11 @@ export default class ObjectiveDrawer extends Component {
                                 })
                             }))
                         }
+                        else {
+                            this.setState({
+                                disabledSelect: true,
+                            })
+                        }
 
                     }
 
@@ -249,8 +206,8 @@ export default class ObjectiveDrawer extends Component {
             console.log('required fills fullfill, call get Upper Object')
         }
         else {
-            
-            
+
+
         }
     }
 
@@ -273,8 +230,6 @@ export default class ObjectiveDrawer extends Component {
         this.props.closeDrawer()
         this.formRef.current.resetFields()
     }
-
-
 
     render() {
         const { listSelect, visible } = this.props;
@@ -441,3 +396,50 @@ export default class ObjectiveDrawer extends Component {
         );
     }
 }
+
+
+
+const makePerson = ({ ascriptionId, name, key }, i) => (
+
+    <Option dataid={ascriptionId} value={ascriptionId} key={key} >{name}</Option>
+);
+
+const makeGroup = ({ groupName, list }, i) => (
+
+    <OptGroup label={groupName} key={i}>
+        {list.map(makePerson)}
+    </OptGroup>
+);
+
+const helloOutsider = (data) => {
+    return <React.Fragment> {data.map(makeGroup)} </React.Fragment>
+}
+
+const makeOption = ({ id, content, okrId, parentId, level },) => (
+
+    <Option dataokrid={okrId} value={id} dataparentid={parentId} datalevel={level} key={id + content} >{content}</Option>
+);
+
+const makeOptGroup = ({ groupName, data }, i) => (
+
+    <OptGroup label={groupName} key={i + groupName}>
+        {data.map(makeOption)}
+    </OptGroup>
+);
+
+const formatUpperObject = (data) => {
+    return <React.Fragment> {data.map(makeOptGroup)} </React.Fragment>
+}
+
+const useResetFormOnCloseModal = ({ form, visible }) => {
+    const prevVisibleRef = useRef();
+    useEffect(() => {
+        prevVisibleRef.current = visible;
+    }, [visible]);
+    const prevVisible = prevVisibleRef.current;
+    useEffect(() => {
+        if (!visible && prevVisible) {
+            form.resetFields();
+        }
+    }, [visible]);
+};
