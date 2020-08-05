@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, Component } from 'react';
 import { Form, Input, Select, Radio, Button } from 'antd';
 import Modal from 'antd/lib/modal/Modal';
-import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, MinusCircleOutlined, LoadingOutlined} from '@ant-design/icons';
 import Axios from 'axios';
 const { Option, OptGroup } = Select;
 
@@ -25,7 +25,9 @@ export default class ObjectiveDrawer extends Component {
         disabled: false,
         disabledSelect: true, //Upper Object
         disabledExcutorSelect: true, //excutor Object
-        initialValues: { keyResults: [' '] }
+        initialValues: { keyResults: [' '] },
+        excutorLoading:false,
+        upperObejectiveLoading:false,
     }
 
     formRef = React.createRef();
@@ -35,6 +37,9 @@ export default class ObjectiveDrawer extends Component {
         console.log('hello')
         this.setState({
             visible: false,
+            disabledExcutorSelect:true,
+            disabledSelect:true
+
         })
         this.props.closeDrawer()
         this.formRef.current.resetFields()
@@ -65,8 +70,12 @@ export default class ObjectiveDrawer extends Component {
     }
 
     onExcutorChange = (e) => {
+        console.log('change in excuto clear upperObject 1')
+        this.formRef.current.resetFields([`upperobjective`])
+
         this.setState({
-            excutor: e
+            excutor: e,
+            disabledSelect:true
         }, (() => {
             this.setState({
                 excutorFilled: true
@@ -74,18 +83,16 @@ export default class ObjectiveDrawer extends Component {
                 this.checkRequireFill()
             }))
         }))
-        this.formRef.current.resetFields([`upperobjective`])
     }
 
     getExcutorData = (value) => {
         this.setState({
-            disabledExcutorSelect: true
+            disabledExcutorSelect: true,
+            excutorLoading:true
         })
         const level = value.target.value;
         Axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/getAscription?level=` + `${level}`)
             .then(res => {
-
-
                 if (this.state.checkPerson) {
                     res.data.data.map(item => {
                         item.list.map(p => {
@@ -99,7 +106,8 @@ export default class ObjectiveDrawer extends Component {
 
                 }, (() => {
                     this.setState({
-                        disabledExcutorSelect: false
+                        disabledExcutorSelect: false,
+                        excutorLoading:false
                     })
 
                 }))
@@ -155,6 +163,10 @@ export default class ObjectiveDrawer extends Component {
     }
 
     getUpperLevelObjective = () => {
+        const { upperObejectiveLoading } = this.state;
+        this.setState({
+            upperObejectiveLoading:true
+        })
         const okrId = this.state.period;
         const level = this.state.level;
         const ascriptionId = this.state.excutor;
@@ -165,6 +177,9 @@ export default class ObjectiveDrawer extends Component {
                     console.log('getUpperObejct data', res.data.data)
                     if (res.data.data.length === 0) {
                         console.log('no upper obejct')
+                        this.setState({
+                            upperObejectiveLoading:false
+                        })
                     }
                     else {
                         console.log('chose upper obejct', res.data.data)
@@ -175,12 +190,14 @@ export default class ObjectiveDrawer extends Component {
                             }, (() => {
                                 this.setState({
                                     disabledSelect: false,
+                                    upperObejectiveLoading:false
                                 })
                             }))
                         }
                         else {
                             this.setState({
                                 disabledSelect: true,
+                                upperObejectiveLoading:false
                             })
                         }
 
@@ -221,8 +238,8 @@ export default class ObjectiveDrawer extends Component {
     }
 
     onFinish = () => {
-        const { period, level, excutor, objective, upperObjective, keyResults } = this.state;
-        console.log('onFinish valideate form',)
+        const { period, level, excutor, objective, upperObjective, keyResults,  } = this.state;
+        console.log('onFinish valideate form',period, level, excutor, objective, upperObjective, keyResults )
         this.setState({
             visible: false,
         })
@@ -233,7 +250,7 @@ export default class ObjectiveDrawer extends Component {
 
     render() {
         const { listSelect, visible } = this.props;
-        const { excutorData, upperObjectiveData, disabledSelect, disabledExcutorSelect, initialValues } = this.state;
+        const { excutorData, upperObjectiveData, disabledSelect, disabledExcutorSelect, initialValues, excutorLoading, upperObejectiveLoading } = this.state;
 
         return (
             <Modal
@@ -283,14 +300,16 @@ export default class ObjectiveDrawer extends Component {
                         label="执行对象"
                         rules={[{ required: true }]}
                     >
-                        <Select label="选择执行对象" onChange={this.onExcutorChange} disabled={disabledExcutorSelect}>
+                        <Select label="选择执行对象" onChange={this.onExcutorChange} disabled={disabledExcutorSelect} loading={excutorLoading} >
 
                             {disabledExcutorSelect ? null
+
                                 :
                                 helloOutsider(excutorData)
                             }
 
                         </Select>
+
                     </Form.Item>
 
                     <Form.Item
@@ -300,7 +319,7 @@ export default class ObjectiveDrawer extends Component {
 
                     >
 
-                        <Select label="选择上级Objective" disabled={disabledSelect} onChange={this.onUpperObjectiveChange} >
+                        <Select label="选择上级Objective" disabled={disabledSelect} onChange={this.onUpperObjectiveChange} loading={upperObejectiveLoading}>
 
                             {disabledSelect ? null : formatUpperObject(upperObjectiveData)}
                         </Select>

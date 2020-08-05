@@ -441,7 +441,7 @@ export default class ContentContainer extends Component {
                     </div>
 
 
-                    <div style={{ display: 'flex' }}>
+                    <div className="functionButton" style={{ display: 'flex' }}>
 
                         <Form.Provider
                             onFormFinish={(name, { values, forms }) => {

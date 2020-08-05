@@ -37,8 +37,33 @@ code {
 }
 
 
-/* //tags  */
+
 
 span .ant-tag {
   margin-right: 0px
+}
+
+
+
+@media screen and (max-width: 425px) {
+
+
+
+  .time-range{
+    display: flex;
+    flex-direction: column;
+    align-items: unset;
+  }
+  .functionButton{
+    display: flex;
+    flex-direction: column;
+    
+  }
+
+  :global.ant-row.ant-form-item{
+      margin-bottom: 0px;
+    }
+    
+
+
 }

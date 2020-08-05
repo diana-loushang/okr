@@ -8,8 +8,7 @@ import { Layout, Tabs, Spin, Alert, Modal, Button } from 'antd';
 import { FullscreenExitOutlined } from '@ant-design/icons';
 
 import 'antd/dist/antd.css';
-import '../src/';
-
+import './index.css';
 import Axios from 'axios';
 // import invokeThingService$ from 'dingtalk-jsapi/api/biz/iot/invokeThingService';
 const { Sider } = Layout;
@@ -54,30 +53,30 @@ export default class App extends Component {
 
 
     //   //叮叮环境使用
-    // dd.ready(() => {
+    dd.ready(() => {
 
-    //   const corpId = `${process.env.REACT_APP_CORP_ID}`
-    //   dd.runtime.permission.requestAuthCode({
+      const corpId = `${process.env.REACT_APP_CORP_ID}`
+      dd.runtime.permission.requestAuthCode({
 
-    //     corpId: corpId, // 企业id
-    //     onSuccess: function (info) {
-    //       axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=` + `${info.code}`)
-    //         .then(res => {
-    //           if (res.data.code === 0) {
-    //             const data = res.data.data
-    //             outThis.getAllData(data)
+        corpId: corpId, // 企业id
+        onSuccess: function (info) {
+          axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=` + `${info.code}`)
+            .then(res => {
+              if (res.data.code === 0) {
+                const data = res.data.data
+                outThis.getAllData(data)
 
-    //           }
-    //           else {
-    //             alert(JSON.stringify(res.data))
-    //           }
-    //         }
-    //         )
-    //     }
-    //   });
-    // })
+              }
+              else {
+                alert(JSON.stringify(res.data))
+              }
+            }
+            )
+        }
+      });
+    })
 
-    outThis.getAllData()
+    // outThis.getAllData()
 
 
   }
@@ -86,37 +85,33 @@ export default class App extends Component {
 
   getAllData = (data) => {
 
-    // this.setState({
-    //   avatar: data.avatar,
-    //   userId: data.userId,
-    //   dingUserId: data.dingUserId,
-    //   userName: data.userName
-    // })
+    this.setState({
+      avatar: data.avatar,
+      userId: data.userId,
+      dingUserId: data.dingUserId,
+      userName: data.userName
+    })
     axios.all
       ([
-        this.getMenu(),
+         this.getMenu(),
         this.getOkrListSelect(),
         this.getParentObjective(),
       ])
       .then(res => {
-        console.log(this.state.panes)
         this.setState({
           bigLoading: false
         })
       })
   }
 
+
+
   getMenu = () => {
     axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/menu/list`)
       .then(response => {
-
-
         this.setState({
           menu: response.data.data,
-
         });
-
-
       })
       .catch(error => {
         console.log("menu", error)
@@ -140,6 +135,7 @@ export default class App extends Component {
             homeData: response.data.data,
             panes: panes,
           }, (() => {
+            
             this.setState({
               isPanesReady: true,
               activeKey: '2111551'
@@ -179,6 +175,7 @@ export default class App extends Component {
           currentOkrValue: response.data.data[0].title
         }, (() => {
           this.getHomeData()
+          this.getMenu();
         }));
       })
       .catch(error => {
@@ -810,6 +807,8 @@ export default class App extends Component {
                       <Spin size="large" tip="Loading..." />
                     </div>
                   }
+                  {/* <SiderNav menu={menu} getItemKey={this.getItemKey} defaultSelectedKeys={defaultSelectedKeys} collapsed={collapsed} /> */}
+
                 </Sider>
 
                 <Layout>
@@ -864,6 +863,7 @@ export default class App extends Component {
               </Layout>
             </React.Fragment>
           }
+
         </Layout>
       </div>
     );
