@@ -28,6 +28,7 @@ export default class ObjectiveDrawer extends Component {
         initialValues: { keyResults: [' '] },
         excutorLoading:false,
         upperObejectiveLoading:false,
+     
     }
 
     formRef = React.createRef();
@@ -70,7 +71,7 @@ export default class ObjectiveDrawer extends Component {
     }
 
     onExcutorChange = (e) => {
-        console.log('change in excuto clear upperObject 1')
+        console.log('change in excuto clear upperObject 1', e)
         this.formRef.current.resetFields([`upperobjective`])
 
         this.setState({
@@ -122,6 +123,7 @@ export default class ObjectiveDrawer extends Component {
             excutorFilled: false,
             disabledExcutorSelect: true,
             disabledSelect: true,
+        
         }, (() => {
             this.setState({
                 levelFilled: true
@@ -140,6 +142,7 @@ export default class ObjectiveDrawer extends Component {
             this.setState({
                 excutorData: null,
                 excutorFilled: true,
+              
 
             }, (() => {
                 this.setState({
@@ -178,7 +181,8 @@ export default class ObjectiveDrawer extends Component {
                     if (res.data.data.length === 0) {
                         console.log('no upper obejct')
                         this.setState({
-                            upperObejectiveLoading:false
+                            upperObejectiveLoading:false,
+                            requireUpperobjective:false,
                         })
                     }
                     else {
@@ -212,7 +216,7 @@ export default class ObjectiveDrawer extends Component {
     }
 
     checkRequireFill = () => {
-        console.log('fill in upper info')
+        console.log('fill in upper info excutor', this.state.excutor, "exctorFilled",this.state.excutorFilled )
         const periodFilled = this.state.periodFilled;
         const levelFilled = this.state.levelFilled;
         const excutorFilled = this.state.excutorFilled;
@@ -238,7 +242,7 @@ export default class ObjectiveDrawer extends Component {
     }
 
     onFinish = () => {
-        const { period, level, excutor, objective, upperObjective, keyResults,  } = this.state;
+        const { period, level, excutor, objective, upperObjective, keyResults, requireUpperobjective  } = this.state;
         console.log('onFinish valideate form',period, level, excutor, objective, upperObjective, keyResults )
         this.setState({
             visible: false,
@@ -250,7 +254,7 @@ export default class ObjectiveDrawer extends Component {
 
     render() {
         const { listSelect, visible } = this.props;
-        const { excutorData, upperObjectiveData, disabledSelect, disabledExcutorSelect, initialValues, excutorLoading, upperObejectiveLoading } = this.state;
+        const { excutorData, upperObjectiveData, disabledSelect, disabledExcutorSelect, initialValues, excutorLoading, upperObejectiveLoading} = this.state;
 
         return (
             <Modal
@@ -298,8 +302,10 @@ export default class ObjectiveDrawer extends Component {
                     <Form.Item
                         name="excutor"
                         label="执行对象"
-                        rules={[{ required: true }]}
+                        rules={ disabledExcutorSelect ? null : [{ required: true }] }
+                     
                     >
+                    
                         <Select label="选择执行对象" onChange={this.onExcutorChange} disabled={disabledExcutorSelect} loading={excutorLoading} >
 
                             {disabledExcutorSelect ? null
@@ -315,7 +321,7 @@ export default class ObjectiveDrawer extends Component {
                     <Form.Item
                         name="upperobjective"
                         label="上级目标"
-                        rules={[{ required: true }]}
+                        rules={ disabledSelect ? null : [{ required: true }]}
 
                     >
 

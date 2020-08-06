@@ -53,30 +53,30 @@ export default class App extends Component {
 
 
     //   //叮叮环境使用
-    dd.ready(() => {
+    // dd.ready(() => {
 
-      const corpId = `${process.env.REACT_APP_CORP_ID}`
-      dd.runtime.permission.requestAuthCode({
+    //   const corpId = `${process.env.REACT_APP_CORP_ID}`
+    //   dd.runtime.permission.requestAuthCode({
 
-        corpId: corpId, // 企业id
-        onSuccess: function (info) {
-          axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=` + `${info.code}`)
-            .then(res => {
-              if (res.data.code === 0) {
-                const data = res.data.data
-                outThis.getAllData(data)
+    //     corpId: corpId, // 企业id
+    //     onSuccess: function (info) {
+    //       axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=` + `${info.code}`)
+    //         .then(res => {
+    //           if (res.data.code === 0) {
+    //             const data = res.data.data
+    //             outThis.getAllData(data)
 
-              }
-              else {
-                alert(JSON.stringify(res.data))
-              }
-            }
-            )
-        }
-      });
-    })
+    //           }
+    //           else {
+    //             alert(JSON.stringify(res.data))
+    //           }
+    //         }
+    //         )
+    //     }
+    //   });
+    // })
 
-    // outThis.getAllData()
+    outThis.getAllData()
 
 
   }
@@ -85,12 +85,12 @@ export default class App extends Component {
 
   getAllData = (data) => {
 
-    this.setState({
-      avatar: data.avatar,
-      userId: data.userId,
-      dingUserId: data.dingUserId,
-      userName: data.userName
-    })
+    // this.setState({
+    //   avatar: data.avatar,
+    //   userId: data.userId,
+    //   dingUserId: data.dingUserId,
+    //   userName: data.userName
+    // })
     axios.all
       ([
          this.getMenu(),
