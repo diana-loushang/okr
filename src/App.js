@@ -50,8 +50,6 @@ export default class App extends Component {
   componentDidMount() {
     const outThis = this;
 
-
-
     //   //叮叮环境使用
     // dd.ready(() => {
 
@@ -78,7 +76,6 @@ export default class App extends Component {
 
     outThis.getAllData()
 
-
   }
 
   // 初始化请求的接口  //连接后台读取GET数据
@@ -93,7 +90,7 @@ export default class App extends Component {
     // })
     axios.all
       ([
-         this.getMenu(),
+        this.getMenu(),
         this.getOkrListSelect(),
         this.getParentObjective(),
       ])
@@ -119,26 +116,46 @@ export default class App extends Component {
 
   }
 
+  createInitialPane = (okrId, okrValue) => {
+    const { currentOkrId, currentOkrValue } = this.state;
+    console.log('called me to create panes', currentOkrId, currentOkrValue)
+    let panes = []
+    let initialPane = { title: '首页', content: '', key: '2111551', closable: false, okrValue: okrValue, okrId: okrId, level: ' ' }
+    panes.push(initialPane)
+    this.setState({
+      currentLevel: " ",
+      panes: panes,
+    }, (() => {
+      this.setState({
+        isPanesReady: true,
+        activeKey: '2111551'
+      })
+
+    }))
+
+
+  }
+
   getHomeData = () => {
     const { currentOkrId, currentOkrValue } = this.state;
 
     // console.log( 'currentOkrId', currentOkrId,'level', currentLevel, 'okrvalue', currentOkrValue)
     axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/homeData?okrId=` + `${currentOkrId}`)
-      .then(response => {
 
-        if (response.data.msg === '成功') {
-          let panes = []
-          let initialPane = { title: '首页', content: '', key: '2111551', closable: false, okrValue: currentOkrValue, okrId: currentOkrId, level: ' ' }
-          panes.push(initialPane)
+      .then(response => {
+        if (response.status===200) {
+          this.createInitialPane(currentOkrId, currentOkrValue)
+          // let panes = []
+          // let initialPane = { title: '首页', content: '', key: '2111551', closable: false, okrValue: currentOkrValue, okrId: currentOkrId, level: ' ' }
+          // panes.push(initialPane)
           this.setState({
-            currentLevel: " ",
+            // currentLevel: " ",
             homeData: response.data.data,
-            panes: panes,
+            // panes: panes,
           }, (() => {
-            
+
             this.setState({
-              isPanesReady: true,
-              activeKey: '2111551'
+              // activeKey: '2111551'
             }, (() => {
               this.setState({
                 isLoading: false,
@@ -152,8 +169,13 @@ export default class App extends Component {
 
         }
         else {
+          console.log('getHomedata error', response)
           alert(response.data.msg)
 
+          this.setState({
+            isLoading: false,
+            isTableReady: true
+          })
         }
 
 
@@ -176,6 +198,7 @@ export default class App extends Component {
         }, (() => {
           this.getHomeData()
           this.getMenu();
+          this.createInitialPane();
         }));
       })
       .catch(error => {
@@ -417,7 +440,7 @@ export default class App extends Component {
 
   //负责去state pane 找到和activeKey匹配的object
   getActivePane = (activeKey) => {
-
+    console.log('activeKey', activeKey)
     const { panes } = this.state
     let activePaneObject = panes.find(item => item.key === activeKey)
     this.setState({
@@ -490,16 +513,21 @@ export default class App extends Component {
 
   //获取表格数据
   updateTable = (object) => {
+    console.log('welcome to update table')
     this.setState({
-      isTableReady: false
+      isTableReady: false,
+      homeData:null,
     })
 
     const { level, okrId, key } = object;
-
+    console.log('object ', level, okrId, key )
     if (key === '2111551') {
+      console.log('首页 ', level, okrId, key )
+      console.log('首页 ',   `${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/homeData?okrId=` + `${okrId}`)
 
       axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/homeData?okrId=` + `${okrId}`)
         .then(res => {
+          console.log(res)
           if (res.data.msg === '成功') {
             if (res.data.data.length > 0) {
               res.data.data.forEach(item => {
@@ -548,6 +576,7 @@ export default class App extends Component {
       const http = `${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/listData?okrId=` + `${okrId}` + '&ascriptionId=' + `${ascriptionId}` + `&level=` + `${level}`
 
       axios.get(http).then(res => {
+        console.log('homedata', res)
 
         if (res.data.msg === "成功") {
 
@@ -636,23 +665,59 @@ export default class App extends Component {
     });
   };
 
-  //发送新建表单去后台
-  getCreateNewObjective = (period, level, excutor, objective, upperObjective, keyResults) => {
-    let arrayTemp = [{ content: `${keyResults}` }];
 
+  formatekeyResults = (keyResults) => {
+  
+    // console.log('formate', keyResults, period, upperObjective )
+    let newArray = []
+    keyResults.forEach(i => {
+       
+        let keyResult =  { 
+          // id:Math.floor((Math.random()*11)+1),
+          // okrId: period,
+          // objectId: upperObjective,
+          content: `${[i]}`,
+       }
+        newArray.push(keyResult)
+      });
+      console.log('newEeay', newArray)
+      return newArray; 
+  }
+
+  //发送新建表单去后台
+  getCreateNewObjective = (period, level, excutor, objective, upperObjective, keyResults, id) => {
+    
+    // this.formate(keyResults, period)
+
+    // let arrayTemp = [{ content: `${keyResults}` }];
+
+    let that = this; 
+    console.log('getCreateNew Objective recevied param:', period, level, excutor, objective, upperObjective, keyResults)
     Axios.post((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/add`), {
+  
       content: `${objective}`,
       okrId: period,
       level: `${level}`,
       parentId: upperObjective,
       ascription: `${excutor}`,
-      keyResults: arrayTemp
+      keyResults: that.formatekeyResults(keyResults)
     }).then(res => {
+      // console.log('postedObject',(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/add`), {
+      //   id:Math.floor((Math.random()*13.5)+1),
+      //   content: `${objective}`,
+      //   okrId: period,
+      //   level: `${level}`,
+      //   parentId: upperObjective,
+      //   ascription: `${excutor}`,
+      //   keyResults: that.formatekeyResults(keyResults, period, upperObjective)
+      // })
+      console.log(res)
       if (res.data.msg === '成功') {
-        const { activeKey } = this.state
-        console.log(this.state.activeKey)
+        const { activeKey } = that.state
         this.getActivePane(activeKey)
-        console.log('get update of table')
+        console.log('get update of table', activeKey)
+
+        
 
       }
       else {
@@ -665,6 +730,16 @@ export default class App extends Component {
 
   //发送编辑后表单去后台
   getNewEditObject = (object) => {
+    console.log(object.content[0])
+
+    
+    let formateObject ={}
+    formateObject.id= object.id;
+    // formateObject.content= ;
+    formateObject.parentId=object.parentId;
+    formateObject.keyResults=object.keyResults
+    console.log('formateObject', formateObject)
+
 
     Axios.post((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/edit`), object).then(res => {
       if (res.data.msg === '成功') {
@@ -675,7 +750,7 @@ export default class App extends Component {
 
       }
       else {
-        console.log(res.data.msg)
+        console.log('failed',res)
       }
     })
   }

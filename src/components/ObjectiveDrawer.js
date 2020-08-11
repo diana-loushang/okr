@@ -71,7 +71,6 @@ export default class ObjectiveDrawer extends Component {
     }
 
     onExcutorChange = (e) => {
-        console.log('change in excuto clear upperObject 1', e)
         this.formRef.current.resetFields([`upperobjective`])
 
         this.setState({
@@ -139,16 +138,18 @@ export default class ObjectiveDrawer extends Component {
         }
 
         if (level === "company") {
+            console.log('before level = company so excutor should = ', this.state.excutor, this.state.upperObjective)
             this.setState({
                 excutorData: null,
                 excutorFilled: true,
-              
-
+                excutor:' ',
+                upperObjective: 0 ,
             }, (() => {
+                console.log('before level = company so excutor should = ', 'excutpr', this.state.excutor, 'upperObjective', this.state.upperObjective)
                 this.setState({
                     disabled: true,
                     isLoading: false,
-                    excutor: " "
+                 
                 })
             }))
 
@@ -232,21 +233,32 @@ export default class ObjectiveDrawer extends Component {
         }
     }
 
-    onValuesChange = (allValues) => {
-        const { keyresults, objective, upperobjective } = allValues;
+    onValuesChange = (changedValues, allValues) => {
+
+        console.log('onVlaue Change,', allValues, 'changed value', changedValues)
+        // const {objective, upperobjective, keyResults} = this.state;
+        const {objective, keyResults} = allValues;
+    
         this.setState({
-            keyResults: keyresults,
+            keyResults:keyResults,
             objective: objective,
-            upperObjective: upperobjective,
-        })
+        
+        }, (()=>{
+            
+            console.log('on Vlue change after set state', this.state.excutor, this.state.upperObjective,this.state.objective, this.state.keyResults )
+            // console.log('after set all change value','objective', this.state.objective,'uppObjecti', this.state.upperObjective, 'keyResult', this.state.keyResults, "exucot", this.state.excutor)
+        }))
     }
 
     onFinish = () => {
-        const { period, level, excutor, objective, upperObjective, keyResults, requireUpperobjective  } = this.state;
-        console.log('onFinish valideate form',period, level, excutor, objective, upperObjective, keyResults )
+        const { period, level, excutor,  upperObjective, objective, keyResults  } = this.state
+        console.log('onFinish valideate form', 'period', period, 'level',level, 'excutor',excutor, 'objective',objective, 'upperObjective',upperObjective, 'keyResults',keyResults )
+        console.log('onFinish valideate form keyResults', keyResults )
+
         this.setState({
             visible: false,
         })
+        // const id = Math.floor((Math.random()*10)+1);
         this.props.getCreateNewObjective(period, level, excutor, objective, upperObjective, keyResults)
         this.props.closeDrawer()
         this.formRef.current.resetFields()
@@ -275,7 +287,7 @@ export default class ObjectiveDrawer extends Component {
                     <Form.Item
                         name="period"
                         label="OKR周期"
-                        rules={[{ required: true }]}
+                        rules={[{ required: true,  message: "选择OKR周期"}]}
                     >
                         <Select label="选择执OKR周期" onChange={this.onPeriodChange}>
 
@@ -289,7 +301,7 @@ export default class ObjectiveDrawer extends Component {
                     <Form.Item
                         name="level"
                         label="层级"
-                        rules={[{ required: true }, { message: "选择OKR周期" }]}
+                        rules={[{ required: true ,  message: "选择层级" }]}
                     >
                         <Radio.Group onChange={this.handelLevelChange}>
                             <Radio key={"company1"} value={"company"}>公司</Radio>
@@ -321,11 +333,11 @@ export default class ObjectiveDrawer extends Component {
                     <Form.Item
                         name="upperobjective"
                         label="上级目标"
-                        rules={ disabledSelect ? null : [{ required: true }]}
+                        rules={ disabledSelect ? null : [{ required: true,  message: "选择上级目标"}]}
 
                     >
 
-                        <Select label="选择上级Objective" disabled={disabledSelect} onChange={this.onUpperObjectiveChange} loading={upperObejectiveLoading}>
+                        <Select label="选择上级目标" disabled={disabledSelect} onChange={this.onUpperObjectiveChange} loading={upperObejectiveLoading}>
 
                             {disabledSelect ? null : formatUpperObject(upperObjectiveData)}
                         </Select>
@@ -338,9 +350,10 @@ export default class ObjectiveDrawer extends Component {
                         rules={[
                             {
                                 required: true,
-                                message: "填写Objective"
+                                message: "填写目标"
                             }
                         ]}
+                        
                     >
                         <Input />
                     </Form.Item>
@@ -366,14 +379,12 @@ export default class ObjectiveDrawer extends Component {
                                                             required: true,
                                                             whitespace: true,
                                                             message:
-                                                                "请填写key Results "
+                                                                "填写结果 "
                                                         }
                                                     ]}
                                                     noStyle
                                                 >
-                                                    <Input
-
-                                                        style={{ width: "93%" }}
+                                                    <Input style={{ width: "93%" }}
                                                     />
                                                 </Form.Item>
                                                 {fields.length > 1 ? (

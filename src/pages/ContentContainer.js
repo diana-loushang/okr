@@ -10,7 +10,6 @@ import DeletePeriodModal from '../components/Modal/DeletePeriodModal';
 import AddPeriodModal from '../components/Modal/AddPeriodModal';
 
 
-// import HomeTable from '../components/HomeTable'
 const { Content, } = Layout;
 const { Option } = Select;
 
@@ -77,7 +76,6 @@ export default class ContentContainer extends Component {
                 render: ((text, record, value) => {
 
                     let level = record.level
-                    console.log('level retrun name', level)
                     let name = null
                     if (level === 'company') {
                         name = '公司'
@@ -181,7 +179,7 @@ export default class ContentContainer extends Component {
         axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/info/` + `${id}`)
             .then(res => {
                 if (res.data.msg === '成功') {
-
+                    
                     this.setState({
                         detailData: res.data.data,
                         parentId: parentId,
@@ -356,20 +354,28 @@ export default class ContentContainer extends Component {
     }
     openOrCloseAll = () => {
         let data = this.props.homeData
+
+        console.log(data, 'data.length no equla to 0 ')
         const { expandAllRows } = this.state;
         let keys = []
         data.map(i => {
+            console.log('inside map', i)
 
-            i.children.map(d => (
-                keys.push(d.id)
-            ))
-            keys.push(i.id)
+            if (i.children!== null) {
+
+                i.children.map(d => (
+                    keys.push(d.id)
+                ))
+                keys.push(i.id)
+            }
+            this.setState({
+                expKeys: expandAllRows ? [] : data && keys
+
+            })
+
         })
-        this.setState({
-            expKeys: expandAllRows ? [] : data && keys
 
-        }, (() => {
-        }))
+
     };
 
 
