@@ -63,9 +63,8 @@ export default class ContentContainer extends Component {
                 ),
                 dataIndex: 'ascriptionName',
                 key: 'ascriptionName',
-                render: ((text, record, value) => {
+                render: ((record) => {
 
-                    // console.log('excutor', record)
                     return <span>{record.ascriptionName}</span>;
                 })
             },
@@ -73,7 +72,7 @@ export default class ContentContainer extends Component {
                 title: '类型',
                 dataIndex: 'level',
                 key: 'level',
-                render: ((text, record, value) => {
+                render: ((record) => {
 
                     let level = record.level
                     let name = null
@@ -92,8 +91,7 @@ export default class ContentContainer extends Component {
             {
                 title: '操作',
                 dataIndex: 'operation',
-                // render: () => <span><Button>修改</Button><Button>查看</Button></span>
-                render: (text, record, value) => {
+                render: (record) => {
                     let level = record.level
 
                     return (
@@ -335,13 +333,9 @@ export default class ContentContainer extends Component {
     }
 
     expandedRowRender = (record) => {
-        console.log(record)
         if (record.children === null) {
-            console.log('no children')
         }
         else {
-            console.log('expandedRowRender,', record)
-
         }
 
     }
@@ -355,14 +349,11 @@ export default class ContentContainer extends Component {
     openOrCloseAll = () => {
         let data = this.props.homeData
 
-        console.log(data, 'data.length no equla to 0 ')
         const { expandAllRows } = this.state;
         let keys = []
         data.map(i => {
-            console.log('inside map', i)
 
             if (i.children!== null) {
-
                 i.children.map(d => (
                     keys.push(d.id)
                 ))
@@ -409,7 +400,6 @@ export default class ContentContainer extends Component {
 
 
     handleAddNewOkrInput = (changedValues) => {
-        console.log('handle add new Okr Input', changedValues)
         this.setState({
             newOkrInputValue: changedValues.newOkrPeriod
         }, (() => {

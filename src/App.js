@@ -50,44 +50,44 @@ export default class App extends Component {
   componentDidMount() {
     const outThis = this;
 
-    //   //叮叮环境使用
-    // dd.ready(() => {
+    // //   //叮叮环境使用
+    dd.ready(() => {
+      const corpId = `${process.env.REACT_APP_CORP_ID}`
+      dd.runtime.permission.requestAuthCode({
+        corpId: corpId, // 企业id
+        onSuccess: function (info) {
+          axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=` + `${info.code}`)
+            .then(res => {
+              if (res.data.code === 0) {
+                const data = res.data.data
+                outThis.getAllData(data)
 
-    //   const corpId = `${process.env.REACT_APP_CORP_ID}`
-    //   dd.runtime.permission.requestAuthCode({
+              }
+              else {
+                alert(JSON.stringify(res.data))
+              }
+            }
+            )
+        }
+      });
+    })
 
-    //     corpId: corpId, // 企业id
-    //     onSuccess: function (info) {
-    //       axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/dingTalk/login?authCode=` + `${info.code}`)
-    //         .then(res => {
-    //           if (res.data.code === 0) {
-    //             const data = res.data.data
-    //             outThis.getAllData(data)
+    //   //If不在叮叮环境使用
 
-    //           }
-    //           else {
-    //             alert(JSON.stringify(res.data))
-    //           }
-    //         }
-    //         )
-    //     }
-    //   });
-    // })
-
-    outThis.getAllData()
+    // outThis.getAllData()
 
   }
 
   // 初始化请求的接口  //连接后台读取GET数据
-
   getAllData = (data) => {
 
-    // this.setState({
-    //   avatar: data.avatar,
-    //   userId: data.userId,
-    //   dingUserId: data.dingUserId,
-    //   userName: data.userName
-    // })
+    this.setState({
+      avatar: data.avatar,
+      userId: data.userId,
+      dingUserId: data.dingUserId,
+      userName: data.userName
+    })
+
     axios.all
       ([
         this.getMenu(),
@@ -99,6 +99,7 @@ export default class App extends Component {
           bigLoading: false
         })
       })
+
   }
 
 
@@ -118,7 +119,6 @@ export default class App extends Component {
 
   createInitialPane = (okrId, okrValue) => {
     const { currentOkrId, currentOkrValue } = this.state;
-    console.log('called me to create panes', currentOkrId, currentOkrValue)
     let panes = []
     let initialPane = { title: '首页', content: '', key: '2111551', closable: false, okrValue: okrValue, okrId: okrId, level: ' ' }
     panes.push(initialPane)
@@ -133,25 +133,18 @@ export default class App extends Component {
 
     }))
 
-
   }
 
   getHomeData = () => {
     const { currentOkrId, currentOkrValue } = this.state;
 
-    // console.log( 'currentOkrId', currentOkrId,'level', currentLevel, 'okrvalue', currentOkrValue)
     axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/homeData?okrId=` + `${currentOkrId}`)
 
       .then(response => {
         if (response.status===200) {
           this.createInitialPane(currentOkrId, currentOkrValue)
-          // let panes = []
-          // let initialPane = { title: '首页', content: '', key: '2111551', closable: false, okrValue: currentOkrValue, okrId: currentOkrId, level: ' ' }
-          // panes.push(initialPane)
           this.setState({
-            // currentLevel: " ",
             homeData: response.data.data,
-            // panes: panes,
           }, (() => {
 
             this.setState({
@@ -162,14 +155,12 @@ export default class App extends Component {
                 isTableReady: true
               })
             }))
-            // this.getObjectListData()
           }))
 
 
 
         }
         else {
-          console.log('getHomedata error', response)
           alert(response.data.msg)
 
           this.setState({
@@ -190,7 +181,6 @@ export default class App extends Component {
     axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
       .then(response => {
 
-        console.log('current okrID', response.data.data[0].id)
         this.setState({
           listSelect: response.data.data,
           currentOkrId: response.data.data[0].id,
@@ -219,7 +209,6 @@ export default class App extends Component {
 
   getObjectListData = () => {
     const { currentOkrId, currentLevel, ascriptionId } = this.state;
-    console.log("getbjekjc list data", currentOkrId, currentLevel, ascriptionId)
     axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/listData?okrId=` + `${currentOkrId}` + `&level=` + `${currentLevel}` + `&ascriptionId=`)
       .then(response => {
         console.log(response)
@@ -234,7 +223,6 @@ export default class App extends Component {
   }
 
   getNewPeriod = (period) => {
-    console.log(period)
     axios.post((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/add`), {
       title: period
     }).then(response => {
@@ -243,7 +231,6 @@ export default class App extends Component {
         // getOkrList()
         axios.get(`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/okr/listSelect`)
           .then(res => {
-            console.log('Get added new Okr Period', res.data.data)
             this.setState
               ({
                 listSelect: res.data.data,
@@ -274,35 +261,6 @@ export default class App extends Component {
         this.updatePanes(item.id, item.title, activeKey)
       }))
     })
-
-    // panes.forEach(object=>{
-    //  if(object.key === activeKey){
-    //    console.log('before correction', object.okrId)
-    //    object.okrId = okrId
-    //    console.log(object.okrId, "after coorection")
-    //  }
-    //  else  ; 
-    // }
-    // )
-    // console.log()
-    //   findObject.okrId=okrId;
-
-    //   // newPanes.splice( item =>item.key !== activeKey)
-    //  let copyOfPanes = panes;
-    //  let newPanes = copyOfPanes.filter(ele => ele.key !== activeKey)
-    //   console.log('remove currrent item key of', activeKey, newPanes, "origin panes", panes)
-    //     newPanes.push(findObject)
-
-    //   console.log(newPanes)
-    //   let currentOkrId = okrId
-    //   console.log('getokr before set', okrId)
-    //   this.setState({
-    //     currentOkrId: currentOkrId,
-    //     panes:newPanes
-
-    //   }, (() => {
-    //     this.getActivePane(activeKey)
-    //   }))
 
   }
 
@@ -754,9 +712,6 @@ export default class App extends Component {
       }
     })
   }
-
-
-
 
   //进入全屏
   requestFullScreen = () => {

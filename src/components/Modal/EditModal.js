@@ -49,8 +49,6 @@ export default class EditModal extends Component {
 
     componentDidMount() {
         const data = this.props.data
-        console.log('edit modal CMD', data.content)
-        console.log('parentId', data.parentId)
 
         this.setState({
             id: data.id,
@@ -102,12 +100,8 @@ export default class EditModal extends Component {
         this.setState({
             initialValues: tempInitialValues
         }, (() => {
-            console.log(this.state.initialValues)
             this.setState({ loading: false })
         }))
-
-
-        console.log('formate', content)
     }
 
 
@@ -115,7 +109,6 @@ export default class EditModal extends Component {
         const { okrId, level, ascriptionId } = this.state;
         Axios.get((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/getParentObjective?okrId=` + `${okrId}` + `&level=` + `${level}` + `&ascriptionId=` + `${ascriptionId}`))
             .then(res => {
-                console.log('edit modal getUppterLevel', res)
                 if (res.status = 200) {
                     if (res.data.data.length === 0) {
                         this.setState({

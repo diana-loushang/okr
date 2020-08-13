@@ -138,14 +138,12 @@ export default class ObjectiveDrawer extends Component {
         }
 
         if (level === "company") {
-            console.log('before level = company so excutor should = ', this.state.excutor, this.state.upperObjective)
             this.setState({
                 excutorData: null,
                 excutorFilled: true,
                 excutor:' ',
                 upperObjective: 0 ,
             }, (() => {
-                console.log('before level = company so excutor should = ', 'excutpr', this.state.excutor, 'upperObjective', this.state.upperObjective)
                 this.setState({
                     disabled: true,
                     isLoading: false,
@@ -174,21 +172,16 @@ export default class ObjectiveDrawer extends Component {
         const okrId = this.state.period;
         const level = this.state.level;
         const ascriptionId = this.state.excutor;
-        console.log(okrId, level, ascriptionId)
         Axios.get((`${process.env.REACT_APP_OKR_HTTP}/dingtalk/react/objective/getParentObjective?okrId=` + `${okrId}` + `&level=` + `${level}` + `&ascriptionId=` + `${ascriptionId}`))
             .then(res => {
                 if (res.status = 200) {
-                    console.log('getUpperObejct data', res.data.data)
                     if (res.data.data.length === 0) {
-                        console.log('no upper obejct')
                         this.setState({
                             upperObejectiveLoading:false,
                             requireUpperobjective:false,
                         })
                     }
                     else {
-                        console.log('chose upper obejct', res.data.data)
-                        console.log(res.data.data[0].data, "")
                         if (res.data.data[0].data.length !== 0) {
                             this.setState({
                                 upperObjectiveData: res.data.data
@@ -217,7 +210,6 @@ export default class ObjectiveDrawer extends Component {
     }
 
     checkRequireFill = () => {
-        console.log('fill in upper info excutor', this.state.excutor, "exctorFilled",this.state.excutorFilled )
         const periodFilled = this.state.periodFilled;
         const levelFilled = this.state.levelFilled;
         const excutorFilled = this.state.excutorFilled;
@@ -225,7 +217,6 @@ export default class ObjectiveDrawer extends Component {
         if (periodFilled && levelFilled && excutorFilled) {
 
             this.getUpperLevelObjective()
-            console.log('required fills fullfill, call get Upper Object')
         }
         else {
 
@@ -235,7 +226,6 @@ export default class ObjectiveDrawer extends Component {
 
     onValuesChange = (changedValues, allValues) => {
 
-        console.log('onVlaue Change,', allValues, 'changed value', changedValues)
         // const {objective, upperobjective, keyResults} = this.state;
         const {objective, keyResults} = allValues;
     
@@ -244,16 +234,11 @@ export default class ObjectiveDrawer extends Component {
             objective: objective,
         
         }, (()=>{
-            
-            console.log('on Vlue change after set state', this.state.excutor, this.state.upperObjective,this.state.objective, this.state.keyResults )
-            // console.log('after set all change value','objective', this.state.objective,'uppObjecti', this.state.upperObjective, 'keyResult', this.state.keyResults, "exucot", this.state.excutor)
         }))
     }
 
     onFinish = () => {
         const { period, level, excutor,  upperObjective, objective, keyResults  } = this.state
-        console.log('onFinish valideate form', 'period', period, 'level',level, 'excutor',excutor, 'objective',objective, 'upperObjective',upperObjective, 'keyResults',keyResults )
-        console.log('onFinish valideate form keyResults', keyResults )
 
         this.setState({
             visible: false,

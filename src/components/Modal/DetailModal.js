@@ -7,7 +7,6 @@ export default class DetailModal extends Component {
 
 
     onFinish = (e) => {
-        console.log('click closecloseDetailModal', e)
         this.props.closeDetailModal()
     }
 

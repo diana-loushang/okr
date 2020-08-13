@@ -28,7 +28,6 @@ const HeaderNav = ({ collapsed, toggle, reFreshPage, avatar, userId, dingUserId,
                 <div style={{ padding: 0, display: 'flex', alignItems: 'center', paddingRight: '1rem' }}>
                     <SyncOutlined style={{ margin: 12 }} onClick={() => {
                         reFreshPage()
-                        console.log('clikck fresh')
                     }} />
                     <FullscreenExitOutlined style={{ margin: 12 }} onClick={fullScreen} />
 
